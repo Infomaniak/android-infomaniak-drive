@@ -36,10 +36,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.view.View;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.nextcloud.client.account.UserAccountManager;
+import com.nextcloud.client.jobs.BackgroundJobManager;
 import com.nextcloud.client.network.ConnectivityService;
 import com.owncloud.android.MainApp;
 import com.owncloud.android.R;
@@ -150,6 +150,9 @@ public abstract class FileActivity extends DrawerActivity
 
     @Inject
     ConnectivityService connectivityService;
+
+    @Inject
+    BackgroundJobManager backgroundJobManager;
 
     @Override
     public void showFiles(boolean onDeviceOnly) {
@@ -405,7 +408,7 @@ public abstract class FileActivity extends DrawerActivity
         boolean remoteWipeSupported = accountManager.getServerVersion(account).isRemoteWipeSupported();
 
         if (remoteWipeSupported) {
-            new CheckRemoteWipeTask(account, new WeakReference<>(this)).execute();
+            new CheckRemoteWipeTask(backgroundJobManager, account, new WeakReference<>(this)).execute();
         } else {
             performCredentialsUpdate(account, context);
         }
@@ -611,7 +614,7 @@ public abstract class FileActivity extends DrawerActivity
         dialog.show(getSupportFragmentManager(), DIALOG_CERT_NOT_SAVED);
     }
 
-    public void checkForNewDevVersionNecessary(View view, Context context) {
+    public void checkForNewDevVersionNecessary(Context context) {
         if (getResources().getBoolean(R.bool.dev_version_direct_download_enabled)) {
             ArbitraryDataProvider arbitraryDataProvider = new ArbitraryDataProvider(getContentResolver());
             int count = arbitraryDataProvider.getIntegerValue(FilesSyncHelper.GLOBAL, APP_OPENED_COUNT);
@@ -624,7 +627,7 @@ public abstract class FileActivity extends DrawerActivity
 
     @Override
     public void returnVersion(Integer latestVersion) {
-        showDevSnackbar(this, latestVersion, false);
+        showDevSnackbar(this, latestVersion, false, true);
     }
 
     public static void checkForNewDevVersion(LoadingVersionNumberTask.VersionDevInterface callback, Context context) {
@@ -633,7 +636,10 @@ public abstract class FileActivity extends DrawerActivity
         loadTask.execute(url);
     }
 
-    public static void showDevSnackbar(Activity activity, Integer latestVersion, boolean openDirectly) {
+    public static void showDevSnackbar(Activity activity,
+                                       Integer latestVersion,
+                                       boolean openDirectly,
+                                       boolean inBackground) {
         Integer currentVersion = -1;
         try {
             currentVersion = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0).versionCode;
@@ -661,7 +667,9 @@ public abstract class FileActivity extends DrawerActivity
                         }).show();
             }
         } else {
-            DisplayUtils.showSnackMessage(activity, R.string.dev_version_no_new_version_available, Snackbar.LENGTH_LONG);
+            if (!inBackground) {
+                DisplayUtils.showSnackMessage(activity, R.string.dev_version_no_new_version_available, Snackbar.LENGTH_LONG);
+            }
         }
     }
 

@@ -3,8 +3,10 @@
  *
  * @author Andy Scherzinger
  * @author Chris Narkiewicz  <hello@ezaquarii.com>
+ * @author Chawki Chouib  <chouibc@gmail.com>
  * Copyright (C) 2016 ownCloud Inc.
  * Copyright (C) 2020 Chris Narkiewicz <hello@ezaquarii.com>
+ * Copyright (C) 2020 Chawki Chouib  <chouibc@gmail.com>
  * <p/>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2,
@@ -36,10 +38,9 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.view.MenuItem;
 
-import com.evernote.android.job.JobRequest;
-import com.evernote.android.job.util.support.PersistableBundleCompat;
 import com.nextcloud.client.account.User;
 import com.nextcloud.client.account.UserAccountManager;
+import com.nextcloud.client.jobs.BackgroundJobManager;
 import com.nextcloud.client.onboarding.FirstRunActivity;
 import com.nextcloud.java.util.Optional;
 import com.owncloud.android.MainApp;
@@ -48,7 +49,6 @@ import com.owncloud.android.datamodel.ArbitraryDataProvider;
 import com.owncloud.android.datamodel.FileDataStorageManager;
 import com.owncloud.android.files.services.FileDownloader;
 import com.owncloud.android.files.services.FileUploader;
-import com.owncloud.android.jobs.AccountRemovalJob;
 import com.owncloud.android.lib.common.OwnCloudAccount;
 import com.owncloud.android.lib.common.utils.Log_OC;
 import com.owncloud.android.services.OperationsService;
@@ -70,6 +70,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -108,6 +109,7 @@ public class ManageAccountsActivity extends FileActivity implements UserListAdap
     private ArbitraryDataProvider arbitraryDataProvider;
     private boolean multipleAccountsSupported;
 
+    @Inject BackgroundJobManager backgroundJobManager;
     @Inject UserAccountManager accountManager;
 
     @Override
@@ -123,7 +125,19 @@ public class ManageAccountsActivity extends FileActivity implements UserListAdap
         recyclerView = findViewById(R.id.account_list);
 
         setupToolbar();
+
+        // set the back button from action bar
+        ActionBar actionBar = getSupportActionBar();
+
+        // check if is not null
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(true);
+        }
+
+        // set title Action bar
         updateActionBarTitleAndHomeButtonByString(getResources().getString(R.string.prefs_manage_accounts));
+        ThemeUtils.tintBackButton(actionBar, this);
 
         List<User> users = accountManager.getAllUsers();
         originalUsers = toAccountNames(users);
@@ -416,16 +430,7 @@ public class ManageAccountsActivity extends FileActivity implements UserListAdap
             mDownloaderBinder.cancel(user.toPlatformAccount());
         }
 
-        // schedule job
-        PersistableBundleCompat bundle = new PersistableBundleCompat();
-        bundle.putString(AccountRemovalJob.ACCOUNT, user.getAccountName());
-
-        new JobRequest.Builder(AccountRemovalJob.TAG)
-                .startNow()
-                .setExtras(bundle)
-                .setUpdateCurrent(false)
-                .build()
-                .schedule();
+        backgroundJobManager.startAccountRemovalJob(user.getAccountName(), false);
 
         // immediately select a new account
         List<User> users = accountManager.getAllUsers();

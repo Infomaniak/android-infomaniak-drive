@@ -181,9 +181,7 @@ public class FileMenuFilter {
     }
 
     /**
-     * Performs the real filtering, to be applied in the {@link Menu} by the caller methods.
-     *
-     * Decides what actions must be shown and hidden.
+     * Decides what actions must be shown and hidden implementing the different rule sets.
      *
      * @param toShow                List to save the options that must be shown in the menu.
      * @param toHide                List to save the options that must be shown in the menu.

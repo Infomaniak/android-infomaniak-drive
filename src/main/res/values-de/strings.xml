@@ -192,7 +192,7 @@
     <string name="disable_new_media_folder_detection_notifications">Ausschalten</string>
     <string name="dismiss">Ausblenden</string>
     <string name="dismiss_notification_description">Benachrichtigung verwerfen</string>
-    <string name="download_latest_dev_version">Die nueste Entwicklerversion herunterladen</string>
+    <string name="download_latest_dev_version">Die neueste Entwicklerversion herunterladen</string>
     <string name="downloader_download_failed_content">Konnte %1$s nicht herunterladen</string>
     <string name="downloader_download_failed_credentials_error">Herunterladen fehlgeschlagen, erneute Anmeldung erforderlich</string>
     <string name="downloader_download_failed_ticker">Herunterladen fehlgeschlagen</string>
@@ -266,6 +266,7 @@
     <string name="etm_background_jobs">Hintergrund-Aufgaben</string>
     <string name="etm_background_jobs_cancel_all">Alle Aufgaben abbrechen</string>
     <string name="etm_background_jobs_prune">Inaktive Aufgaben bereinigen</string>
+    <string name="etm_background_jobs_schedule_test_job">Test-Aufgabe planen</string>
     <string name="etm_background_jobs_start_test_job">Test-Aufgabe starten</string>
     <string name="etm_background_jobs_stop_test_job">Test-Aufgabe stoppen</string>
     <string name="etm_migrations">Migrationen (App-Aktualisierung)</string>

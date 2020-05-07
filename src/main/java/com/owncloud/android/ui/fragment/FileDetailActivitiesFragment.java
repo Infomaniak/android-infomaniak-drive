@@ -175,8 +175,8 @@ public class FileDetailActivitiesFragment extends Fragment implements
 
         setupView();
 
-        onCreateSwipeToRefresh(swipeEmptyListRefreshLayout);
-        onCreateSwipeToRefresh(swipeListRefreshLayout);
+        ThemeUtils.colorSwipeRefreshLayout(getContext(), swipeEmptyListRefreshLayout);
+        ThemeUtils.colorSwipeRefreshLayout(getContext(), swipeListRefreshLayout);
 
         fetchAndSetData(-1);
 
@@ -254,7 +254,7 @@ public class FileDetailActivitiesFragment extends Fragment implements
 
         emptyContentProgressBar.getIndeterminateDrawable().setColorFilter(ThemeUtils.primaryAccentColor(getContext()),
                 PorterDuff.Mode.SRC_IN);
-        emptyContentIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_activity_light_grey));
+        emptyContentIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_activity));
 
         adapter = new ActivityAndVersionListAdapter(getContext(),
                                                     accountManager,
@@ -414,7 +414,7 @@ public class FileDetailActivitiesFragment extends Fragment implements
 
     private void setEmptyContent(String headline, String message) {
         if (emptyContentContainer != null && emptyContentMessage != null) {
-            emptyContentIcon.setImageDrawable(requireContext().getResources().getDrawable(R.drawable.ic_activity_light_grey));
+            emptyContentIcon.setImageDrawable(requireContext().getResources().getDrawable(R.drawable.ic_activity));
             emptyContentHeadline.setText(headline);
             emptyContentMessage.setText(message);
 
@@ -446,15 +446,6 @@ public class FileDetailActivitiesFragment extends Fragment implements
             }
             isLoadingActivities = false;
         });
-    }
-
-    protected void onCreateSwipeToRefresh(SwipeRefreshLayout refreshLayout) {
-        int primaryColor = ThemeUtils.primaryColor(getContext());
-        int darkColor = ThemeUtils.primaryDarkColor(getContext());
-        int accentColor = ThemeUtils.primaryAccentColor(getContext());
-
-        // Colors in animations
-        refreshLayout.setColorSchemeColors(accentColor, primaryColor, darkColor);
     }
 
     @Override

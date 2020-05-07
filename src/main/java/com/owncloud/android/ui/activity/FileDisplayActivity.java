@@ -152,6 +152,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import static com.owncloud.android.datamodel.OCFile.PATH_SEPARATOR;
+import static com.owncloud.android.utils.DisplayUtils.openSortingOrderDialogFragment;
 
 /**
  * Displays, what files the user has available in his ownCloud. This is the main view.
@@ -328,7 +329,7 @@ public class FileDisplayActivity extends FileActivity
             syncAndUpdateFolder(true);
         }
 
-        setIndeterminate(mSyncInProgress);
+        showProgressBar(mSyncInProgress);
         // always AFTER setContentView(...) in onCreate(); to work around bug in its implementation
 
         upgradeNotificationForInstantUpload();
@@ -782,7 +783,7 @@ public class FileDisplayActivity extends FileActivity
         searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
         searchMenuItem.setVisible(false);
 
-        ThemeUtils.themeSearchView(searchView, true, this);
+        ThemeUtils.themeSearchView(searchView, this);
 
         // populate list of menu items to show/hide when drawer is opened/closed
         mDrawerMenuItemstoShowHideList = new ArrayList<>(4);
@@ -867,14 +868,8 @@ public class FileDisplayActivity extends FileActivity
                 break;
             }
             case R.id.action_sort: {
-                FragmentManager fm = getSupportFragmentManager();
-                FragmentTransaction ft = fm.beginTransaction();
-                ft.addToBackStack(null);
-
-                SortingOrderDialogFragment mSortingOrderDialogFragment = SortingOrderDialogFragment.newInstance(
-                    preferences.getSortOrderByFolder(getListOfFilesFragment().getCurrentFile()));
-                mSortingOrderDialogFragment.show(ft, SortingOrderDialogFragment.SORTING_ORDER_FRAGMENT);
-
+                openSortingOrderDialogFragment(getSupportFragmentManager(),
+                                               preferences.getSortOrderByFolder(getListOfFilesFragment().getCurrentFile()));
                 break;
             }
             case R.id.action_switch_view: {
@@ -1393,7 +1388,7 @@ public class FileDisplayActivity extends FileActivity
                         DataHolderUtil.getInstance().delete(intent.getStringExtra(FileSyncAdapter.EXTRA_RESULT));
 
                         Log_OC.d(TAG, "Setting progress visibility to " + mSyncInProgress);
-                        setIndeterminate(mSyncInProgress);
+                        showProgressBar(mSyncInProgress);
 
                         setBackgroundText();
                     }
@@ -1431,7 +1426,8 @@ public class FileDisplayActivity extends FileActivity
     private void setBackgroundText() {
         final OCFileListFragment ocFileListFragment = getListOfFilesFragment();
         if (ocFileListFragment != null) {
-            if (mSyncInProgress) {
+            if (mSyncInProgress ||
+                getFile().getFileLength() > 0 && getStorageManager().getFolderContent(getFile(), false).isEmpty()) {
                 ocFileListFragment.setEmptyListLoadingMessage();
             } else {
                 ocFileListFragment.setEmptyListMessage(ExtendedListFragment.SearchType.NO_SEARCH);
@@ -1511,7 +1507,7 @@ public class FileDisplayActivity extends FileActivity
                     }
                 }
 
-                setIndeterminate(false);
+                showProgressBar(false);
 
             } finally {
                 if (intent != null) {
@@ -2149,11 +2145,11 @@ public class FileDisplayActivity extends FileActivity
 
 
     private void requestForDownload() {
-        Account account = getAccount();
+        User user = getUser().orElseThrow(RuntimeException::new);
         //if (!mWaitingToPreview.isDownloading()) {
-        if (!mDownloaderBinder.isDownloading(account, mWaitingToPreview)) {
+        if (!mDownloaderBinder.isDownloading(user.toPlatformAccount(), mWaitingToPreview)) {
             Intent i = new Intent(this, FileDownloader.class);
-            i.putExtra(FileDownloader.EXTRA_ACCOUNT, account);
+            i.putExtra(FileDownloader.EXTRA_USER, user);
             i.putExtra(FileDownloader.EXTRA_FILE, mWaitingToPreview);
             startService(i);
         }
@@ -2225,7 +2221,7 @@ public class FileDisplayActivity extends FileActivity
                                         null
                                 );
 
-                                setIndeterminate(true);
+                                showProgressBar(true);
 
                                 setBackgroundText();
 
@@ -2239,10 +2235,10 @@ public class FileDisplayActivity extends FileActivity
     }
 
     private void requestForDownload(OCFile file, String downloadBehaviour, String packageName, String activityName) {
-        Account account = getAccount();
-        if (!mDownloaderBinder.isDownloading(account, mWaitingToPreview)) {
+        final User currentUser = getUser().orElseThrow(RuntimeException::new);
+        if (!mDownloaderBinder.isDownloading(currentUser.toPlatformAccount(), mWaitingToPreview)) {
             Intent i = new Intent(this, FileDownloader.class);
-            i.putExtra(FileDownloader.EXTRA_ACCOUNT, account);
+            i.putExtra(FileDownloader.EXTRA_USER, currentUser);
             i.putExtra(FileDownloader.EXTRA_FILE, file);
             i.putExtra(SendShareDialog.PACKAGE_NAME, packageName);
             i.putExtra(SendShareDialog.ACTIVITY_NAME, activityName);
@@ -2403,9 +2399,10 @@ public class FileDisplayActivity extends FileActivity
     }
 
     public void startContactListFragment(OCFile file) {
+        final User user = getUser().orElseThrow(RuntimeException::new);
         Intent intent = new Intent(this, ContactsPreferenceActivity.class);
         intent.putExtra(ContactListFragment.FILE_NAME, Parcels.wrap(file));
-        intent.putExtra(ContactListFragment.ACCOUNT, Parcels.wrap(getAccount()));
+        intent.putExtra(ContactListFragment.USER, user);
         startActivity(intent);
     }
 
@@ -2608,14 +2605,14 @@ public class FileDisplayActivity extends FileActivity
         }
 
         EventBus.getDefault().post(new TokenPushEvent());
-        checkForNewDevVersionNecessary(findViewById(R.id.root_layout), getApplicationContext());
+        checkForNewDevVersionNecessary(getApplicationContext());
     }
 
     @Override
     protected void onRestart() {
         super.onRestart();
 
-        checkForNewDevVersionNecessary(findViewById(R.id.root_layout), getApplicationContext());
+        checkForNewDevVersionNecessary(getApplicationContext());
     }
 
     public void setSearchQuery(String query) {

@@ -54,6 +54,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.nextcloud.client.account.UserAccountManager;
 import com.nextcloud.client.di.Injectable;
@@ -118,6 +119,8 @@ public class ExtendedListFragment extends Fragment implements
     @Inject UserAccountManager accountManager;
     private ScaleGestureDetector mScaleGestureDetector;
     protected SwipeRefreshLayout mRefreshListLayout;
+    protected MaterialButton mSortButton;
+    protected MaterialButton mSwitchGridViewButton;
     protected LinearLayout mEmptyListContainer;
     protected TextView mEmptyListMessage;
     protected TextView mEmptyListHeadline;
@@ -196,7 +199,7 @@ public class ExtendedListFragment extends Fragment implements
         closeButton = searchView.findViewById(androidx.appcompat.R.id.search_close_btn);
         searchView.setOnQueryTextListener(this);
         searchView.setOnCloseListener(this);
-        ThemeUtils.themeSearchView(searchView, true, requireContext());
+        ThemeUtils.themeSearchView(searchView, requireContext());
 
         SearchView.SearchAutoComplete theTextArea = searchView.findViewById(R.id.search_src_text);
         theTextArea.setHighlightColor(ThemeUtils.primaryAccentColor(getContext()));
@@ -257,7 +260,6 @@ public class ExtendedListFragment extends Fragment implements
 
                 if (currentVisibility != oldVisibility) {
                     if (currentVisibility == View.VISIBLE) {
-
                         setEmptyListMessage(SearchType.REGULAR_FILTER);
                     } else {
                         setEmptyListMessage(SearchType.NO_SEARCH);
@@ -269,17 +271,7 @@ public class ExtendedListFragment extends Fragment implements
             }
         });
 
-        int fontColor = ThemeUtils.fontColor(getContext());
-
         LinearLayout searchBar = searchView.findViewById(R.id.search_bar);
-        TextView searchBadge = searchView.findViewById(R.id.search_badge);
-
-        searchBadge.setTextColor(fontColor);
-        searchBadge.setHintTextColor(fontColor);
-
-        ImageView searchButton = searchView.findViewById(R.id.search_button);
-        searchButton.setImageDrawable(ThemeUtils.tintDrawable(R.drawable.ic_search, fontColor));
-
         searchBar.setLayoutTransition(new LayoutTransition());
     }
 
@@ -382,7 +374,11 @@ public class ExtendedListFragment extends Fragment implements
 
         // Pull-down to refresh layout
         mRefreshListLayout = v.findViewById(R.id.swipe_containing_list);
-        onCreateSwipeToRefresh(mRefreshListLayout);
+        ThemeUtils.colorSwipeRefreshLayout(getContext(), mRefreshListLayout);
+        mRefreshListLayout.setOnRefreshListener(this);
+
+        mSortButton = v.findViewById(R.id.sort_button);
+        mSwitchGridViewButton = v.findViewById(R.id.switch_grid_view_button);
 
         mFabMain = v.findViewById(R.id.fab_main);
         ThemeUtils.tintFloatingActionButton(mFabMain, R.drawable.ic_plus, getContext());
@@ -772,17 +768,6 @@ public class ExtendedListFragment extends Fragment implements
      */
     public String getEmptyViewText() {
         return (mEmptyListContainer != null && mEmptyListMessage != null) ? mEmptyListMessage.getText().toString() : "";
-    }
-
-    protected void onCreateSwipeToRefresh(SwipeRefreshLayout refreshLayout) {
-        int primaryColor = ThemeUtils.primaryColor(getContext());
-        int darkColor = ThemeUtils.primaryDarkColor(getContext());
-        int accentColor = ThemeUtils.primaryAccentColor(getContext());
-
-        // Colors in animations
-        // TODO change this to use darker and lighter color, again.
-        refreshLayout.setColorSchemeColors(accentColor, primaryColor, darkColor);
-        refreshLayout.setOnRefreshListener(this);
     }
 
     @Override

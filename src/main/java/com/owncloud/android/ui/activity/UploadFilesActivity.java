@@ -74,6 +74,8 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import static com.owncloud.android.utils.DisplayUtils.openSortingOrderDialogFragment;
+
 /**
  * Displays local files and let the user choose what of them wants to upload
  * to the current ownCloud account.
@@ -83,7 +85,6 @@ public class UploadFilesActivity extends FileActivity implements
     OnClickListener, ConfirmationDialogFragmentListener, SortingOrderDialogFragment.OnSortingOrderListener,
     CheckAvailableSpaceTask.CheckAvailableSpaceListener, StoragePathAdapter.StoragePathAdapterListener, Injectable {
 
-    private static final String SORT_ORDER_DIALOG_TAG = "SORT_ORDER_DIALOG";
     private static final int SINGLE_DIR = 1;
 
     private ArrayAdapter<String> mDirectories;
@@ -212,8 +213,7 @@ public class UploadFilesActivity extends FileActivity implements
             actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
             actionBar.setListNavigationCallbacks(mDirectories, this);
 
-            Drawable backArrow = getResources().getDrawable(R.drawable.ic_arrow_back);
-            actionBar.setHomeAsUpIndicator(ThemeUtils.tintDrawable(backArrow, ThemeUtils.fontColor(this)));
+            ThemeUtils.tintBackButton(actionBar, this);
         }
 
         // wait dialog
@@ -297,14 +297,8 @@ public class UploadFilesActivity extends FileActivity implements
                 break;
             }
             case R.id.action_sort: {
-                FragmentManager fm = getSupportFragmentManager();
-                FragmentTransaction ft = fm.beginTransaction();
-                ft.addToBackStack(null);
-
-                SortingOrderDialogFragment mSortingOrderDialogFragment = SortingOrderDialogFragment.newInstance(
-                    preferences.getSortOrderByType(FileSortOrder.Type.uploadFilesView));
-                mSortingOrderDialogFragment.show(ft, SORT_ORDER_DIALOG_TAG);
-
+                openSortingOrderDialogFragment(getSupportFragmentManager(),
+                                               preferences.getSortOrderByType(FileSortOrder.Type.uploadFilesView));
                 break;
             }
             case R.id.action_switch_view: {

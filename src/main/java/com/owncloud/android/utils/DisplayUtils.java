@@ -27,7 +27,6 @@
 
 package com.owncloud.android.utils;
 
-import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -70,6 +69,7 @@ import com.owncloud.android.lib.common.OwnCloudAccount;
 import com.owncloud.android.lib.common.utils.Log_OC;
 import com.owncloud.android.ui.TextDrawable;
 import com.owncloud.android.ui.activity.FileDisplayActivity;
+import com.owncloud.android.ui.dialog.SortingOrderDialogFragment;
 import com.owncloud.android.ui.events.SearchEvent;
 import com.owncloud.android.ui.fragment.OCFileListFragment;
 import com.owncloud.android.utils.glide.CustomGlideUriLoader;
@@ -89,18 +89,19 @@ import java.math.BigDecimal;
 import java.net.IDN;
 import java.nio.charset.Charset;
 import java.text.DateFormat;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.widget.AppCompatDrawableManager;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
+import static com.owncloud.android.ui.dialog.SortingOrderDialogFragment.SORTING_ORDER_FRAGMENT;
 
 /**
  * A helper class for UI/display related operations.
@@ -165,7 +166,7 @@ public final class DisplayUtils {
             }
 
             return new BigDecimal(String.valueOf(result)).setScale(
-                    sizeScales[suffixIndex], BigDecimal.ROUND_HALF_UP) + " " + sizeSuffixes[suffixIndex];
+                sizeScales[suffixIndex], BigDecimal.ROUND_HALF_UP) + " " + sizeSuffixes[suffixIndex];
         }
     }
 
@@ -302,7 +303,7 @@ public final class DisplayUtils {
      */
     public static CharSequence getRelativeTimestamp(Context context, long modificationTimestamp) {
         return getRelativeDateTimeString(context, modificationTimestamp, DateUtils.SECOND_IN_MILLIS,
-                DateUtils.WEEK_IN_MILLIS, 0);
+                                         DateUtils.WEEK_IN_MILLIS, 0);
     }
 
 
@@ -391,7 +392,7 @@ public final class DisplayUtils {
         }
 
         SpannableStringBuilder sb = new SpannableStringBuilder(text);
-        if(spanText == null) {
+        if (spanText == null) {
             return sb;
         }
 
@@ -528,13 +529,13 @@ public final class DisplayUtils {
 
     private static void downloadPNGIcon(Context context, String iconUrl, SimpleTarget imageView, int placeholder) {
         Glide
-                .with(context)
-                .load(iconUrl)
-                .centerCrop()
-                .placeholder(placeholder)
-                .error(placeholder)
-                .crossFade()
-                .into(imageView);
+            .with(context)
+            .load(iconUrl)
+            .centerCrop()
+            .placeholder(placeholder)
+            .error(placeholder)
+            .crossFade()
+            .into(imageView);
     }
 
     private static void downloadSVGIcon(CurrentAccountProvider currentAccountProvider,
@@ -547,33 +548,33 @@ public final class DisplayUtils {
                                         int height) {
         GenericRequestBuilder<Uri, InputStream, SVG, PictureDrawable> requestBuilder = Glide.with(context)
             .using(new CustomGlideUriLoader(currentAccountProvider, clientFactory), InputStream.class)
-                .from(Uri.class)
-                .as(SVG.class)
-                .transcode(new SvgDrawableTranscoder(), PictureDrawable.class)
-                .sourceEncoder(new StreamEncoder())
-                .cacheDecoder(new FileToStreamDecoder<>(new SvgDecoder(height, width)))
-                .decoder(new SvgDecoder(height, width))
-                .placeholder(placeholder)
-                .error(placeholder)
-                .animate(android.R.anim.fade_in);
+            .from(Uri.class)
+            .as(SVG.class)
+            .transcode(new SvgDrawableTranscoder(), PictureDrawable.class)
+            .sourceEncoder(new StreamEncoder())
+            .cacheDecoder(new FileToStreamDecoder<>(new SvgDecoder(height, width)))
+            .decoder(new SvgDecoder(height, width))
+            .placeholder(placeholder)
+            .error(placeholder)
+            .animate(android.R.anim.fade_in);
 
 
         Uri uri = Uri.parse(iconUrl);
         requestBuilder
-                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                .load(uri)
-                .into(imageView);
+            .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+            .load(uri)
+            .into(imageView);
     }
 
     public static Bitmap downloadImageSynchronous(Context context, String imageUrl) {
         try {
             return Glide.with(context)
-                    .load(imageUrl)
-                    .asBitmap()
-                    .diskCacheStrategy(DiskCacheStrategy.NONE)
-                    .skipMemoryCache(true)
-                    .into(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
-                    .get();
+                .load(imageUrl)
+                .asBitmap()
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .skipMemoryCache(true)
+                .into(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
+                .get();
         } catch (Exception e) {
             Log_OC.e(TAG, "Could not download image " + imageUrl);
             return null;
@@ -684,32 +685,32 @@ public final class DisplayUtils {
      */
     public static void showSnackMessage(Context context, View view, @StringRes int messageResource, Object... formatArgs) {
         Snackbar.make(
-                view,
-                String.format(context.getString(messageResource, formatArgs)),
-                Snackbar.LENGTH_LONG)
-                .show();
+            view,
+            String.format(context.getString(messageResource, formatArgs)),
+            Snackbar.LENGTH_LONG)
+            .show();
     }
 
     // Solution inspired by https://stackoverflow.com/questions/34936590/why-isnt-my-vector-drawable-scaling-as-expected
     // Copied from https://raw.githubusercontent.com/nextcloud/talk-android/8ec8606bc61878e87e3ac8ad32c8b72d4680013c/app/src/main/java/com/nextcloud/talk/utils/DisplayUtils.java
     // under GPL3
     public static void useCompatVectorIfNeeded() {
-            try {
-                @SuppressLint("RestrictedApi") AppCompatDrawableManager drawableManager = AppCompatDrawableManager.get();
-                Class<?> inflateDelegateClass = Class.forName("android.support.v7.widget.AppCompatDrawableManager$InflateDelegate");
-                Class<?> vdcInflateDelegateClass = Class.forName("android.support.v7.widget.AppCompatDrawableManager$VdcInflateDelegate");
+        try {
+            @SuppressLint("RestrictedApi") AppCompatDrawableManager drawableManager = AppCompatDrawableManager.get();
+            Class<?> inflateDelegateClass = Class.forName("android.support.v7.widget.AppCompatDrawableManager$InflateDelegate");
+            Class<?> vdcInflateDelegateClass = Class.forName("android.support.v7.widget.AppCompatDrawableManager$VdcInflateDelegate");
 
-                Constructor<?> constructor = vdcInflateDelegateClass.getDeclaredConstructor();
-                constructor.setAccessible(true);
-                Object vdcInflateDelegate = constructor.newInstance();
+            Constructor<?> constructor = vdcInflateDelegateClass.getDeclaredConstructor();
+            constructor.setAccessible(true);
+            Object vdcInflateDelegate = constructor.newInstance();
 
-                Class<?> args[] = {String.class, inflateDelegateClass};
-                Method addDelegate = AppCompatDrawableManager.class.getDeclaredMethod("addDelegate", args);
-                addDelegate.setAccessible(true);
-                addDelegate.invoke(drawableManager, "vector", vdcInflateDelegate);
-            } catch (Exception e) {
-                Log.e(TAG, "Failed to use reflection to enable proper vector scaling");
-            }
+            Class<?> args[] = {String.class, inflateDelegateClass};
+            Method addDelegate = AppCompatDrawableManager.class.getDeclaredMethod("addDelegate", args);
+            addDelegate.setAccessible(true);
+            addDelegate.invoke(drawableManager, "vector", vdcInflateDelegate);
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to use reflection to enable proper vector scaling");
+        }
     }
 
     public static int convertDpToPixel(float dp, Context context) {
@@ -722,9 +723,9 @@ public final class DisplayUtils {
     static public void showServerOutdatedSnackbar(Activity activity, int length) {
         Snackbar.make(activity.findViewById(android.R.id.content),
                       R.string.outdated_server, length)
-                .setAction(R.string.dismiss, v -> {
-                })
-                .show();
+            .setAction(R.string.dismiss, v -> {
+            })
+            .show();
     }
 
     static public void startLinkIntent(Activity activity, @StringRes int link) {
@@ -740,8 +741,15 @@ public final class DisplayUtils {
         }
     }
 
-    static public void showErrorAndAbort(Context context, String errorMessage) {
-        Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show();
-        ((Activity) context).finish();
+    static public void showErrorAndFinishActivity(Activity activity, String errorMessage) {
+        Toast.makeText(activity, errorMessage, Toast.LENGTH_LONG).show();
+        activity.finish();
+    }
+
+    static public void openSortingOrderDialogFragment(FragmentManager supportFragmentManager, FileSortOrder sortOrder) {
+        FragmentTransaction fragmentTransaction = supportFragmentManager.beginTransaction();
+        fragmentTransaction.addToBackStack(null);
+
+        SortingOrderDialogFragment.newInstance(sortOrder).show(fragmentTransaction, SORTING_ORDER_FRAGMENT);
     }
 }

@@ -22,7 +22,6 @@
  */
 package com.owncloud.android.ui.preview;
 
-import android.accounts.Account;
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -395,8 +394,9 @@ public class PreviewImageActivity extends FileActivity implements
             Log_OC.d(TAG, "requestForDownload called without binder to download service");
 
         } else if (!mDownloaderBinder.isDownloading(getAccount(), file)) {
+            final User user = getUser().orElseThrow(RuntimeException::new);
             Intent i = new Intent(this, FileDownloader.class);
-            i.putExtra(FileDownloader.EXTRA_ACCOUNT, getAccount());
+            i.putExtra(FileDownloader.EXTRA_USER, user);
             i.putExtra(FileDownloader.EXTRA_FILE, file);
             startService(i);
         }

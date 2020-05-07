@@ -16,6 +16,7 @@
 
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/ListItemLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -29,15 +30,32 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <com.owncloud.android.ui.SquareImageView
-            android:id="@+id/thumbnail"
+        <FrameLayout
+            android:id="@+id/shimmer_view_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="@dimen/standard_eigth_padding"
-            android:scaleType="centerCrop"
-            android:src="@drawable/folder"
-            android:contentDescription="@null"/>
+            android:clipChildren="true">
 
+            <com.elyeproj.loaderviewlibrary.LoaderImageView
+                android:id="@+id/thumbnail_shimmer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/standard_eigth_padding"
+                android:contentDescription="@null"
+                android:scaleType="centerCrop"
+                android:visibility="gone"
+                app:width_weight="0.4"
+                app:height_weight="0.6" />
+
+            <com.owncloud.android.ui.SquareImageView
+                android:id="@+id/thumbnail"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="@null"
+                android:padding="@dimen/standard_eigth_padding"
+                android:scaleType="centerCrop"
+                android:src="@drawable/folder" />
+        </FrameLayout>
 
         <ImageView
             android:id="@+id/favorite_action"
@@ -54,7 +72,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="top|end"
             android:layout_marginEnd="@dimen/standard_quarter_margin"
-            android:layout_marginRight="@dimen/standard_quarter_margin"
             android:layout_marginTop="@dimen/grid_image_shared_icon_layout_top_margin"
             android:contentDescription="@string/shared_icon_shared_via_link"
             android:src="@drawable/shared_via_link" />
@@ -65,7 +82,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="top|end"
             android:layout_marginEnd="@dimen/standard_quarter_margin"
-            android:layout_marginRight="@dimen/standard_quarter_margin"
             android:layout_marginTop="@dimen/grid_image_shared_icon_layout_top_margin"
             android:clickable="true"
             android:contentDescription="@string/unread_comments"
@@ -80,7 +96,6 @@
             android:layout_gravity="bottom|end"
             android:layout_marginBottom="@dimen/standard_quarter_margin"
             android:layout_marginEnd="@dimen/standard_quarter_margin"
-            android:layout_marginRight="@dimen/standard_quarter_margin"
             android:layout_marginTop="@dimen/standard_quarter_margin"
             android:contentDescription="@string/synced_icon"
             android:src="@drawable/ic_synced" />

@@ -20,7 +20,8 @@
   ~ along with this program. If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<vector android:height="16dp"
+<vector
+    android:height="16dp"
     android:viewportHeight="16"
     android:viewportWidth="16"
     android:width="16dp"
