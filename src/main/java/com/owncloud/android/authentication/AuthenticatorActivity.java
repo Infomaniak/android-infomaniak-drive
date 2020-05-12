@@ -1353,7 +1353,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity
 
         if (!mServerIsValid) {
             // hide old login
-            setOldLoginVisibility(View.GONE);
+            // setOldLoginVisibility(View.GONE); kDrive
         }
 
         /// very special case (TODO: move to a common place for all the remote operations)
