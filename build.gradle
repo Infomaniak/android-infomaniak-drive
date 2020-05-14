@@ -63,7 +63,7 @@ ext {
     daggerVersion = "2.27"
     markwonVersion =  "4.3.1"
     prismVersion = "2.0.0"
-    androidLibraryVersion = "2.1.1"
+    androidLibraryVersion = "master-SNAPSHOT"
 
     travisBuild = System.getenv("TRAVIS") == "true"
 
@@ -159,7 +159,7 @@ android {
 
         buildTypes {
             debug {
-                testCoverageEnabled true
+                testCoverageEnabled (project.hasProperty('coverage'))
             }
         }
 
@@ -384,7 +384,7 @@ dependencies {
     //androidTestImplementation "com.android.support:support-annotations:${supportLibraryVersion}"
     androidTestImplementation 'tools.fastlane:screengrab:2.0.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    androidTestCompile('com.android.support.test.espresso:espresso-intents:3.0.2')
+    androidTestImplementation('com.android.support.test.espresso:espresso-intents:3.0.2')
 
 //    jacocoAnt "org.jacoco:org.jacoco.ant:${jacocoVersion}"
 //    jacocoAgent "org.jacoco:org.jacoco.agent:${jacocoVersion}"

@@ -122,7 +122,7 @@ public class OCFileListBottomSheetDialog extends BottomSheetDialog {
         ThemeUtils.tintDrawable(iconMakeDir.getDrawable(), primaryColor);
 
         headline.setText(getContext().getResources().getString(R.string.add_to_cloud,
-                                                               ThemeUtils.getDefaultDisplayNameForRootFolder(getContext())));
+                ThemeUtils.getDefaultDisplayNameForRootFolder(getContext())));
 
         OCCapability capability = fileActivity.getCapabilities();
         if (capability.getRichDocuments().isTrue() && capability.getRichDocumentsDirectEditing().isTrue() &&
@@ -194,8 +194,8 @@ public class OCFileListBottomSheetDialog extends BottomSheetDialog {
         });
 
         setOnShowListener(d ->
-                              BottomSheetBehavior.from((View) view.getParent()).setPeekHeight(view.getMeasuredHeight())
-                         );
+                BottomSheetBehavior.from((View) view.getParent()).setPeekHeight(view.getMeasuredHeight())
+        );
     }
 
     @OnClick(R.id.menu_mkdir)

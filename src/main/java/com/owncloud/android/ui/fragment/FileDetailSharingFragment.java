@@ -427,7 +427,8 @@ public class FileDetailSharingFragment extends Fragment implements ShareeListAda
                 shareByLinkAllowEditing.isChecked(),
                 publicShare.getPermissions()
         );
-        menu.findItem(R.id.action_hide_file_download).setEnabled(false); //kDrive
+        SharingMenuHelper.setupHideFileDownload(menu.findItem(R.id.action_hide_file_download),
+            publicShare.isHideFileDownload(), capabilities);
         SharingMenuHelper.setupPasswordMenuItem(
                 menu.findItem(R.id.action_password),
                 publicShare.isPasswordProtected()
