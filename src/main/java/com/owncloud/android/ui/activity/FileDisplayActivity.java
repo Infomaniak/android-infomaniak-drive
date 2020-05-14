@@ -327,9 +327,6 @@ public class FileDisplayActivity extends FileActivity
             syncAndUpdateFolder(true);
         }
 
-        showProgressBar(mSyncInProgress);
-        // always AFTER setContentView(...) in onCreate(); to work around bug in its implementation
-
         upgradeNotificationForInstantUpload();
         checkOutdatedServer();
     }
@@ -1201,6 +1198,8 @@ public class FileDisplayActivity extends FileActivity
     protected void onResume() {
         Log_OC.v(TAG, "onResume() start");
         super.onResume();
+        // Instead of onPostCreate, starting the loading in onResume for children fragments
+        getListOfFilesFragment().setLoading(mSyncInProgress);
         syncAndUpdateFolder(false);
 
         OCFile startFile = null;
@@ -1398,8 +1397,7 @@ public class FileDisplayActivity extends FileActivity
                         DataHolderUtil.getInstance().delete(intent.getStringExtra(FileSyncAdapter.EXTRA_RESULT));
 
                         Log_OC.d(TAG, "Setting progress visibility to " + mSyncInProgress);
-                        showProgressBar(mSyncInProgress);
-
+                        getListOfFilesFragment().setLoading(mSyncInProgress);
                         setBackgroundText();
                     }
                 }
@@ -1516,9 +1514,7 @@ public class FileDisplayActivity extends FileActivity
                         // TODO what about other kind of previews?
                     }
                 }
-
-                showProgressBar(false);
-
+                getListOfFilesFragment().setLoading(Boolean.FALSE);
             } finally {
                 if (intent != null) {
                     removeStickyBroadcast(intent);
@@ -2231,7 +2227,7 @@ public class FileDisplayActivity extends FileActivity
                                         null
                                 );
 
-                                showProgressBar(true);
+                                getListOfFilesFragment().setLoading(Boolean.TRUE);
 
                                 setBackgroundText();
 

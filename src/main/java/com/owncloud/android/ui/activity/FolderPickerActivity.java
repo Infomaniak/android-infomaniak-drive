@@ -151,7 +151,6 @@ public class FolderPickerActivity extends FileActivity implements FileFragment.C
 
         updateActionBarTitleAndHomeButtonByString(caption);
 
-        showProgressBar(mSyncInProgress);
         // always AFTER setContentView(...) ; to work around bug in its implementation
 
         // sets message for empty list of folders
@@ -262,7 +261,7 @@ public class FolderPickerActivity extends FileActivity implements FileFragment.C
                                                                             getApplicationContext());
 
         refreshFolderOperation.execute(getAccount(), this, null, null);
-        showProgressBar(true);
+        getListOfFilesFragment().setLoading(Boolean.TRUE);
         setBackgroundText();
     }
 
@@ -270,6 +269,8 @@ public class FolderPickerActivity extends FileActivity implements FileFragment.C
     protected void onResume() {
         super.onResume();
         Log_OC.e(TAG, "onResume() start");
+        getListOfFilesFragment().setLoading(mSyncInProgress);
+
 
         // refresh list of files
         refreshListOfFilesFragment(false);
@@ -541,7 +542,7 @@ public class FolderPickerActivity extends FileActivity implements FileFragment.C
                     DataHolderUtil.getInstance().delete(intent.getStringExtra(FileSyncAdapter.EXTRA_RESULT));
                     Log_OC.d(TAG, "Setting progress visibility to " + mSyncInProgress);
 
-                    showProgressBar(mSyncInProgress);
+                    getListOfFilesFragment().setLoading(mSyncInProgress);
 
                     setBackgroundText();
                 }
