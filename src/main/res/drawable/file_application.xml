@@ -1,25 +1,12 @@
-<!--
-  Nextcloud Android client application
-
-  Copyright (C) 2020 Nextcloud.
-
-  This program is free software; you can redistribute it and/or
-  modify it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE
-  License as published by the Free Software Foundation; either
-  version 3 of the License, or any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU AFFERO GENERAL PUBLIC LICENSE for more details.
-
-  You should have received a copy of the GNU Affero General Public
-  License along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-  Icon provided by Android Material Library in Apache License 2.0
--->
-<vector android:height="24dp" android:tint="#969696"
-    android:viewportHeight="24" android:viewportWidth="24"
-    android:width="24dp" xmlns:android="http://schemas.android.com/apk/res/android">
-    <path android:fillColor="#FF000000" android:pathData="M19.1,12.9a2.8,2.8 0,0 0,0.1 -0.9,2.8 2.8,0 0,0 -0.1,-0.9l2.1,-1.6a0.7,0.7 0,0 0,0.1 -0.6L19.4,5.5a0.7,0.7 0,0 0,-0.6 -0.2l-2.4,1a6.5,6.5 0,0 0,-1.6 -0.9l-0.4,-2.6a0.5,0.5 0,0 0,-0.5 -0.4H10.1a0.5,0.5 0,0 0,-0.5 0.4L9.3,5.4a5.6,5.6 0,0 0,-1.7 0.9l-2.4,-1a0.4,0.4 0,0 0,-0.5 0.2l-2,3.4c-0.1,0.2 0,0.4 0.2,0.6l2,1.6a2.8,2.8 0,0 0,-0.1 0.9,2.8 2.8,0 0,0 0.1,0.9L2.8,14.5a0.7,0.7 0,0 0,-0.1 0.6l1.9,3.4a0.7,0.7 0,0 0,0.6 0.2l2.4,-1a6.5,6.5 0,0 0,1.6 0.9l0.4,2.6a0.5,0.5 0,0 0,0.5 0.4h3.8a0.5,0.5 0,0 0,0.5 -0.4l0.3,-2.6a5.6,5.6 0,0 0,1.7 -0.9l2.4,1a0.4,0.4 0,0 0,0.5 -0.2l2,-3.4c0.1,-0.2 0,-0.4 -0.2,-0.6ZM12,15.6A3.6,3.6 0,1 1,15.6 12,3.6 3.6,0 0,1 12,15.6Z"/>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#757575"
+        android:fillType="nonZero"
+        android:pathData="M15.586,0C15.8512,0 16.1055,0.1055 16.293,0.293L16.293,0.293L21.707,5.707C21.8946,5.8945 22,6.1488 22,6.414L22,6.414L22,22C22,23.1046 21.1046,24 20,24L20,24L4,24C2.8954,24 2,23.1046 2,22L2,22L2,2C2,0.8954 2.8954,0 4,0L4,0ZM14.965,2L4.5,2C4.2239,2 4,2.2239 4,2.5L4,2.5L4,21.5C4,21.7761 4.2239,22 4.5,22L4.5,22L19.5,22C19.7761,22 20,21.7761 20,21.5L20,21.5L20,7.035C20,6.9026 19.9475,6.7757 19.854,6.682L19.854,6.682L15.318,2.146C15.2243,2.0525 15.0974,2 14.965,2L14.965,2ZM12.005,5.8761C12.7141,5.8761 13.3396,6.3403 13.545,7.019L13.545,7.019L13.914,8.229C13.965,8.3927 14.1323,8.4906 14.3,8.455L14.3,8.455L15.522,8.171C16.2132,8.0144 16.9258,8.3264 17.2795,8.9406C17.6332,9.5548 17.5454,10.3278 17.063,10.847L17.063,10.847L16.205,11.771C16.087,11.9001 16.087,12.0979 16.205,12.227L16.205,12.227L17.063,13.152C17.5454,13.6712 17.6332,14.4442 17.2795,15.0584C16.9258,15.6726 16.2132,15.9846 15.522,15.828L15.522,15.828L14.295,15.544C14.1274,15.5088 13.9604,15.6066 13.909,15.77L13.909,15.77L13.54,16.98C13.3357,17.6598 12.7099,18.1253 12,18.1253C11.2901,18.1253 10.6643,17.6598 10.46,16.98L10.46,16.98L10.091,15.771C10.04,15.6073 9.8727,15.5094 9.705,15.545L9.705,15.545L8.478,15.829C7.7868,15.9856 7.0742,15.6736 6.7205,15.0594C6.3668,14.4452 6.4546,13.6722 6.937,13.153L6.937,13.153L7.795,12.228C7.913,12.0989 7.913,11.9011 7.795,11.772L7.795,11.772L6.937,10.847C6.4546,10.3278 6.3668,9.5548 6.7205,8.9406C7.0742,8.3264 7.7868,8.0144 8.478,8.171L8.478,8.171L9.71,8.455C9.8778,8.4912 10.0454,8.393 10.096,8.229L10.096,8.229L10.465,7.019C10.6704,6.3403 11.2959,5.8761 12.005,5.8761ZM12,10.25C11.0335,10.25 10.25,11.0335 10.25,12C10.25,12.9665 11.0335,13.75 12,13.75C12.966,13.7489 13.7489,12.966 13.75,12C13.75,11.0335 12.9665,10.25 12,10.25Z"
+        android:strokeWidth="1"
+        android:strokeColor="#00000000" />
 </vector>
