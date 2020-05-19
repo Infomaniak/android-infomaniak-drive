@@ -258,7 +258,7 @@ public class FileDisplayActivity extends FileActivity
         setContentView(R.layout.files);
 
         // setup toolbar
-        setupToolbar(true);
+        setupHomeSearchToolbar();
 
         mMenuButton.setOnClickListener(v -> {
             openDrawer();
@@ -1250,16 +1250,16 @@ public class FileDisplayActivity extends FileActivity
         if (menuItemId == -1) {
             if (MainApp.isOnlyOnDevice()) {
                 setDrawerMenuItemChecked(R.id.nav_on_device);
-                setupToolbar(false);
+                setupToolbar();
             } else {
                 setDrawerMenuItemChecked(R.id.nav_all_files);
-                setupToolbar(true);
+                setupHomeSearchToolbar();
             }
         } else {
             if (menuItemId == R.id.nav_all_files) {
-                setupToolbar(true);
+                setupHomeSearchToolbar();
             } else {
-                setupToolbar(false);
+                setupToolbar();
             }
             setDrawerMenuItemChecked(menuItemId);
         }
