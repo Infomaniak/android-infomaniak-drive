@@ -162,7 +162,7 @@ public class UserInfoActivity extends FileActivity implements Injectable {
             fetchAndSetData();
         }
 
-        setHeaderImage();
+        //setHeaderImage(); Custom for kDrive
     }
 
     @Override

@@ -49,6 +49,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.URLUtil;
 
+import com.infomaniak.drive.Utils;
 import com.nextcloud.client.account.User;
 import com.nextcloud.client.account.UserAccountManager;
 import com.nextcloud.client.di.Injectable;
@@ -478,7 +479,7 @@ public class SettingsActivity extends ThemedPreferenceActivity
                 final Activity activity = this;
                 pCalendarContacts.setOnPreferenceClickListener(preference -> {
                     try {
-                        launchDavDroidLogin();
+                        Utils.launchKSync(this);
                     } catch (Throwable t) {
                         Log_OC.e(TAG, "Base Uri for account could not be resolved to call DAVdroid!", t);
                         DisplayUtils.showSnackMessage(
