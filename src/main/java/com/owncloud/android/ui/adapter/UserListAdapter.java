@@ -34,6 +34,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.infomaniak.drive.Utils;
 import com.nextcloud.client.account.User;
 import com.nextcloud.client.account.UserAccountManager;
 import com.owncloud.android.R;
@@ -171,7 +172,7 @@ public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
      * @param user the account
      */
     private void setUser(AccountViewHolderItem viewHolder, User user) {
-        viewHolder.accountViewItem.setText(DisplayUtils.convertIdn(user.getAccountName(), false));
+        viewHolder.accountViewItem.setText(DisplayUtils.convertIdn(Utils.getUserEmail(user.getAccountName()), false));
         viewHolder.accountViewItem.setTag(user.getAccountName());
     }
 

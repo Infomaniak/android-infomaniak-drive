@@ -48,6 +48,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.infomaniak.drive.Utils;
 import com.nextcloud.client.account.User;
 import com.nextcloud.client.di.Injectable;
 import com.nextcloud.client.preferences.AppPreferences;
@@ -264,7 +265,7 @@ public class UserInfoActivity extends FileActivity implements Injectable {
     }
 
     private void populateUserInfoUi(UserInfo userInfo) {
-        userName.setText(user.getAccountName());
+        userName.setText(Utils.getUserEmail(user.getAccountName()));
         avatar.setTag(user.getAccountName());
         DisplayUtils.setAvatar(user, this, mCurrentAccountAvatarRadiusDimension, getResources(), avatar, this);
 

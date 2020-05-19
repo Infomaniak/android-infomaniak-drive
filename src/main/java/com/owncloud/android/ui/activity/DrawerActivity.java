@@ -55,6 +55,7 @@ import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.navigation.NavigationView;
+import com.infomaniak.drive.Utils;
 import com.nextcloud.client.account.User;
 import com.nextcloud.client.di.Injectable;
 import com.nextcloud.client.network.ClientFactory;
@@ -792,7 +793,7 @@ public abstract class DrawerActivity extends ToolbarActivity
             TextView usernameFull = (TextView) findNavigationViewChildById(R.id.drawer_username_full);
 
             String name = user.getAccountName();
-            usernameFull.setText(DisplayUtils.convertIdn(name.substring(name.lastIndexOf('@') + 1),
+            usernameFull.setText(DisplayUtils.convertIdn(Utils.getUserEmail(name),
                                                          false));
             usernameFull.setTextColor(ThemeUtils.fontColor(this));
 
