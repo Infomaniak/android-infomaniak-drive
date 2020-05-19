@@ -906,9 +906,8 @@ public final class ThumbnailsCacheManager {
             if (drawable != null) {
                 AvatarGenerationListener listener = mAvatarGenerationListener.get();
                 if (listener != null) {
-                    AvatarGenerationTask avatarWorkerTask = getAvatarWorkerTask(mCallContext);
                     String accountName = mUserId + "@" + mServerName;
-                    if (this == avatarWorkerTask && listener.shouldCallGeneratedCallback(accountName, mCallContext)) {
+                    if (listener.shouldCallGeneratedCallback(accountName, mCallContext)) {
                         listener.avatarGenerated(drawable, mCallContext);
                     }
                 }

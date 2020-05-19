@@ -488,6 +488,8 @@ public final class DisplayUtils {
             }
         }
 
+        listener.avatarGenerated(avatar, callContext);
+
         // check for new avatar, eTag is compared, so only new one is downloaded
         if (ThumbnailsCacheManager.cancelPotentialAvatarWork(userId, callContext)) {
             final ThumbnailsCacheManager.AvatarGenerationTask task =
@@ -500,9 +502,6 @@ public final class DisplayUtils {
                                                                 serverName,
                                                                 context);
 
-            final ThumbnailsCacheManager.AsyncAvatarDrawable asyncDrawable =
-                new ThumbnailsCacheManager.AsyncAvatarDrawable(resources, avatar, task);
-            listener.avatarGenerated(asyncDrawable, callContext);
             task.execute(userId);
         }
     }
