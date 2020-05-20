@@ -204,8 +204,24 @@ public class FileDataStorageManager {
         return deleteFiles(uri, where, whereArgs, "");
     }
 
+    /**
+     * Use getFileByEncryptedRemotePath() or getFileByDecryptedRemotePath()
+     */
+    @Deprecated
     public OCFile getFileByPath(String path) {
-        Cursor cursor = getFileCursorForValue(ProviderTableMeta.FILE_PATH, path);
+        return getFileByEncryptedRemotePath(path);
+    }
+
+    public OCFile getFileByEncryptedRemotePath(String path) {
+        return getFileByPath(ProviderTableMeta.FILE_PATH, path);
+    }
+
+    public OCFile getFileByDecryptedRemotePath(String path) {
+        return getFileByPath(ProviderTableMeta.FILE_PATH_DECRYPTED, path);
+    }
+
+    private OCFile getFileByPath(String type, String path) {
+        Cursor cursor = getFileCursorForValue(type, path);
         OCFile ocFile = null;
 
         if (cursor.moveToFirst()) {
@@ -931,7 +947,7 @@ public class FileDataStorageManager {
             ocFile = new OCFile(cursor.getString(cursor.getColumnIndex(ProviderTableMeta.FILE_PATH)));
             ocFile.setFileId(cursor.getLong(cursor.getColumnIndex(ProviderTableMeta._ID)));
             ocFile.setParentId(cursor.getLong(cursor.getColumnIndex(ProviderTableMeta.FILE_PARENT)));
-            ocFile.setEncryptedFileName(cursor.getString(cursor.getColumnIndex(ProviderTableMeta.FILE_ENCRYPTED_NAME)));
+            ocFile.setDecryptedRemotePath(getString(cursor, ProviderTableMeta.FILE_PATH_DECRYPTED));
             ocFile.setMimeType(cursor.getString(cursor.getColumnIndex(ProviderTableMeta.FILE_CONTENT_TYPE)));
             ocFile.setStoragePath(cursor.getString(cursor.getColumnIndex(ProviderTableMeta.FILE_STORAGE_PATH)));
             if (ocFile.getStoragePath() == null) {
@@ -963,9 +979,6 @@ public class FileDataStorageManager {
             ocFile.setEtagInConflict(cursor.getString(cursor.getColumnIndex(ProviderTableMeta.FILE_ETAG_IN_CONFLICT)));
             ocFile.setFavorite(cursor.getInt(cursor.getColumnIndex(ProviderTableMeta.FILE_FAVORITE)) == 1);
             ocFile.setEncrypted(cursor.getInt(cursor.getColumnIndex(ProviderTableMeta.FILE_IS_ENCRYPTED)) == 1);
-            if (ocFile.isEncrypted()) {
-                ocFile.setFileName(cursor.getString(cursor.getColumnIndex(ProviderTableMeta.FILE_NAME)));
-            }
             ocFile.setMountType(WebdavEntry.MountType.values()[cursor.getInt(
                 cursor.getColumnIndex(ProviderTableMeta.FILE_MOUNT_TYPE))]);
             ocFile.setPreviewAvailable(cursor.getInt(cursor.getColumnIndex(ProviderTableMeta.FILE_HAS_PREVIEW)) == 1);
