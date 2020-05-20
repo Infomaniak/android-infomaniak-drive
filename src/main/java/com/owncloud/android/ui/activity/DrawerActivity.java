@@ -1391,9 +1391,11 @@ public abstract class DrawerActivity extends ToolbarActivity
     // Custom kDrive
     public boolean shouldCallGeneratedCallback(String tag, Object callContext) {
         if (callContext instanceof MenuItem) {
-            return true;
+            MenuItem menuItem = (MenuItem) callContext;
+            return String.valueOf(menuItem.getTitle()).equals(tag);
         } else if (callContext instanceof ImageView) {
-            return true;
+            ImageView imageView = (ImageView) callContext;
+            return String.valueOf(imageView.getTag()).equals(tag);
         } else return callContext instanceof MaterialButton;
     }
 
