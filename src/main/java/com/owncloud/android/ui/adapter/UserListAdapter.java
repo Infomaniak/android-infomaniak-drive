@@ -41,7 +41,6 @@ import com.owncloud.android.R;
 import com.owncloud.android.lib.common.OwnCloudAccount;
 import com.owncloud.android.lib.common.utils.Log_OC;
 import com.owncloud.android.ui.activity.BaseActivity;
-import com.owncloud.android.ui.activity.ReceiveExternalFilesActivity;
 import com.owncloud.android.utils.DisplayUtils;
 import com.owncloud.android.utils.ThemeUtils;
 
@@ -69,13 +68,15 @@ public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public static final int KEY_USER_INFO_REQUEST_CODE = 13;
     private ClickListener clickListener;
     private boolean showAddAccount;
+    private boolean showDotsMenu;
 
     public UserListAdapter(BaseActivity context,
                            UserAccountManager accountManager,
                            List<UserListItem> values,
                            Drawable tintedCheck,
                            ClickListener clickListener,
-                           boolean showAddAccount) {
+                           boolean showAddAccount,
+                           boolean showDotsMenu) {
         this.context = context;
         this.accountManager = accountManager;
         this.values = values;
@@ -86,6 +87,7 @@ public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.tintedCheck = tintedCheck;
         this.clickListener = clickListener;
         this.showAddAccount = showAddAccount;
+        this.showDotsMenu = showDotsMenu;
     }
 
     @Override
@@ -307,10 +309,12 @@ public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             ImageView accountMenu = view.findViewById(R.id.account_menu);
 
             view.setOnClickListener(this);
-            if(context instanceof ReceiveExternalFilesActivity) {
+            if (showDotsMenu) {
+                accountMenu.setVisibility(View.VISIBLE);
+                accountMenu.setOnClickListener(this);
+            } else {
                 accountMenu.setVisibility(View.GONE);
             }
-            accountMenu.setOnClickListener(this);
         }
 
         public void setData(User user) {
