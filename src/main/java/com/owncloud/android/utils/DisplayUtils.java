@@ -491,19 +491,17 @@ public final class DisplayUtils {
         listener.avatarGenerated(avatar, callContext);
 
         // check for new avatar, eTag is compared, so only new one is downloaded
-        if (ThumbnailsCacheManager.cancelPotentialAvatarWork(userId, callContext)) {
-            final ThumbnailsCacheManager.AvatarGenerationTask task =
-                new ThumbnailsCacheManager.AvatarGenerationTask(listener,
-                                                                callContext,
-                                                                user.toPlatformAccount(),
-                                                                resources,
-                                                                avatarRadius,
-                                                                userId,
-                                                                serverName,
-                                                                context);
+        final ThumbnailsCacheManager.AvatarGenerationTask task =
+            new ThumbnailsCacheManager.AvatarGenerationTask(listener,
+                                                            callContext,
+                                                            user.toPlatformAccount(),
+                                                            resources,
+                                                            avatarRadius,
+                                                            userId,
+                                                            serverName,
+                                                            context);
 
-            task.execute(userId);
-        }
+        task.execute(userId);
     }
 
     public static void downloadIcon(CurrentAccountProvider currentAccountProvider,
