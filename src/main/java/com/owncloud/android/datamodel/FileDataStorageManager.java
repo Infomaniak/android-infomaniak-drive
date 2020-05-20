@@ -1418,6 +1418,7 @@ public class FileDataStorageManager {
             + ProviderTableMeta.OCSHARES_SHARE_TYPE + " = ? OR "
             + ProviderTableMeta.OCSHARES_SHARE_TYPE + " = ? OR "
             + ProviderTableMeta.OCSHARES_SHARE_TYPE + " = ? OR "
+            + ProviderTableMeta.OCSHARES_SHARE_TYPE + " = ? OR "
             + ProviderTableMeta.OCSHARES_SHARE_TYPE + " = ? ) ";
         String[] selectionArgs = new String[]{filePath, accountName,
             Integer.toString(ShareType.USER.getValue()),

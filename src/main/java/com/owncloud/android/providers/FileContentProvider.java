@@ -700,6 +700,7 @@ public class FileContentProvider extends ContentProvider {
                        + ProviderTableMeta.FILE_NAME + TEXT
                        + ProviderTableMeta.FILE_ENCRYPTED_NAME + TEXT
                        + ProviderTableMeta.FILE_PATH + TEXT
+                       + ProviderTableMeta.FILE_PATH_DECRYPTED + TEXT
                        + ProviderTableMeta.FILE_PARENT + INTEGER
                        + ProviderTableMeta.FILE_CREATION + INTEGER
                        + ProviderTableMeta.FILE_MODIFIED + INTEGER
@@ -2100,9 +2101,11 @@ public class FileContentProvider extends ContentProvider {
                 Log_OC.i(SQL, "Entering in the #53 add rich workspace to file table");
                 db.beginTransaction();
                 try {
-                    db.execSQL(ALTER_TABLE + ProviderTableMeta.FILE_TABLE_NAME +
-                                   ADD_COLUMN + ProviderTableMeta.FILE_RICH_WORKSPACE + " TEXT ");
-
+                    if (!checkIfColumnExists(db, ProviderTableMeta.FILE_TABLE_NAME,
+                                             ProviderTableMeta.FILE_RICH_WORKSPACE)) {
+                        db.execSQL(ALTER_TABLE + ProviderTableMeta.FILE_TABLE_NAME +
+                                       ADD_COLUMN + ProviderTableMeta.FILE_RICH_WORKSPACE + " TEXT ");
+                    }
                     upgraded = true;
                     db.setTransactionSuccessful();
                 } finally {
@@ -2189,6 +2192,25 @@ public class FileContentProvider extends ContentProvider {
                     db.execSQL("UPDATE " + ProviderTableMeta.SYNCED_FOLDERS_TABLE_NAME + " SET " +
                                    ProviderTableMeta.SYNCED_FOLDER_NAME_COLLISION_POLICY + " = " +
                                    FileUploader.NameCollisionPolicy.ASK_USER.serialize());
+                    upgraded = true;
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+            }
+
+            if (!upgraded) {
+                Log_OC.i(SQL, String.format(Locale.ENGLISH, UPGRADE_VERSION_MSG, oldVersion, newVersion));
+            }
+
+            if (oldVersion < 56 && newVersion >= 56) {
+                Log_OC.i(SQL, "Entering in the #56 add decrypted remote path");
+                db.beginTransaction();
+                try {
+                    // Add synced.name_collision_policy
+                    db.execSQL(ALTER_TABLE + ProviderTableMeta.FILE_TABLE_NAME +
+                                   ADD_COLUMN + ProviderTableMeta.FILE_PATH_DECRYPTED + " TEXT "); // strin
+
                     upgraded = true;
                     db.setTransactionSuccessful();
                 } finally {
