@@ -272,7 +272,7 @@ public abstract class DrawerActivity extends ToolbarActivity
      * setup drawer header, basically the logo color
      */
     private void setupDrawerHeader(FrameLayout drawerHeader) {
-        drawerHeader.setBackgroundColor(ThemeUtils.primaryColor(getAccount(), true, this));
+        //drawerHeader.setBackgroundColor(ThemeUtils.primaryColor(getAccount(), true, this)); kDrive
     }
 
     /**
