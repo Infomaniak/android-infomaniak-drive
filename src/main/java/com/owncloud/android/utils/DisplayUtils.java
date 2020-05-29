@@ -428,7 +428,8 @@ public final class DisplayUtils {
         String userId = accountManager.getUserData(user.toPlatformAccount(),
                 com.owncloud.android.lib.common.accounts.AccountUtils.Constants.KEY_USER_ID);
 
-        setAvatar(user, userId, listener, avatarRadius, resources, callContext, context);
+        // kDrive
+        setAvatar(user, userId,user.getAccountName(), listener, avatarRadius, resources, callContext, context);
     }
 
     /**
