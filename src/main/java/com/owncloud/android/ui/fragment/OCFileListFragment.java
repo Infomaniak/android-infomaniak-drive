@@ -1763,7 +1763,8 @@ public class OCFileListFragment extends ExtendedListFragment implements
             event.getSearchType() != null &&
             (!TextUtils.isEmpty(event.getSearchQuery()) ||
                 event.searchType == SearchRemoteOperation.SearchType.SHARED_SEARCH ||
-                event.searchType == SearchRemoteOperation.SearchType.SHARED_FILTER);
+                event.searchType == SearchRemoteOperation.SearchType.SHARED_FILTER ||
+                event.searchType == SearchRemoteOperation.SearchType.FAVORITE_SEARCH);
     }
 
     private void syncAndCheckFiles(Collection<OCFile> files) {
