@@ -1124,6 +1124,11 @@ public class OCFileListFragment extends ExtendedListFragment implements
                     mContainerActivity.getFileOperationsHelper().toggleEncryption(singleFile, false);
                     return true;
                 }
+                // kDrive - action_share listener
+                case R.id.action_share: {
+                    showShareDetailView(singleFile);
+                    return true;
+                }
             }
         }
 

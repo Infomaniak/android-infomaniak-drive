@@ -889,6 +889,9 @@ public class OCFileListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         } else {
             sharedIconView.setVisibility(View.GONE);
         }
+
+        // kDrive - Hide all "Share icons"
+        sharedIconView.setVisibility(View.GONE);
     }
 
     /**

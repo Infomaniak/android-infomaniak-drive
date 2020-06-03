@@ -214,6 +214,9 @@ public class FileMenuFilter {
         filterUnsetEncrypted(toShow, toHide, endToEndEncryptionEnabled);
         filterSetPictureAs(toShow, toHide);
         filterStream(toShow, toHide, isMediaSupported);
+
+        // kDrive - Filter share item if needed
+        filterShare(toShow, toHide);
     }
 
     private void filterShareFile(List<Integer> toShow, List<Integer> toHide, OCCapability capability) {
@@ -293,6 +296,16 @@ public class FileMenuFilter {
             toShow.add(R.id.action_edit);
         } else {
             toHide.add(R.id.action_edit);
+        }
+    }
+
+    // kDrive - filtering the menu share item
+    private void filterShare(List<Integer> toShow, List<Integer> toHide) {
+        int shareAction = R.id.action_share;
+        if (isSingleSelection() && files.iterator().next().canReshare()) {
+            toShow.add(shareAction);
+        } else {
+            toHide.add(shareAction);
         }
     }
 
