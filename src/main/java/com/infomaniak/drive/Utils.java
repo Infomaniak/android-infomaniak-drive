@@ -159,7 +159,7 @@ public class Utils {
             }
         }
     }
-    
+
     public static void filterShare(List<Integer> toShow, List<Integer> toHide, boolean isSingleSelection, Collection<OCFile> files) {
         int shareAction = R.id.action_share;
         if (isSingleSelection && files.iterator().next().canReshare()) {
