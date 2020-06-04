@@ -9,6 +9,8 @@ import com.owncloud.android.R;
 import com.owncloud.android.datamodel.OCFile;
 import com.owncloud.android.utils.DisplayUtils;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -155,6 +157,15 @@ public class Utils {
 
                 DisplayUtils.showSnackMessage(activity, R.string.prefs_calendar_contacts_no_store_error);
             }
+        }
+    }
+    
+    public static void filterShare(List<Integer> toShow, List<Integer> toHide, boolean isSingleSelection, Collection<OCFile> files) {
+        int shareAction = R.id.action_share;
+        if (isSingleSelection && files.iterator().next().canReshare()) {
+            toShow.add(shareAction);
+        } else {
+            toHide.add(shareAction);
         }
     }
 }

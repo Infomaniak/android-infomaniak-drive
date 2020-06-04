@@ -52,6 +52,8 @@ import java.util.List;
 
 import androidx.annotation.Nullable;
 
+import static com.infomaniak.drive.Utils.filterShare;
+
 /**
  * Filters out the file actions available in a given {@link Menu} for a given {@link OCFile}
  * according to the current state of the latest.
@@ -216,7 +218,7 @@ public class FileMenuFilter {
         filterStream(toShow, toHide, isMediaSupported);
 
         // kDrive - Filter share item if needed
-        filterShare(toShow, toHide);
+        filterShare(toShow, toHide, isSingleSelection(), files);
     }
 
     private void filterShareFile(List<Integer> toShow, List<Integer> toHide, OCCapability capability) {
@@ -296,16 +298,6 @@ public class FileMenuFilter {
             toShow.add(R.id.action_edit);
         } else {
             toHide.add(R.id.action_edit);
-        }
-    }
-
-    // kDrive - filtering the menu share item
-    private void filterShare(List<Integer> toShow, List<Integer> toHide) {
-        int shareAction = R.id.action_share;
-        if (isSingleSelection() && files.iterator().next().canReshare()) {
-            toShow.add(shareAction);
-        } else {
-            toHide.add(shareAction);
         }
     }
 
