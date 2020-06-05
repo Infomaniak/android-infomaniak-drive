@@ -1720,6 +1720,8 @@ public class FileDataStorageManager {
                           capability.getRichDocumentsProductName());
         contentValues.put(ProviderTableMeta.CAPABILITIES_DIRECT_EDITING_ETAG,
                           capability.getDirectEditingEtag());
+        contentValues.put(ProviderTableMeta.CAPABILITIES_ETAG,
+                          capability.getEtag());
 
         return contentValues;
     }
@@ -1830,6 +1832,7 @@ public class FileDataStorageManager {
             capability.setRichDocumentsOptionalMimeTypeList(Arrays.asList(optionalMimetypes.split(",")));
             capability.setRichDocumentsProductName(getString(cursor, ProviderTableMeta.CAPABILITIES_RICHDOCUMENT_PRODUCT_NAME));
             capability.setDirectEditingEtag(getString(cursor, ProviderTableMeta.CAPABILITIES_DIRECT_EDITING_ETAG));
+            capability.setEtag(getString(cursor, ProviderTableMeta.CAPABILITIES_ETAG));
         }
         return capability;
     }
