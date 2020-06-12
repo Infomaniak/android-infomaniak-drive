@@ -1203,6 +1203,10 @@ public class FileDisplayActivity extends FileActivity
             setDrawerMenuItemChecked(menuItemId);
         }
 
+        if (getListOfFilesFragment() instanceof PhotoFragment) {
+            updateActionBarTitleAndHomeButtonByString(getString(R.string.drawer_item_photos));
+        }
+
         Log_OC.v(TAG, "onResume() end");
     }
 
