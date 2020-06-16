@@ -1,23 +1,13 @@
-<!--
-    @author Google LLC
-    Copyright (C) 2018 Google LLC
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
--->
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:height="24dp"
-    android:width="24dp"
+<vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt"
     android:viewportWidth="24"
-    android:viewportHeight="24">
-    <path android:fillColor="#757575" android:pathData="M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12,2Z" />
+    android:viewportHeight="24"
+    android:width="24dp"
+    android:height="24dp">
+    <group
+        android:translateX="4"
+        android:translateY="2">
+        <path
+            android:pathData="M8.33333333 0C3.96317314 0.00505141704 0.421718084 3.54650647 0.416666667 7.91666667C0.416666667 13.3725 5.865 18.3233333 7.53416667 19.7108333C7.99720197 20.0954888 8.66863137 20.0954888 9.13166667 19.7108333C10.7983333 18.3233333 16.25 13.3708333 16.25 7.91583333C16.2444895 3.54599858 12.7031686 0.00505048628 8.33333333 0ZM8.33333333 12.0833333C6.03214688 12.0833333 4.16666667 10.2178531 4.16666667 7.91666667C4.16666667 5.61548021 6.03214688 3.75 8.33333333 3.75C10.6345198 3.75 12.5 5.61548021 12.5 7.91666667C12.5 9.02173537 12.0610132 10.0815433 11.2796116 10.8629449C10.49821 11.6443465 9.43840204 12.0833333 8.33333333 12.0833333L8.33333333 12.0833333Z"
+            android:fillColor="#757575" />
+    </group>
 </vector>

@@ -1,23 +1,14 @@
-<!--
-    @author Google LLC
-    Copyright (C) 2019 Google LLC
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
--->
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:height="24dp"
-    android:width="24dp"
+<vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt"
     android:viewportWidth="24"
-    android:viewportHeight="24">
-    <path android:fillColor="#757575" android:pathData="M8.5,13.5L11,16.5L14.5,12L19,18H5M21,19V5C21,3.89 20.1,3 19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19Z" />
+    android:viewportHeight="24"
+    android:width="24dp"
+    android:height="24dp">
+    <group
+        android:translateX="3"
+        android:translateY="4">
+        <path
+            android:pathData="M16.5 0C17.3284271 -0.0000000000000001521796 18 0.671572875 18 1.5L18 14.5C18 15.3284271 17.3284271 16 16.5 16L1.5 16C0.671572875 16 0.0000000000000003234977 15.3284271 0 14.5L0 1.5C-0.0000000000000003234977 0.671572875 0.671572875 0.0000000000000003742242 1.5 0L16.5 0ZM10.6347933 6.7047619C10.4741843 6.7047619 10.3249041 6.78534754 10.239782 6.9180001L10.239782 6.9180001L7.97964621 10.4404854L7.94195902 10.4848187C7.89915337 10.5238475 7.84221441 10.5463084 7.78214053 10.5463084C7.70204202 10.5463084 7.6275167 10.506378 7.58463485 10.4404854L7.58463485 10.4404854L6.10969135 9.13232158L6.05134172 9.05920622C5.96440396 8.97065818 5.84316719 8.91908338 5.71467999 8.91908338C5.554071 8.91908338 5.4047908 8.99966901 5.31966864 9.13232158L5.31966864 9.13232158L1.45182473 14.2048508L1.42598679 14.2602195C1.40816893 14.317956 1.4144572 14.3811841 1.4452645 14.4353925C1.48634091 14.5076703 1.56451175 14.5524063 1.64933041 14.5524063L1.64933041 14.5524063L16.1144886 14.5524063L16.1763804 14.544287C16.2360743 14.5283169 16.2877472 14.4896009 16.3185545 14.4353925C16.3596309 14.3631146 16.3571179 14.2748018 16.3119943 14.2048508L16.3119943 14.2048508L11.0298047 6.9180001L10.971455 6.84488475C10.8845173 6.75633671 10.7632805 6.7047619 10.6347933 6.7047619ZM6.10784431 2.8952381C5.0272872 2.8952381 4.15132258 3.74802905 4.15132258 4.8C4.15132258 5.85197095 5.0272872 6.7047619 6.10784431 6.7047619C7.18840143 6.7047619 8.06436605 5.85197095 8.06436605 4.8C8.06436605 3.74802905 7.18840143 2.8952381 6.10784431 2.8952381Z"
+            android:fillType="evenOdd"
+            android:fillColor="#757575" />
+    </group>
 </vector>

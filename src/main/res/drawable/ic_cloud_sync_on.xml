@@ -1,23 +1,9 @@
-<!--
-    @author Google LLC
-    Copyright (C) 2018 Google LLC
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
--->
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:height="24dp"
-    android:width="24dp"
+<vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt"
     android:viewportWidth="24"
-    android:viewportHeight="24">
-    <path android:fillColor="#757575" android:pathData="M19.35,10.03C18.67,6.59 15.64,4 12,4C9.11,4 6.6,5.64 5.35,8.03C2.34,8.36 0,10.9 0,14A6,6 0 0,0 6,20H19A5,5 0 0,0 24,15C24,12.36 21.95,10.22 19.35,10.03Z" />
+    android:viewportHeight="24"
+    android:width="24dp"
+    android:height="24dp">
+    <path
+        android:pathData="M4.81065059 19.3978323C3.49337098 19.3836464 2.2254245 18.8947183 1.23965059 18.0208323C0.401991726 17.1682787 -0.0454214349 16.0070316 0.00365059275 14.8128323C0.003486021 12.4037855 1.86654412 10.4049067 4.26965059 10.2358323C4.3816465 10.2277107 4.47448668 10.1459132 4.49665059 10.0358323C5.17248916 6.95891571 7.6579448 4.60621256 10.7672921 4.10011667C13.8766394 3.59402079 16.9799141 5.03706888 18.5966506 7.74083232C18.6375097 7.80902996 18.7084778 7.85361726 18.7876506 7.86083232C20.0835721 7.98139545 21.2995661 8.540534 22.2346506 9.44583232C23.8550519 11.0085137 24.4248627 13.3676801 23.6963599 15.4976935C22.9678572 17.627707 21.0726417 19.1437902 18.8346506 19.3868323C18.7919108 19.3928154 18.7488071 19.3958226 18.7056506 19.3958323L4.81065059 19.3958323L4.81065059 19.3978323Z"
+        android:fillColor="#757575" />
 </vector>

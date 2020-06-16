@@ -1,25 +1,13 @@
-<!--
-  Nextcloud Android client application
-
-  Copyright (C) 2020 Nextcloud.
-
-  This program is free software; you can redistribute it and/or
-  modify it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE
-  License as published by the Free Software Foundation; either
-  version 3 of the License, or any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU AFFERO GENERAL PUBLIC LICENSE for more details.
-
-  You should have received a copy of the GNU Affero General Public
-  License along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-  Icon provided by Android Material Library in Apache License 2.0
--->
-<vector android:height="24dp" android:tint="#F7CD46"
-    android:viewportHeight="24.0" android:viewportWidth="24.0"
-    android:width="24dp" xmlns:android="http://schemas.android.com/apk/res/android">
-    <path android:fillColor="#FF000000" android:pathData="M12,17.27L18.18,21l-1.64,-7.03L22,9.24l-7.19,-0.61L12,2 9.19,8.63 2,9.24l5.46,4.73L5.82,21z"/>
+<vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt"
+    android:viewportWidth="24"
+    android:viewportHeight="24"
+    android:width="24dp"
+    android:height="24dp">
+    <group
+        android:translateX="2"
+        android:translateY="2">
+        <path
+            android:pathData="M19.920037 7.21793946C19.7322716 6.71782485 19.2514021 6.38553732 18.7131368 6.38395472L13.4881003 6.38395472C13.3058779 6.38408488 13.1434367 6.27012641 13.0829389 6.0997191L11.2073508 0.829446139C11.0192192 0.33061993 10.538487 0 10.0013091 0C9.46413108 0 8.9833989 0.33061993 8.79526727 0.829446139L8.79097531 0.843062217L6.91967916 6.0997191C6.85928606 6.26983184 6.69728343 6.38372394 6.51537619 6.38395472L1.28862287 6.38395472C0.746671425 6.38355073 0.262478896 6.71962373 0.0774404152 7.22462387C-0.107598066 7.729624 0.0461329934 8.29543415 0.461990671 8.63996855L4.91189857 12.2992894C5.04813642 12.4113742 5.10097607 12.5948903 5.04494944 12.761385L3.17537008 18.3192976C2.9980752 18.8466058 3.18533328 19.4270381 3.63838329 19.7544709C4.09143329 20.0819038 4.70612136 20.0810621 5.15825728 19.7523897L9.74722481 16.4164508C9.89823275 16.3067685 10.103527 16.3067685 10.2545349 16.4164508L14.8417856 19.7515387C15.2937483 20.0813448 15.9091178 20.0829563 16.3628316 19.755522C16.8165454 19.4280876 17.004087 18.8470344 16.8263896 18.3192976L14.9568103 12.757981C14.9007836 12.5914863 14.9536233 12.4079702 15.0898611 12.2958853L19.548353 8.6314585C19.9588083 8.28407034 20.1071894 7.71977497 19.920037 7.21793946Z"
+            android:fillColor="#FCC10A" />
+    </group>
 </vector>
