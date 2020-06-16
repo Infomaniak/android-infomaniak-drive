@@ -32,14 +32,7 @@ public class Utils {
      * @return if open
      */
     public static boolean openOnlyOffice(Activity activity, User user, OCFile file) {
-        String type;
-        if (isDoc(file)) {
-            type = "text";
-        } else if (isSpreadsheet(file)) {
-            type = "spreadsheet";
-        } else if (isPresentation(file)) {
-            type = "presentation";
-        } else {
+        if (!isDoc(file) && !isSpreadsheet(file) && !isPresentation(file)) {
             return false;
         }
 
@@ -54,7 +47,7 @@ public class Utils {
 
         String fileID = file.getRemoteId().replaceAll("^0*", "");
 
-        String url = "https://drive.infomaniak.com/app/drive/" + driveID + "/preview/" + type + "/" + fileID;
+        String url = "https://drive.infomaniak.com/app/office/" + driveID + "/" + fileID;
 
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(Uri.parse(url));
