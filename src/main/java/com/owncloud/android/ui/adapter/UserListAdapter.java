@@ -149,8 +149,6 @@ public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private void setupAddAccountListItem(AddAccountViewHolderItem holder) {
         View actionView = holder.itemView;
 
-        holder.usernameViewItem.setTextColor(context.getResources().getColor(R.color.fontAppbar));
-
         // bind action listener
         boolean isProviderOrOwnInstallationVisible = context.getResources()
                 .getBoolean(R.bool.show_provider_or_own_installation);
@@ -334,10 +332,8 @@ public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
      * Account ViewHolderItem to get smooth scrolling.
      */
     static class AddAccountViewHolderItem extends RecyclerView.ViewHolder {
-        private TextView usernameViewItem;
         AddAccountViewHolderItem(@NonNull View view) {
             super(view);
-            this.usernameViewItem = view.findViewById(R.id.user_name);
         }
     }
 
