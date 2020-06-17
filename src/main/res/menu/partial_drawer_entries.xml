@@ -71,11 +71,13 @@
             android:orderInCategory="0"
             android:title="@string/drawer_item_recently_modified"
             android:visible="false"/>
+        <!-- Infomaniak : Visible to false, to hide notifications -->
         <item
             android:orderInCategory="0"
             android:id="@+id/nav_notifications"
             android:icon="@drawable/nav_notifications"
-            android:title="@string/drawer_item_notifications"/>
+            android:title="@string/drawer_item_notifications"
+            android:visible="false"/>
         <item
             android:orderInCategory="0"
             android:id="@+id/nav_synced_folders"
