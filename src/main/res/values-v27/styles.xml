@@ -41,7 +41,8 @@
     </style>
 
     <style name="Theme.ownCloud.noActionBar.Login" parent="Theme.ownCloud.noActionBar.LoginBase21">
-        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:navigationBarColor">@color/white</item><!--kDrive-->
+        <item name="android:windowLightNavigationBar">true</item><!--kDrive-->
     </style>
 
 </resources>

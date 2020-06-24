@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+kDrive
+-->
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <style name="Theme.ownCloud.noActionBar.LoginBase21" parent="Theme.ownCloud.noActionBar.LoginBase">
+        <item name="android:statusBarColor">@color/white</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+
+    <style name="Theme.ownCloud.noActionBar.Login" parent="Theme.ownCloud.noActionBar.LoginBase21" />
+
+</resources>

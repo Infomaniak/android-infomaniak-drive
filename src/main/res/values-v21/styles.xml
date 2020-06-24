@@ -76,10 +76,4 @@
         <item name="android:textColorHint">@color/secondary_text_color</item>
     </style>
 
-    <style name="Theme.ownCloud.noActionBar.LoginBase21" parent="Theme.ownCloud.noActionBar.LoginBase">
-        <item name="android:navigationBarColor">@color/primary</item>
-    </style>
-
-    <style name="Theme.ownCloud.noActionBar.Login" parent="Theme.ownCloud.noActionBar.LoginBase21" />
-
 </resources>
