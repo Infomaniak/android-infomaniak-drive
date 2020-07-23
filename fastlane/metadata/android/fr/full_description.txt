@@ -1,0 +1,14 @@
+kDrive est un service de stockage et de synchronisation qui respecte la vie privée pour collaborer et accéder à vos données depuis tous vos appareils. Vos données sont chiffrées et exclusivement stockées en Suisse, dans les datacenters écologiques d'Infomaniak.
+
+Avec l'app kDrive, vous pouvez :
+
+- Gérer, partager et consulter vos documents, photos, vidéos et fichiers audio
+- Synchroniser vos données avec kDrive
+- Stocker des fichiers pour y accéder hors ligne
+- Consulter et modifier vos fichiers Word, Excel et PowerPoint
+- Numériser des documents, reçus, notes, etc.
+- Gérer plusieurs Drive Infomaniak
+
+Infomaniak est une entreprise indépendante qui est détenue par ses fondateurs et ses employés. Nous n'analysons ou ne revendons pas vos données. Vous gardez le contrôle total de vos données et vous pouvez travailler et collaborer sans limites dans un écosystème sécurisé.
+
+Pour utiliser kDrive, il est pour le moment nécessaire de souscrire à un abonnement mensuel (dès CHF 5.92 ou 6.57 euros TTC par mois pour 2 To d'espace de stockage). Pour en savoir plus, veuillez consulter notre site https://infomaniak.com/fr/kdrive

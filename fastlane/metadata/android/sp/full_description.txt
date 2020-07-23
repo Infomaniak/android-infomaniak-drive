@@ -1,0 +1,14 @@
+kDrive es un Cloud seguro que respeta la privacidad para colaborar y acceder a tus datos desde todos tus dispositivos. Tus datos se cifran y se almacenan exclusivamente en Suiza, en los centros de datos ecológicos de Infomaniak.
+
+La aplicación kDrive te permite:
+
+- gestionar, compartir y consultar tus documentos, fotos, vídeos y ficheros de audio
+- agregar cualquier fichero a tu Drive
+- almacenar los ficheros para acceder a ellos fuera de línea
+- consultar y modificar tus documentos Word, Excel y PowerPoint
+- digitalizar documentos, recibos, notas, etc.
+- gestionar varios Drive de Infomaniak
+
+Infomaniak es una empresa independiente, cuyos propietarios son sus fundadores y empleados. No analizamos ni revendemos tus datos. Tú conservas el control total de tus datos y puedes trabajar y colaborar sin limitaciones en un ecosistema seguro.
+
+Para utilizar kDrive, de momento debes suscribir un abono mensual (desde 5,92 CHF o 6,57 euros impuestos incl. por mes para 2 TB de espacio de almacenamiento). Para más información, consulta nuestro sitio https://infomaniak.com/es/kdrive
