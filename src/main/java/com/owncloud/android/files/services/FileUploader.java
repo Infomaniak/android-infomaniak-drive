@@ -9,7 +9,7 @@
  *
  *  Copyright (C) 2012 Bartek Przybylski
  *  Copyright (C) 2012-2016 ownCloud Inc.
- *  Copyright (C) 2019 Chris Narkiewicz <hello@ezaquarii.com>
+ *  Copyright (C) 2020 Chris Narkiewicz <hello@ezaquarii.com>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License version 2,
@@ -47,10 +47,10 @@ import android.os.Parcelable;
 import android.os.Process;
 import android.util.Pair;
 
-import com.evernote.android.job.JobRequest;
-import com.evernote.android.job.util.Device;
 import com.nextcloud.client.account.UserAccountManager;
+import com.nextcloud.client.device.BatteryStatus;
 import com.nextcloud.client.device.PowerManagementService;
+import com.nextcloud.client.network.Connectivity;
 import com.nextcloud.client.network.ConnectivityService;
 import com.owncloud.android.MainApp;
 import com.owncloud.android.R;
@@ -71,7 +71,7 @@ import com.owncloud.android.lib.common.operations.RemoteOperationResult.ResultCo
 import com.owncloud.android.lib.common.utils.Log_OC;
 import com.owncloud.android.lib.resources.files.FileUtils;
 import com.owncloud.android.operations.UploadFileOperation;
-import com.owncloud.android.ui.activity.FileActivity;
+import com.owncloud.android.ui.activity.ConflictsResolveActivity;
 import com.owncloud.android.ui.activity.UploadListActivity;
 import com.owncloud.android.ui.notifications.NotificationUtils;
 import com.owncloud.android.utils.ErrorMessageAdapter;
@@ -555,7 +555,7 @@ public class FileUploader extends Service
     public void onAccountsUpdated(Account[] accounts) {
         // Review current upload, and cancel it if its account doesn't exist
         if (mCurrentUpload != null && !accountManager.exists(mCurrentUpload.getAccount())) {
-            mCurrentUpload.cancel();
+            mCurrentUpload.cancel(ResultCode.ACCOUNT_NOT_FOUND);
         }
         // The rest of uploads are cancelled when they try to start
     }
@@ -671,12 +671,15 @@ public class FileUploader extends Service
         }
 
         /// includes a pending intent in the notification showing the details
-        Intent showUploadListIntent = new Intent(this, UploadListActivity.class);
-        showUploadListIntent.putExtra(FileActivity.EXTRA_FILE, upload.getFile());
-        showUploadListIntent.putExtra(FileActivity.EXTRA_ACCOUNT, upload.getAccount());
-        showUploadListIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        mNotificationBuilder.setContentIntent(PendingIntent.getActivity(this, (int) System.currentTimeMillis(),
-                                                                        showUploadListIntent, 0));
+        Intent intent = UploadListActivity.createIntent(upload.getFile(),
+                                                        upload.getAccount(),
+                                                        Intent.FLAG_ACTIVITY_CLEAR_TOP,
+                                                        this);
+        mNotificationBuilder.setContentIntent(PendingIntent.getActivity(this,
+                                                                        (int) System.currentTimeMillis(),
+                                                                        intent,
+                                                                        0)
+                                             );
 
         if (!upload.isInstantPicture() && !upload.isInstantVideo()) {
             if (mNotificationManager == null) {
@@ -776,14 +779,24 @@ public class FileUploader extends Service
                     PendingIntent.FLAG_ONE_SHOT
                 ));
             } else {
-                //in case of failure, do not show details file view (because there is no file!)
-                Intent showUploadListIntent = new Intent(this, UploadListActivity.class);
-                showUploadListIntent.putExtra(FileActivity.EXTRA_FILE, upload.getFile());
-                showUploadListIntent.putExtra(FileActivity.EXTRA_ACCOUNT, upload.getAccount());
-                showUploadListIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                mNotificationBuilder.setContentIntent(PendingIntent.getActivity(
-                    this, (int) System.currentTimeMillis(), showUploadListIntent, 0
-                ));
+                Intent intent;
+                if (uploadResult.getCode().equals(ResultCode.SYNC_CONFLICT)) {
+                    intent = ConflictsResolveActivity.createIntent(upload.getFile(),
+                                                                   upload.getAccount(),
+                                                                   Intent.FLAG_ACTIVITY_CLEAR_TOP,
+                                                                   this);
+                } else {
+                    intent = UploadListActivity.createIntent(upload.getFile(),
+                                                             upload.getAccount(),
+                                                             Intent.FLAG_ACTIVITY_CLEAR_TOP,
+                                                             this);
+                }
+
+                mNotificationBuilder.setContentIntent(PendingIntent.getActivity(this,
+                                                                                (int) System.currentTimeMillis(),
+                                                                                intent,
+                                                                                0)
+                                                     );
             }
 
             mNotificationBuilder.setContentText(content);
@@ -1007,11 +1020,12 @@ public class FileUploader extends Service
         boolean resultMatch;
         boolean accountMatch;
 
-        boolean gotNetwork = connectivityService.getActiveNetworkType() != JobRequest.NetworkType.ANY &&
-            !connectivityService.isInternetWalled();
-        boolean gotWifi = gotNetwork && Device.getNetworkType(context).equals(JobRequest.NetworkType.UNMETERED);
-        boolean charging = Device.getBatteryStatus(context).isCharging();
-        boolean isPowerSaving = powerManagementService.isPowerSavingEnabled();
+        final Connectivity connectivity = connectivityService.getConnectivity();
+        final boolean gotNetwork = connectivity.isConnected() && !connectivityService.isInternetWalled();
+        final boolean gotWifi = connectivity.isWifi();
+        final BatteryStatus batteryStatus = powerManagementService.getBattery();
+        final boolean charging = batteryStatus.isCharging() || batteryStatus.isFull();
+        final boolean isPowerSaving = powerManagementService.isPowerSavingEnabled();
 
         for (OCUpload failedUpload : failedUploads) {
             accountMatch = account == null || account.name.equals(failedUpload.getAccountName());
@@ -1027,7 +1041,7 @@ public class FileUploader extends Service
                         uploadsStorageManager.updateUpload(failedUpload);
                     }
                 } else {
-                    charging = charging || Device.getBatteryStatus(context).getBatteryPercent() == 1;
+
                     if (!isPowerSaving && gotNetwork && canUploadBeRetried(failedUpload, gotWifi, charging)) {
                         retryUpload(context, currentAccount, failedUpload);
                     }
@@ -1126,7 +1140,7 @@ public class FileUploader extends Service
             }
 
             if (upload != null) {
-                upload.cancel();
+                upload.cancel(resultCode);
                 // need to update now table in mUploadsStorageManager,
                 // since the operation will not get to be run by FileUploader#uploadFile
                 if (resultCode != null) {
@@ -1149,7 +1163,7 @@ public class FileUploader extends Service
             if (mCurrentUpload != null) {
                 Log_OC.d(TAG, "Current Upload Account= " + mCurrentUpload.getAccount().name);
                 if (mCurrentUpload.getAccount().name.equals(account.name)) {
-                    mCurrentUpload.cancel();
+                    mCurrentUpload.cancel(ResultCode.CANCELLED);
                 }
             }
 
@@ -1286,9 +1300,10 @@ public class FileUploader extends Service
             Context context = MainApp.getAppContext();
             if (context != null) {
                 ResultCode cancelReason = null;
-                if (mCurrentUpload.isWifiRequired() && !Device.getNetworkType(context).equals(JobRequest.NetworkType.UNMETERED)) {
+                Connectivity connectivity = connectivityService.getConnectivity();
+                if (mCurrentUpload.isWifiRequired() && !connectivity.isWifi()) {
                     cancelReason = ResultCode.DELAYED_FOR_WIFI;
-                } else if (mCurrentUpload.isChargingRequired() && !Device.getBatteryStatus(context).isCharging()) {
+                } else if (mCurrentUpload.isChargingRequired() && !powerManagementService.getBattery().isCharging()) {
                     cancelReason = ResultCode.DELAYED_FOR_CHARGING;
                 } else if (!mCurrentUpload.isIgnoringPowerSaveMode() && powerManagementService.isPowerSavingEnabled()) {
                     cancelReason = ResultCode.DELAYED_IN_POWER_SAVE_MODE;

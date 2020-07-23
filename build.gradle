@@ -1,13 +1,14 @@
+import com.github.spotbugs.snom.SpotBugsTask
+
 // Gradle build file
 //
 // This project was started in Eclipse and later moved to Android Studio. In the transition, both IDEs were supported.
 // Due to this, the files layout is not the usual in new projects created with Android Studio / gradle. This file
 // merges declarations usually split in two separates build.gradle file, one for global settings of the project in
 // its root folder, another one for the app module in subfolder of root.
-import com.github.spotbugs.SpotBugsTask
 
 buildscript {
-    ext.kotlin_version = '1.3.70'
+    ext.kotlin_version = '1.3.72'
     repositories {
         google()
         jcenter()
@@ -20,15 +21,13 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.5.3'
-        classpath('com.dicedmelon.gradle:jacoco-android:0.1.4') {
-            exclude group: 'org.codehaus.groovy', module: 'groovy-all'
-        }
-        classpath 'gradle.plugin.com.github.spotbugs:spotbugs-gradle-plugin:1.6.6'
+        classpath 'com.android.tools.build:gradle:4.0.0'
+        classpath('com.hiya:jacoco-android:0.2')
+        classpath 'gradle.plugin.com.github.spotbugs.snom:spotbugs-gradle-plugin:4.3.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:1.6.0"
+        classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:1.9.1"
         classpath "commons-httpclient:commons-httpclient:3.1@jar" // remove after entire switch to lib v2
-        classpath 'com.karumi:shot:3.1.0'
+        classpath 'com.karumi:shot:4.3.0'
     }
 }
 
@@ -39,7 +38,7 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'checkstyle'
 apply plugin: 'pmd'
-apply plugin: 'jacoco-android'
+apply plugin: 'com.hiya.jacoco-android'
 apply plugin: 'com.github.spotbugs'
 apply plugin: 'io.gitlab.arturbosch.detekt'
 apply plugin: 'shot'
@@ -51,7 +50,7 @@ configurations {
         exclude group: 'com.google.firebase', module: 'firebase-core'
         exclude group: 'com.google.firebase', module: 'firebase-analytics'
         exclude group: 'com.google.firebase', module: 'firebase-measurement-connector'
-        exclude group: 'org.jetbrains', module: 'annotations-java5' // via prism4j, already using annotations explicitely
+        exclude group: 'org.jetbrains', module: 'annotations-java5' // via prism4j, already using annotations explicitly
 
         // check for updates every build
         resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
@@ -60,15 +59,15 @@ configurations {
 
 ext {
     jacocoVersion = "0.8.2"
-    daggerVersion = "2.26"
-    markwonVersion =  "4.2.2"
+    daggerVersion = "2.27"
+    markwonVersion =  "4.4.0"
     prismVersion = "2.0.0"
-    androidLibraryVersion = "2.1.1"
+    androidLibraryVersion = "master-SNAPSHOT"
 
     travisBuild = System.getenv("TRAVIS") == "true"
 
-    // allows for -Dpre-dex=false to be set
-    preDexEnabled = "true".equals(System.getProperty("pre-dex", "true"))
+    // allows for -D pre-dex=false to be set
+    preDexEnabled = "true" == System.getProperty("pre-dex", "true")
 }
 
 repositories {
@@ -84,14 +83,14 @@ repositories {
 
 // semantic versioning for version code
 def versionMajor = 3
-def versionMinor = 11
-def versionPatch = 2
-def versionBuild = 91 // 0-50=Alpha / 51-98=RC / 90-99=stable
+def versionMinor = 13
+def versionPatch = 0
+def versionBuild = 90 // 0-50=Alpha / 51-98=RC / 90-99=stable
 
 for (TaskExecutionRequest tr : getGradle().getStartParameter().getTaskRequests()) {
     for (String arg : tr.args) {
         // any gplay, but only exact "build", as e.g. buildGeneric shall not apply gplay.grade
-        if (arg.contains("Gplay") || arg.contains("lint") || arg.contains("executeScreenshot") || arg == "build") {
+        if (arg.contains("Gplay") || arg.contains("lint") || arg.contains("ExecuteScreenshot") || arg == "build") {
             apply from: 'gplay.gradle'
             System.console().println("Applying gplay.gradle")
             break
@@ -99,17 +98,11 @@ for (TaskExecutionRequest tr : getGradle().getStartParameter().getTaskRequests()
     }
 }
 
-spotbugs {
-    toolVersion = '3.1.12'
-}
 
-shot {
-    appId = 'com.infomaniak.drive'
-    instrumentationTestTask = 'connectedGplayDebugAndroidTest'
-}
 
 android {
     lintOptions {
+        checkGeneratedSources = true
         abortOnError false
         htmlReport true
         htmlOutput file("$project.buildDir/reports/lint/lint.html")
@@ -119,7 +112,8 @@ android {
             'IconMissingDensityFolder',
             'IconDensities',
             'GoogleAppIndexingWarning',
-            'MissingDefaultResource'
+            'MissingDefaultResource',
+            'InvalidPeriodicWorkRequestInterval' // crashes due to a bug in lint itself
     }
 
     dexOptions {
@@ -129,7 +123,7 @@ android {
     compileSdkVersion 29
 
     defaultConfig {
-        minSdkVersion 16
+        minSdkVersion 18
         targetSdkVersion 29
 
         // arguments to be passed to functional tests
@@ -158,7 +152,7 @@ android {
 
         buildTypes {
             debug {
-                testCoverageEnabled true
+                testCoverageEnabled (project.hasProperty('coverage'))
             }
         }
 
@@ -191,7 +185,6 @@ android {
 
         testOptions {
             unitTests.returnDefaultValues = true
-            execution 'ANDROIDX_TEST_ORCHESTRATOR'
             animationsDisabled true
         }
     }
@@ -200,7 +193,7 @@ android {
     // see http://tools.android.com/tech-docs/new-build-system/user-guide#TOC-Configuring-the-Structure
 
     dexOptions {
-        // Skip pre-dexing when running on Travis CI or when disabled via -Dpre-dex=false.
+        // Skip pre-dexing when running on Travis CI or when disabled via -D pre-dex=false.
         preDexLibraries = preDexEnabled && !travisBuild
     }
 
@@ -242,37 +235,33 @@ android {
     android.applicationVariants.all { variant ->
         String variantName = variant.name
         String capVariantName = variantName.substring(0, 1).toUpperCase() + variantName.substring(1)
-        tasks.register("spotbugs${capVariantName}", SpotBugsTask) {
+        tasks.register("spotbugs${capVariantName}Report", SpotBugsTask) {
             ignoreFailures = true // should continue checking
             effort = "max"
             reportLevel = "medium"
             classes = fileTree("$project.buildDir/intermediates/javac/${variantName}/classes/")
             excludeFilter = file("${project.rootDir}/spotbugs-filter.xml")
-            pluginClasspath = project.configurations.spotbugsPlugins
-            source = fileTree('src/main/java')
-            classpath = files()
-            include '**/*.java'
-            exclude '**/gen/**'
 
             reports {
                 xml.enabled = false
-                html.enabled = true
                 html {
+                    enabled = true
                     destination = file("$project.buildDir/reports/spotbugs/spotbugs.html")
                 }
             }
         }
     }
 
-    check.dependsOn 'checkstyle', 'spotbugsGplayDebug', 'pmd', 'lint', 'ktlint', 'detekt'
+    check.dependsOn 'checkstyle', 'spotbugsGplayDebugReport', 'pmd', 'lint', 'ktlint', 'detekt'
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
-    dataBinding {
-        enabled true
+    buildFeatures {
+        dataBinding true
+        viewBinding true
     }
 }
 
@@ -284,6 +273,15 @@ dependencies {
     gplayImplementation "com.github.nextcloud:android-library:$androidLibraryVersion"
     versionDevImplementation "com.github.nextcloud:android-library:$androidLibraryVersion"
     qaImplementation "com.github.nextcloud:android-library:$androidLibraryVersion"
+
+    kapt 'javax.xml.bind:jaxb-api:2.3.1'
+    kapt 'org.glassfish.jaxb:jaxb-core:2.3.0.1'
+    kapt 'org.glassfish.jaxb:jaxb-runtime:2.3.3'
+
+    annotationProcessor 'javax.xml.bind:jaxb-api:2.3.1'
+    annotationProcessor 'org.glassfish.jaxb:jaxb-core:2.3.0.1'
+    annotationProcessor 'org.glassfish.jaxb:jaxb-runtime:2.3.3'
+
     compileOnly 'org.jbundle.util.osgi.wrapped:org.jbundle.util.osgi.wrapped.org.apache.http.client:4.1.2' // remove after entire switch to lib v2
     implementation "commons-httpclient:commons-httpclient:3.1@jar" // remove after entire switch to lib v2
     implementation 'org.apache.jackrabbit:jackrabbit-webdav:2.13.1' // remove after entire switch to lib v2
@@ -291,26 +289,25 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.google.android.material:material:1.1.0'
     implementation 'com.jakewharton:disklrucache:2.0.2'
-    implementation 'androidx.appcompat:appcompat:1.2.0-alpha03'
+    implementation 'androidx.appcompat:appcompat:1.2.0-rc01'
     implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'androidx.exifinterface:exifinterface:1.1.0'
+    implementation 'androidx.exifinterface:exifinterface:1.2.0'
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0"
-    implementation "androidx.work:work-runtime:2.3.3"
-    implementation "androidx.work:work-runtime-ktx:2.3.2"
+    implementation "androidx.work:work-runtime:2.3.4"
+    implementation "androidx.work:work-runtime-ktx:2.3.4"
     implementation 'com.github.albfernandez:juniversalchardet:2.0.3' // need this version for Android <7
     compileOnly 'com.google.code.findbugs:annotations:2.0.1'
-    implementation 'commons-io:commons-io:2.6'
-    implementation 'com.github.tobiaskaminsky:android-job:v1.2.6.1' // 'com.github.evernote:android-job:v1.2.5'
+    implementation 'commons-io:commons-io:2.7'
     implementation 'com.jakewharton:butterknife:10.2.1'
     kapt 'com.jakewharton:butterknife-compiler:10.2.1'
     implementation 'org.greenrobot:eventbus:3.2.0'
-    implementation 'com.googlecode.ez-vcard:ez-vcard:0.10.5'
+    implementation 'com.googlecode.ez-vcard:ez-vcard:0.10.6'
     implementation 'org.lukhnos:nnio:0.2'
-    implementation 'com.madgag.spongycastle:pkix:1.54.0.0'
+    implementation 'org.bouncycastle:bcpkix-jdk15on:1.65'
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'com.afollestad:sectioned-recyclerview:0.5.0'
     implementation 'com.github.chrisbanes:PhotoView:2.3.0'
-    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.15'
+    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.20'
     implementation 'com.github.tobiaskaminsky:qrcodescanner:0.1.2.2' // 'com.github.blikoon:QRCodeScanner:0.1.2'
     implementation 'com.google.android:flexbox:2.0.1'
     implementation 'org.parceler:parceler-api:1.1.13'
@@ -333,11 +330,11 @@ dependencies {
     kapt "com.google.dagger:dagger-compiler:$daggerVersion"
     kapt "com.google.dagger:dagger-android-processor:$daggerVersion"
 
-    compileOnly "org.projectlombok:lombok:1.18.12"
-    annotationProcessor "org.projectlombok:lombok:1.18.12"
-
-    ktlint "com.pinterest:ktlint:0.36.0"
+    ktlint "com.pinterest:ktlint:0.37.2"
     implementation 'org.conscrypt:conscrypt-android:2.4.0'
+
+    // Shimmer animation
+    implementation 'com.elyeproj.libraries:loaderviewlibrary:2.0.0'
 
     // dependencies for markdown rendering
     implementation "io.noties.markwon:core:$markwonVersion"
@@ -352,12 +349,12 @@ dependencies {
 
     // dependencies for local unit tests
     testImplementation 'junit:junit:4.13'
-    testImplementation 'org.mockito:mockito-core:3.3.1'
+    testImplementation 'org.mockito:mockito-core:3.3.3'
     testImplementation 'androidx.test:core:1.2.0'
-    testImplementation 'org.powermock:powermock-core:2.0.5'
-    testImplementation 'org.powermock:powermock-module-junit4:2.0.5'
-    testImplementation 'org.powermock:powermock-api-mockito2:2.0.5'
-    testImplementation 'org.json:json:20190722'
+    testImplementation 'org.powermock:powermock-core:2.0.7'
+    testImplementation 'org.powermock:powermock-module-junit4:2.0.7'
+    testImplementation 'org.powermock:powermock-api-mockito2:2.0.7'
+    testImplementation 'org.json:json:20200518'
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
     testImplementation "androidx.arch.core:core-testing:2.1.0"
 
@@ -379,7 +376,7 @@ dependencies {
     //androidTestImplementation "com.android.support:support-annotations:${supportLibraryVersion}"
     androidTestImplementation 'tools.fastlane:screengrab:2.0.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    androidTestCompile('com.android.support.test.espresso:espresso-intents:3.0.2')
+    androidTestImplementation('com.android.support.test.espresso:espresso-intents:3.0.2')
 
 //    jacocoAnt "org.jacoco:org.jacoco.ant:${jacocoVersion}"
 //    jacocoAgent "org.jacoco:org.jacoco.agent:${jacocoVersion}"
@@ -390,6 +387,9 @@ dependencies {
 //    androidJacocoAnt "org.jacoco:org.jacoco.agent:${jacocoVersion}"
 
     implementation "com.github.stateless4j:stateless4j:2.6.0"
+    androidTestImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
+    androidTestImplementation "org.mockito:mockito-android:3.3.3"
+    androidTestImplementation 'net.bytebuddy:byte-buddy:1.10.12'
 }
 
 configurations.all {
@@ -412,17 +412,15 @@ android.applicationVariants.all { variant ->
 tasks.register("combinedTestReport", JacocoReport) {
 
     reports {
-        xml.enabled = true
-        html.enabled = true
+        xml.enabled true
+        html.enabled true
+        csv.enabled false
     }
 
-    def fileFilter = ['**/R.class', '**/R$*.class', '**/BuildConfig.*', '**/Manifest*.*', '**/*Test*.*', 'android/**/*.*']
-    def debugTree = fileTree(dir: "$project.buildDir/intermediates/classes/gplay/debug", excludes: fileFilter)
-    def mainSrc = "$project.projectDir/src/main/java"
-
-    sourceDirectories = files([mainSrc])
-    classDirectories = files([debugTree])
-    executionData = fileTree(dir: project.buildDir, includes: [
+    additionalSourceDirs.setFrom files(subprojects.sourceSets.main.allSource.srcDirs)
+    sourceDirectories.setFrom files(subprojects.sourceSets.main.allSource.srcDirs)
+    classDirectories.setFrom files(subprojects.sourceSets.main.output)
+    executionData.setFrom project.fileTree(dir: project.buildDir, includes: [
         'jacoco/testGplayDebugUnitTest.exec', 'outputs/code-coverage/connected/flavors/GPLAY/*coverage.ec'
     ])
 }

@@ -33,6 +33,7 @@
     <string name="activity_chooser_title">Poslat odkaz na…</string>
     <string name="activity_icon">Aktivita</string>
     <string name="add_to_cloud">Přidat k %1$s</string>
+    <string name="appbar_search_in">Hledat v %s</string>
     <string name="associated_account_not_found">Související účet nenalezen!</string>
     <string name="auth_access_failed">Přístup se nezdařil: %1$s</string>
     <string name="auth_account_does_not_exist">Účet zatím není na tomto zařízení přidán</string>
@@ -43,10 +44,10 @@
     <string name="auth_check_server">Zkontrolovat server</string>
     <string name="auth_connection_established">Spojení navázáno</string>
     <string name="auth_expired_basic_auth_toast">Zadejte stávající heslo</string>
-    <string name="auth_fail_get_user_name">Vámi používaný server nevrací správný identifikátor uživatele – obraťte se na správce serveru</string>
+    <string name="auth_fail_get_user_name">Vámi používaný server nevrací správný identifikátor uživatele – obraťte se na správce serveru.</string>
     <string name="auth_host_address">Adresa serveru</string>
     <string name="auth_host_url">Adresa serveru https://…</string>
-    <string name="auth_illegal_login_used">Byla použita neplatná přihlašovací URL</string>
+    <string name="auth_illegal_login_used">Použita neplatná přihlašovací URL</string>
     <string name="auth_incorrect_address_title">Nesprávný formát adresy serveru</string>
     <string name="auth_incorrect_path_title">Server nenalezen</string>
     <string name="auth_no_net_conn_title">Žádné síťové spojení</string>
@@ -71,12 +72,12 @@
     <string name="auth_unsupported_multiaccount">%1$s nepodporuje vícero účtů</string>
     <string name="auth_username">Uživatelské jméno</string>
     <string name="auth_wrong_connection_title">Nedaří se navázat spojení</string>
-    <string name="auth_wtf_reenter_URL">Neočekávaný stav; zadejte znovu adresu serveru</string>
+    <string name="auth_wtf_reenter_URL">Neočekávaný stav; zadejte znovu adresu serveru.</string>
     <string name="auto_upload_file_behaviour_kept_in_folder">ponechán v původní složce, protože je pouze pro čtení</string>
     <string name="auto_upload_on_wifi">Nahrávat pouze přes neplacené Wi-Fi připojení</string>
     <string name="auto_upload_path">/AutoUpload</string>
     <string name="autoupload_configure">Nastavit</string>
-    <string name="autoupload_create_new_custom_folder">Vytvořte nové nastavení vlastní složky</string>
+    <string name="autoupload_create_new_custom_folder">Vytvořit nové uživatelsky určené nastavení složky</string>
     <string name="autoupload_custom_folder">Nastavit uživatelsky určenou složku</string>
     <string name="autoupload_disable_power_save_check">Zakázat kontrolu úspory energie</string>
     <string name="autoupload_hide_folder">Skrýt složku</string>
@@ -114,20 +115,21 @@
     <string name="common_send">Odeslat</string>
     <string name="common_share">Sdílet</string>
     <string name="common_switch_account">Přepnout účet</string>
+    <string name="common_switch_to_account">Přepnout na účet</string>
     <string name="common_unknown">neznámý</string>
     <string name="common_yes">Ano</string>
     <string name="community_beta_headline">Vyzkoušet vývojové sestavení</string>
-    <string name="community_beta_text">Zahrnuje všechny nadcházející funkce a pohybuje se na hraně stability. Mohou se vyskytnout chyby, a pokud ano, nahlaste nám je prosím.</string>
+    <string name="community_beta_text">Zahrnuje všechny nadcházející funkce a pohybuje se na hraně stability. Mohou se vyskytnout chyby – pokud ano, nahlaste nám je prosím.</string>
     <string name="community_contribute_forum_forum">diskuzní fórum</string>
     <string name="community_contribute_forum_text">Pomozte ostatním na</string>
-    <string name="community_contribute_github_text">Kontrolujte, vylepšujte a programujte – podrobnosti naleznete na %1$s</string>
+    <string name="community_contribute_github_text">Kontrolujte, vylepšujte a programujte – podrobnosti naleznete na %1$s.</string>
     <string name="community_contribute_headline">Aktivně něčím přispět</string>
     <string name="community_contribute_irc_text">Připojte se k IRC chatu:</string>
     <string name="community_contribute_translate_text">aplikace</string>
     <string name="community_contribute_translate_translate">Překládat</string>
     <string name="community_dev_direct_download">Stáhnout vývojové vydání přímo</string>
-    <string name="community_dev_fdroid">Získat vývojové vydání z aplikace F-Droid</string>
-    <string name="community_rc_fdroid">Získat kandidáta na vydání z aplikace F-Droid</string>
+    <string name="community_dev_fdroid">Získat vývojové vydání aplikace z F-Droid</string>
+    <string name="community_rc_fdroid">Získat kandidáta na vydání aplikace z F-Droid</string>
     <string name="community_rc_play_store">Získat kandidáta na vydání z Google Play store</string>
     <string name="community_release_candidate_headline">Kandidát na vydání</string>
     <string name="community_release_candidate_text">Kandidát na vydání (RC) je zachyceným stavem nadcházejícího vydání a očekává se, že bude stabilní. Testování vašeho individuálního nastavení by to mohlo pomoci to zajistit. Přihlaste se k testování v katalogu aplikací Play nebo se podívejte do F-Droid v části „Verze“ a přihlaste se ručně.</string>
@@ -164,7 +166,7 @@
     <string name="copy_file_error">Při pokusu o zkopírování tohoto souboru či složky došlo k chybě</string>
     <string name="copy_file_invalid_into_descendent">Není možné zkopírovat složku do některé z jejích vlastních podsložek</string>
     <string name="copy_file_invalid_overwrite">Soubor už v cílové složce existuje</string>
-    <string name="copy_file_not_found">Nedaří se zkopírovat. Zkontrolujte zda soubor existuje</string>
+    <string name="copy_file_not_found">Nedaří se zkopírovat. Zkontrolujte zda soubor existuje.</string>
     <string name="copy_link">Zkopírovat odkaz</string>
     <string name="copy_move_to_encrypted_folder_not_supported">Kopírování/přesouvání do šifrované složky není v tuto chvíli podporováno.</string>
     <string name="copy_to">Zkopírovat do…</string>
@@ -266,6 +268,7 @@
     <string name="etm_background_jobs">Úlohy na pozadí</string>
     <string name="etm_background_jobs_cancel_all">Zrušit všechny úlohy</string>
     <string name="etm_background_jobs_prune">Odstranit neaktivní úlohy</string>
+    <string name="etm_background_jobs_schedule_test_job">Naplánovat testovací úlohu</string>
     <string name="etm_background_jobs_start_test_job">Spustit zkušební úlohu</string>
     <string name="etm_background_jobs_stop_test_job">Zastavit zkušební úlohu</string>
     <string name="etm_migrations">Migrace (přechod na novější verzi aplikace)</string>
@@ -287,19 +290,20 @@
     <string name="file_list_empty">Nahrajte nějaký obsah, nebo synchronizujte s vašimi zařízeními.</string>
     <string name="file_list_empty_favorite_headline">Zatím žádné oblíbené položky</string>
     <string name="file_list_empty_favorites_filter">Vaše vyhledávání nenalezlo žádné oblíbené soubory.</string>
-    <string name="file_list_empty_favorites_filter_list">Zde budou zobrazeny soubory a složky, které označíte jako oblíbené</string>
+    <string name="file_list_empty_favorites_filter_list">Zde budou zobrazeny soubory a složky, které označíte jako oblíbené.</string>
     <string name="file_list_empty_headline">Nejsou zde žádné soubory</string>
     <string name="file_list_empty_headline_search">V této složce nebylo nic nalezeno</string>
     <string name="file_list_empty_headline_server_search">Žádné výsledky</string>
     <string name="file_list_empty_headline_server_search_photos">Žádné fotky</string>
     <string name="file_list_empty_headline_server_search_videos">Žádná videa</string>
     <string name="file_list_empty_moving">Nic tu není. Můžete přidat složku.</string>
+    <string name="file_list_empty_on_device">Stažené soubory a složky se zobrazí zde.</string>
     <string name="file_list_empty_recently_added">Nenalezeny žádné nedávno přidané soubory</string>
     <string name="file_list_empty_recently_added_filter">Žádné nedávno přidané soubory.</string>
     <string name="file_list_empty_recently_modified">Nenalezeny žádné soubory změněné za uplynulých 7 dnů</string>
     <string name="file_list_empty_recently_modified_filter">V uplynulých sedmi dnech nebyly změněny žádné soubory.</string>
     <string name="file_list_empty_search">Zkusit hledat v jiné složce?</string>
-    <string name="file_list_empty_shared">Zde budou zobrazeny vámi sdílené soubory a složky</string>
+    <string name="file_list_empty_shared">Zde budou zobrazeny vámi sdílené soubory a složky.</string>
     <string name="file_list_empty_shared_headline">Zatím nebylo nic sdíleno</string>
     <string name="file_list_empty_text_photos">Nahrajte nějaké fotky nebo zapněte automatické nahrávání.</string>
     <string name="file_list_empty_text_photos_filter">Žádné fotky.</string>
@@ -417,12 +421,12 @@
     <string name="move_file_error">Při pokusu o přesun tohoto souboru či složky došlo k chybě</string>
     <string name="move_file_invalid_into_descendent">Není možné přesunout složku do její vlastní podsložky</string>
     <string name="move_file_invalid_overwrite">Soubor už v cílové složce existuje</string>
-    <string name="move_file_not_found">Soubor se nedaří přesunout – zkontrolujte zda existuje</string>
+    <string name="move_file_not_found">Soubor se nedaří přesunout – zkontrolujte zda existuje.</string>
     <string name="move_to">Přesunout do…</string>
-    <string name="network_error_connect_timeout_exception">Při čekání na server došlo k chybě. Operace nemohla být dokončena</string>
+    <string name="network_error_connect_timeout_exception">Při čekání na odpověď serveru se vyskytla chyba, operace nemohla být dokončena.</string>
     <string name="network_error_socket_exception">Při připojování k serveru došlo k chybě</string>
-    <string name="network_error_socket_timeout_exception">Při čekání na server došlo k chybě. Operace nemohla být dokončena</string>
-    <string name="network_host_not_available">Operace nemohla být dokončena, protože server není dostupný</string>
+    <string name="network_error_socket_timeout_exception">Při čekání na odpověď serveru se vyskytla chyba, operace nemohla být dokončena.</string>
+    <string name="network_host_not_available">Operace nemohla být dokončena, protože server není dostupný.</string>
     <string name="new_comment">Nový komentář…</string>
     <string name="new_media_folder_detected">Zjištěna nová složka s médii %1$s.</string>
     <string name="new_media_folder_photos">foto</string>
@@ -488,7 +492,7 @@
     <string name="prefs_calendar_contacts_address_resolve_error">Adresu serveru pro účet se pro DAVx5 (dříve známé pod názvem DAVdroid) nepodařilo přeložit</string>
     <string name="prefs_calendar_contacts_no_store_error">F-Droid ani Google Play není nainstalováno</string>
     <string name="prefs_calendar_contacts_summary">Nastavit pro stávající účet DAVx5 (dříve známé pod názvem DAVdroid) (verze 1.3.0 a novější)</string>
-    <string name="prefs_calendar_contacts_sync_setup_successful">Synchronizace kalendáře &amp; kontaktů úspěšně dokončena</string>
+    <string name="prefs_calendar_contacts_sync_setup_successful">Synchronizace kalendáře a kontaktů úspěšně dokončena</string>
     <string name="prefs_category_about">O aplikaci</string>
     <string name="prefs_category_details">Podrobnosti</string>
     <string name="prefs_category_dev">Vývojové</string>
@@ -589,8 +593,8 @@
     <string name="share_internal_link_to_folder_text">Sdílení interním odkazem funguje pouze pro uživatele, kteří mají k této složce přístup</string>
     <string name="share_known_remote_clarification">%1$s (v %2$s)</string>
     <string name="share_link_empty_password">Je třeba zadat heslo</string>
-    <string name="share_link_file_error">Při pokusu o sdílení tohoto souboru či složky došlo k chybě</string>
-    <string name="share_link_file_no_exist">Nedaří se sdílet – zkontrolujte zda soubor existuje</string>
+    <string name="share_link_file_error">Při pokusu o sdílení tohoto souboru či složky došlo k chybě.</string>
+    <string name="share_link_file_no_exist">Nedaří se sdílet – zkontrolujte zda soubor existuje.</string>
     <string name="share_link_forbidden_permissions">pro sdílení tohoto souboru</string>
     <string name="share_link_optional_password_title">Zadejte nepovinné heslo</string>
     <string name="share_link_password_title">Zadejte heslo</string>
@@ -606,7 +610,7 @@
     <string name="share_privilege_unshare">Zrušit sdílení</string>
     <string name="share_remote_clarification">%1$s (vzdálený)</string>
     <string name="share_room_clarification">%1$s (konverzace)</string>
-    <string name="share_search">Jméno, identifikátor v rámci sdruženého cloudu, nebo e-mailová adresa…</string>
+    <string name="share_search">Jméno, identifikátor v rámci federovaného cloudu, nebo e-mailová adresa…</string>
     <string name="share_send_note">Poznámka pro příjemce</string>
     <string name="share_via_link_edit_permission_label">Umožnit úpravy</string>
     <string name="share_via_link_expiration_date_label">Nastavit datum skončení platnosti</string>
@@ -691,8 +695,8 @@ Ještě Nextcloud neznáte? Je to server pro komunikaci, synchronizaci a sdílen
 
 Další informace o Nextcloud naleznete na  https://nextcloud.com</string>
     <string name="store_full_dev_desc">Kompletní privátní řešení pro všechy vaše soubory, fotky, kalendáře a kontakty. 
-Toto je oficiální vývojová verze aktualizovaná denně. Obsahuje nejnovější fukcionaliti, ale může být nestabilní a ohrozit vaše data. Je pro uživatele, kteří jsou ochotni testovat a hlásit chyby na které narazí. Nepoužívejte ji pro svoje produkční prostředí.
-Jak vývojová tak produkční verze je k dispozici na F-droidu a mohou být nainstalovány souběžně.</string>
+Toto je oficiální vývojová verze aktualizovaná denně. Obsahuje nejnovější fukce, ale může být nestabilní a ohrozit vaše data. Je pro uživatele, kteří jsou ochotni testovat a hlásit chyby na které narazí. Nepoužívejte ji pro svoje produkční prostředí.
+Jak vývojová tak produkční verze je k dispozici na F-droid a mohou být nainstalovány souběžně.</string>
     <string name="store_short_desc">Platforma pro produktivitu hostovaná u vás, kde vaše data jsou opravdu vaše</string>
     <string name="store_short_dev_desc">Platforma pro produktivitu hostovaná u vás, kde vaše data jsou opravdu vaše (vývojová verze)</string>
     <string name="stream">Proudově vysílat s…</string>
@@ -735,7 +739,7 @@ Jak vývojová tak produkční verze je k dispozici na F-droidu a mohou být nai
     <string name="timeout_richDocuments">Načítání trvá velmi dlouho…</string>
     <string name="trashbin_activity_title">Smazané soubory</string>
     <string name="trashbin_empty_headline">Žádné smazané soubory</string>
-    <string name="trashbin_empty_message">Odsud je možné obnovit smazané soubory</string>
+    <string name="trashbin_empty_message">Odsud je možné obnovit smazané soubory.</string>
     <string name="trashbin_file_not_deleted">Soubor %1$s se nepodařilo smazat!</string>
     <string name="trashbin_file_not_restored">Soubor %1$s se nepodařilo obnovit!</string>
     <string name="trashbin_loading_failed">Načtení obsahu koše se nezdařilo!</string>
@@ -743,13 +747,13 @@ Jak vývojová tak produkční verze je k dispozici na F-droidu a mohou být nai
     <string name="unread_comments">Existuje nepřečtený komentář</string>
     <string name="unset_encrypted">Zrušit šifrování</string>
     <string name="unset_favorite">Odebrat z oblíbených</string>
-    <string name="unshare_link_file_error">Při pokusu o zrušení sdílení tohoto souboru či složky došlo k chybě</string>
-    <string name="unshare_link_file_no_exist">Nedaří se ukončit sdílení – kontrolujte zda soubor existuje</string>
+    <string name="unshare_link_file_error">Při pokusu o zrušení sdílení tohoto souboru či složky došlo k chybě.</string>
+    <string name="unshare_link_file_no_exist">Nedaří se ukončit sdílení – kontrolujte zda soubor existuje.</string>
     <string name="unshare_link_forbidden_permissions">pro zrušení sdílení tohoto souboru</string>
     <string name="unsharing_failed">Zrušení sdílení se nezdařilo</string>
     <string name="untrusted_domain">Přístup prostřednictvím nedůvěryhodné domény. Více informací naleznete v dokumentaci.</string>
-    <string name="update_link_file_error">Došlo k chybě při pokusu o aktualizaci sdílení</string>
-    <string name="update_link_file_no_exist">Nedaří se aktualizovat. Ověřte že soubor existuje</string>
+    <string name="update_link_file_error">Došlo k chybě při pokusu o aktualizaci sdílení.</string>
+    <string name="update_link_file_no_exist">Nedaří se aktualizovat. Ověřte že soubor existuje.</string>
     <string name="update_link_forbidden_permissions">pro aktualizaci tohoto sdílení</string>
     <string name="updating_share_failed">Změna sdílení se nezdařila</string>
     <string name="upload_cannot_create_file">Nedaří se vytvořit místní soubor</string>
@@ -831,7 +835,7 @@ Jak vývojová tak produkční verze je k dispozici na F-droidu a mohou být nai
     <string name="user_info_phone">Telefonní číslo</string>
     <string name="user_info_twitter">Twitter</string>
     <string name="user_info_website">Webové stránky</string>
-    <string name="user_information_retrieval_error">Chyba při příjmu informace od uživatele</string>
+    <string name="user_information_retrieval_error">Chyba při příjmu informací o uživateli</string>
     <string name="userinfo_no_info_headline">Osobní údaje nejsou nastaveny</string>
     <string name="userinfo_no_info_text">Na své profilové stránce přidejte jméno, obrázek a kontaktní údaje.</string>
     <string name="username">Uživatelské jméno</string>

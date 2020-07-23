@@ -116,14 +116,11 @@ public class ActivitiesActivity extends FileActivity implements ActivityListInte
         // setup toolbar
         setupToolbar();
 
-        onCreateSwipeToRefresh(swipeListRefreshLayout);
+        ThemeUtils.colorSwipeRefreshLayout(this, swipeListRefreshLayout);
 
         // setup drawer
         setupDrawer(R.id.nav_activity);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            ThemeUtils.setColoredTitle(actionBar, getString(R.string.drawer_item_activities), this);
-        }
+        updateActionBarTitleAndHomeButtonByString(getString(R.string.drawer_item_activities));
 
         swipeListRefreshLayout.setOnRefreshListener(() -> {
             // We set lastGiven variable to undefined here since when manually refreshing
@@ -137,15 +134,6 @@ public class ActivitiesActivity extends FileActivity implements ActivityListInte
         emptyContentProgressBar.setVisibility(View.GONE);
         emptyContentMessage.setVisibility(View.INVISIBLE);
         emptyContentHeadline.setVisibility(View.INVISIBLE);
-    }
-
-    protected void onCreateSwipeToRefresh(SwipeRefreshLayout refreshLayout) {
-        int primaryColor = ThemeUtils.primaryColor(this);
-        int darkColor = ThemeUtils.primaryDarkColor(this);
-        int accentColor = ThemeUtils.primaryAccentColor(this);
-
-        // Colors in animations
-        refreshLayout.setColorSchemeColors(accentColor, primaryColor, darkColor);
     }
 
     @Override
@@ -166,7 +154,7 @@ public class ActivitiesActivity extends FileActivity implements ActivityListInte
      * sets up the UI elements and loads all activity items.
      */
     private void setupContent() {
-        emptyContentIcon.setImageResource(R.drawable.ic_activity_light_grey);
+        emptyContentIcon.setImageResource(R.drawable.ic_activity);
         emptyContentProgressBar.getIndeterminateDrawable().setColorFilter(ThemeUtils.primaryAccentColor(this),
                                                                           PorterDuff.Mode.SRC_IN);
 

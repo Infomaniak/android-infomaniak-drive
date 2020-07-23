@@ -42,8 +42,7 @@
         <item
             android:id="@+id/nav_photos"
             android:icon="@drawable/nav_photos"
-            android:title="@string/drawer_item_photos"
-            android:visible="false"/>
+            android:title="@string/drawer_item_photos" />
         <item
             android:id="@+id/nav_videos"
             android:icon="@drawable/nav_videos"
@@ -54,8 +53,7 @@
             android:id="@+id/nav_shared"
             android:orderInCategory="0"
             android:icon="@drawable/nav_shared"
-            android:title="@string/drawer_item_shared"
-            android:visible="false"/>
+            android:title="@string/drawer_item_shared" />
         <item
             android:id="@+id/nav_on_device"
             android:icon="@drawable/nav_on_device"
@@ -73,11 +71,13 @@
             android:orderInCategory="0"
             android:title="@string/drawer_item_recently_modified"
             android:visible="false"/>
+        <!-- Infomaniak : Visible to false, to hide notifications -->
         <item
             android:orderInCategory="0"
             android:id="@+id/nav_notifications"
             android:icon="@drawable/nav_notifications"
-            android:title="@string/drawer_item_notifications"/>
+            android:title="@string/drawer_item_notifications"
+            android:visible="false"/>
         <item
             android:orderInCategory="0"
             android:id="@+id/nav_synced_folders"
@@ -93,24 +93,6 @@
             android:icon="@drawable/nav_trashbin"
             android:orderInCategory="2"
             android:title="@string/drawer_item_trashbin"/>
-    </group>
-
-    <!--
-      account list placeholder
-      all items in this group MUST have orderInCategory="2" set
-      all accounts are dynamically added with orderInCategory="1" set
-    -->
-    <group android:id="@+id/drawer_menu_accounts">
-        <item
-            android:id="@+id/drawer_menu_account_add"
-            android:icon="@drawable/ic_account_plus"
-            android:orderInCategory="2"
-            android:title="@string/prefs_add_account"/>
-        <item
-            android:id="@+id/drawer_menu_account_manage"
-            android:icon="@drawable/nav_settings"
-            android:orderInCategory="2"
-            android:title="@string/drawer_manage_accounts"/>
     </group>
 
     <!--

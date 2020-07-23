@@ -26,6 +26,7 @@ import android.accounts.Account;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -34,6 +35,7 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.EditText;
@@ -53,7 +55,6 @@ import com.owncloud.android.R;
 import com.owncloud.android.datamodel.FileDataStorageManager;
 import com.owncloud.android.lib.common.utils.Log_OC;
 import com.owncloud.android.lib.resources.status.OCCapability;
-import com.owncloud.android.ui.activity.ToolbarActivity;
 
 import java.lang.reflect.Field;
 
@@ -70,7 +71,7 @@ import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.ColorUtils;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.core.widget.CompoundButtonCompat;
-import androidx.fragment.app.FragmentActivity;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
@@ -127,19 +128,31 @@ public final class ThemeUtils {
         return primaryColor(context, false);
     }
 
-    public static int primaryColor(Context context, boolean replaceWhite) {
-        return primaryColor(null, replaceWhite, context);
+    public static int primaryColor(Context context, boolean replaceEdgeColors) {
+        return primaryColor(null, replaceEdgeColors, context);
     }
 
-    public static int primaryColor(Account account, boolean replaceWhite, Context context) {
+    public static int primaryColor(Account account, boolean replaceEdgeColors, Context context) {
         if (context == null) {
             return Color.GRAY;
         }
 
         try {
             int color = Color.parseColor(getCapability(account, context).getServerColor());
-            if (replaceWhite && Color.WHITE == color) {
-                return getNeutralGrey(context);
+            if (replaceEdgeColors) {
+                if (isDarkModeActive(context)) {
+                    if (Color.BLACK == color) {
+                        return getNeutralGrey(context);
+                    } else {
+                        return color;
+                    }
+                } else {
+                    if (Color.WHITE == color) {
+                        return getNeutralGrey(context);
+                    } else {
+                        return color;
+                    }
+                }
             } else {
                 return color;
             }
@@ -149,35 +162,50 @@ public final class ThemeUtils {
     }
 
     public static int getNeutralGrey(Context context) {
-        return darkTheme(context) ? context.getResources().getColor(R.color.fg_contrast) :
-                                    Color.GRAY;
+        return darkTheme(context) ? context.getResources().getColor(R.color.fg_contrast) : Color.GRAY;
     }
 
     public static int elementColor(Context context) {
-        return elementColor(null, context);
+        return elementColor(null, context, false);
     }
 
     @NextcloudServer(max = 12)
-    public static int elementColor(Account account, Context context) {
+    public static int elementColor(Account account, Context context, boolean replaceEdgeColors) {
         OCCapability capability = getCapability(account, context);
 
         try {
             return Color.parseColor(capability.getServerElementColor());
         } catch (Exception e) {
-            int primaryColor;
+            int color;
 
             try {
-                primaryColor = Color.parseColor(capability.getServerColor());
+                color = Color.parseColor(capability.getServerColor());
             } catch (Exception e1) {
-                primaryColor = context.getResources().getColor(R.color.primary);
+                color = context.getResources().getColor(R.color.primary);
             }
 
-            float[] hsl = colorToHSL(primaryColor);
-
-            if (hsl[INDEX_LUMINATION] > LUMINATION_THRESHOLD) {
-                return context.getResources().getColor(R.color.element_fallback_color);
+            if (replaceEdgeColors) {
+                if (isDarkModeActive(context)) {
+                    if (Color.BLACK == color) {
+                        return getNeutralGrey(context);
+                    } else {
+                        return color;
+                    }
+                } else {
+                    if (Color.WHITE == color) {
+                        return getNeutralGrey(context);
+                    } else {
+                        return color;
+                    }
+                }
             } else {
-                return primaryColor;
+                float[] hsl = colorToHSL(color);
+
+                if (hsl[INDEX_LUMINATION] > LUMINATION_THRESHOLD) {
+                    return context.getResources().getColor(R.color.element_fallback_color);
+                } else {
+                    return color;
+                }
             }
         }
     }
@@ -187,8 +215,12 @@ public final class ThemeUtils {
     }
 
     /**
+     * returns the font color based on the server side theming and uses black/white as a fallback based on
+     * replaceWhite.
+     *
+     * @param context      the context
+     * @param replaceWhite FLAG to return white/black if server side color isn't available
      * @return int font color to use
-     * adapted from https://github.com/nextcloud/server/blob/master/apps/theming/lib/Util.php#L90-L102
      */
     public static int fontColor(Context context, boolean replaceWhite) {
         if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
@@ -216,17 +248,19 @@ public final class ThemeUtils {
 
     /**
      * Tests if light color is set
-     * @return  true if primaryColor is lighter than MAX_LIGHTNESS
+     *
+     * @param color the color
+     * @return true if primaryColor is lighter than MAX_LIGHTNESS
      */
-    public static boolean lightTheme(Context context) {
-        int primaryColor = primaryColor(context);
-        float[] hsl = colorToHSL(primaryColor);
+    public static boolean lightTheme(int color) {
+        float[] hsl = colorToHSL(color);
 
         return hsl[INDEX_LUMINATION] >= MAX_LIGHTNESS;
     }
 
     /**
      * Tests if dark color is set
+     *
      * @return true if dark theme -> e.g.use light font color, darker accent color
      */
     public static boolean darkTheme(Context context) {
@@ -234,6 +268,22 @@ public final class ThemeUtils {
         float[] hsl = colorToHSL(primaryColor);
 
         return hsl[INDEX_LUMINATION] <= 0.55;
+    }
+
+    public static int primaryAppbarColor(Context context) {
+        return ContextCompat.getColor(context, R.color.appbar);
+    }
+
+    public static int appBarPrimaryFontColor(Context context) {
+        return ContextCompat.getColor(context, R.color.fontAppbar);
+    }
+
+    public static int appBarSecondaryFontColor(Context context) {
+        return ContextCompat.getColor(context, R.color.fontSecondaryAppbar);
+    }
+
+    public static int actionModeColor(Context context) {
+        return ContextCompat.getColor(context, R.color.action_mode_background);
     }
 
     /**
@@ -248,7 +298,7 @@ public final class ThemeUtils {
                 actionBar.setTitle(title);
             } else {
                 Spannable text = new SpannableString(title);
-                text.setSpan(new ForegroundColorSpan(fontColor(context, !darkTheme(context))),
+                text.setSpan(new ForegroundColorSpan(appBarPrimaryFontColor(context)),
                              0,
                              text.length(),
                              Spannable.SPAN_INCLUSIVE_INCLUSIVE);
@@ -273,7 +323,7 @@ public final class ThemeUtils {
                 actionBar.setSubtitle(title);
             } else {
                 Spannable text = new SpannableString(title);
-                text.setSpan(new ForegroundColorSpan(fontColor(context)),
+                text.setSpan(new ForegroundColorSpan(appBarSecondaryFontColor(context)),
                              0,
                              text.length(),
                              Spannable.SPAN_INCLUSIVE_INCLUSIVE);
@@ -289,12 +339,16 @@ public final class ThemeUtils {
      * @param supportActionBar
      */
     public static void tintBackButton(@Nullable ActionBar supportActionBar, Context context) {
+        tintBackButton(supportActionBar, context, ThemeUtils.appBarPrimaryFontColor(context));
+    }
+
+    public static void tintBackButton(@Nullable ActionBar supportActionBar, Context context, @ColorInt int color) {
         if (supportActionBar == null) {
             return;
         }
 
-        Drawable backArrow = context.getResources().getDrawable(R.drawable.ic_arrow_back);
-        supportActionBar.setHomeAsUpIndicator(ThemeUtils.tintDrawable(backArrow, ThemeUtils.fontColor(context)));
+        Drawable backArrow = ResourcesCompat.getDrawable(context.getResources(), R.drawable.ic_arrow_back, null);
+        supportActionBar.setHomeAsUpIndicator(ThemeUtils.tintDrawable(backArrow, color));
     }
 
     public static Spanned getColoredTitle(String title, int color) {
@@ -332,7 +386,7 @@ public final class ThemeUtils {
      * Adjust lightness of given color
      *
      * @param lightnessDelta values -1..+1
-     * @param color original color
+     * @param color          original color
      * @param threshold      0..1 as maximum value, -1 to disable
      * @return color adjusted by lightness
      */
@@ -414,6 +468,15 @@ public final class ThemeUtils {
         seekBar.getThumb().setColorFilter(color, PorterDuff.Mode.SRC_IN);
     }
 
+    public static void colorSwipeRefreshLayout(Context context, SwipeRefreshLayout swipeRefreshLayout) {
+        int primaryColor = ThemeUtils.primaryColor(context);
+        int darkColor = ThemeUtils.primaryDarkColor(context);
+        int accentColor = ThemeUtils.primaryAccentColor(context);
+
+        swipeRefreshLayout.setColorSchemeColors(accentColor, primaryColor, darkColor);
+        swipeRefreshLayout.setProgressBackgroundColorSchemeResource(R.color.bg_elevation_one);
+    }
+
     /**
      * set the Nextcloud standard colors for the snackbar.
      *
@@ -431,38 +494,39 @@ public final class ThemeUtils {
      * @param fragmentActivity fragment activity
      * @param color            the color
      */
-    public static void colorStatusBar(FragmentActivity fragmentActivity, @ColorInt int color) {
+    public static void colorStatusBar(Activity fragmentActivity, @ColorInt int color) {
         Window window = fragmentActivity.getWindow();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && window != null) {
+        boolean isLightTheme = lightTheme(color);
+        if (window != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             window.setStatusBarColor(color);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 View decor = window.getDecorView();
-                if (lightTheme(fragmentActivity.getApplicationContext())) {
-                    decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+                if (isLightTheme) {
+                    int systemUiFlagLightStatusBar;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        systemUiFlagLightStatusBar = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+                    } else {
+                        systemUiFlagLightStatusBar = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+                    }
+                    decor.setSystemUiVisibility(systemUiFlagLightStatusBar);
                 } else {
                     decor.setSystemUiVisibility(0);
                 }
+            } else if (isLightTheme) {
+                window.setStatusBarColor(Color.BLACK);
             }
         }
     }
 
-    /**
-     * Sets the color of the progressbar to {@code color} within the given toolbar.
-     *
-     * @param activity         the toolbar activity instance
-     * @param progressBarColor the color to be used for the toolbar's progress bar
-     */
-    public static void colorToolbarProgressBar(FragmentActivity activity, int progressBarColor) {
-        if (activity instanceof ToolbarActivity) {
-            ((ToolbarActivity) activity).setProgressBarBackgroundColor(progressBarColor);
-        }
+    public static void colorStatusBar(Activity fragmentActivity) {
+        colorStatusBar(fragmentActivity, primaryAppbarColor(fragmentActivity));
     }
 
     /**
      * Sets the color of the  TextInputLayout to {@code color} for hint text and box stroke.
      *
      * @param textInputLayout the TextInputLayout instance
-     * @param color the color to be used for the hint text and box stroke
+     * @param color           the color to be used for the hint text and box stroke
      */
     public static void colorTextInputLayout(TextInputLayout textInputLayout, int color) {
         textInputLayout.setBoxStrokeColor(color);
@@ -479,7 +543,7 @@ public final class ThemeUtils {
     }
 
     public static void themeDialogActionButton(MaterialButton button) {
-        if (button == null ) {
+        if (button == null) {
             return;
         }
 
@@ -488,8 +552,8 @@ public final class ThemeUtils {
         int disabledColor = ContextCompat.getColor(context, R.color.disabled_text);
         button.setTextColor(new ColorStateList(
             new int[][]{
-                new int[] { android.R.attr.state_enabled}, // enabled
-                new int[] {-android.R.attr.state_enabled}, // disabled
+                new int[]{android.R.attr.state_enabled}, // enabled
+                new int[]{-android.R.attr.state_enabled}, // disabled
             },
             new int[]{
                 accentColor,
@@ -499,7 +563,9 @@ public final class ThemeUtils {
     }
 
     public static void themeEditText(Context context, EditText editText, boolean themedBackground) {
-        if (editText == null) { return; }
+        if (editText == null) {
+            return;
+        }
 
         int color = ContextCompat.getColor(context, R.color.text_color);
 
@@ -511,6 +577,10 @@ public final class ThemeUtils {
             }
         }
 
+        setEditTextColor(context, editText, color);
+    }
+
+    private static void setEditTextColor(Context context, EditText editText, int color) {
         editText.setTextColor(color);
         editText.setHighlightColor(context.getResources().getColor(R.color.fg_contrast));
         setEditTextCursorColor(editText, color);
@@ -520,15 +590,15 @@ public final class ThemeUtils {
     /**
      * Theme search view
      *
-     * @param searchView       searchView to be changed
-     * @param themedBackground true if background is themed, e.g. on action bar; false if background is white
-     * @param context          the app's context
+     * @param searchView searchView to be changed
+     * @param context    the app's context
      */
-    public static void themeSearchView(SearchView searchView, boolean themedBackground, Context context) {
+    public static void themeSearchView(SearchView searchView, Context context) {
         // hacky as no default way is provided
-        int fontColor = ThemeUtils.fontColor(context, !darkTheme(context));
+        int fontColor = appBarPrimaryFontColor(context);
         SearchView.SearchAutoComplete editText = searchView.findViewById(R.id.search_src_text);
-        themeEditText(context, editText, themedBackground);
+        setEditTextColor(context, editText, fontColor);
+        editText.setHintTextColor(appBarSecondaryFontColor(context));
 
         ImageView closeButton = searchView.findViewById(androidx.appcompat.R.id.search_close_btn);
         closeButton.setColorFilter(fontColor);
@@ -543,14 +613,14 @@ public final class ThemeUtils {
 
     public static void tintCheckbox(AppCompatCheckBox checkBox, int color) {
         CompoundButtonCompat.setButtonTintList(checkBox, new ColorStateList(
-                new int[][]{
-                        new int[]{-android.R.attr.state_checked},
-                        new int[]{android.R.attr.state_checked},
-                },
-                new int[]{
-                        Color.GRAY,
-                        color
-                }
+            new int[][]{
+                new int[]{-android.R.attr.state_checked},
+                new int[]{android.R.attr.state_checked},
+            },
+            new int[]{
+                Color.GRAY,
+                color
+            }
         ));
     }
 
@@ -567,13 +637,13 @@ public final class ThemeUtils {
 
         // setting the thumb color
         DrawableCompat.setTintList(switchView.getThumbDrawable(), new ColorStateList(
-                new int[][]{new int[]{android.R.attr.state_checked}, new int[]{}},
-                new int[]{color, Color.WHITE}));
+            new int[][]{new int[]{android.R.attr.state_checked}, new int[]{}},
+            new int[]{color, Color.WHITE}));
 
         // setting the track color
         DrawableCompat.setTintList(switchView.getTrackDrawable(), new ColorStateList(
-                new int[][]{new int[]{android.R.attr.state_checked}, new int[]{}},
-                new int[]{trackColor, MainApp.getAppContext().getResources().getColor(R.color.switch_track_color_unchecked)}));
+            new int[][]{new int[]{android.R.attr.state_checked}, new int[]{}},
+            new int[]{trackColor, MainApp.getAppContext().getResources().getColor(R.color.switch_track_color_unchecked)}));
     }
 
     public static Drawable tintDrawable(@DrawableRes int id, int color) {
@@ -594,14 +664,29 @@ public final class ThemeUtils {
         return null;
     }
 
+    /**
+     * Will change a menu item text tint
+     * @param item the menu item object
+     * @param color the wanted color (as resource or color)
+     */
+    public static void tintMenuItemText(MenuItem item, int color) {
+        SpannableString newItemTitle = new SpannableString(item.getTitle());
+        newItemTitle.setSpan(new ForegroundColorSpan(color), 0, newItemTitle.length(),
+                             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        item.setTitle(newItemTitle);
+    }
+
     public static String colorToHexString(int color) {
         return String.format("#%06X", 0xFFFFFF & color);
     }
 
-    public static void tintFloatingActionButton(FloatingActionButton button, @DrawableRes int
-            drawable, Context context) {
+    public static void tintFloatingActionButton(FloatingActionButton button, Context context) {
         button.setBackgroundTintList(ColorStateList.valueOf(ThemeUtils.primaryColor(context)));
         button.setRippleColor(ThemeUtils.primaryDarkColor(context));
+    }
+
+    public static void drawableFloatingActionButton(FloatingActionButton button, @DrawableRes int
+        drawable, Context context) {
         button.setImageDrawable(ThemeUtils.tintDrawable(drawable, ThemeUtils.fontColor(context)));
     }
 
@@ -627,13 +712,22 @@ public final class ThemeUtils {
         }
     }
 
+    public static Drawable setIconColor(Drawable drawable) {
+        int color;
+        if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+            color = Color.WHITE;
+        } else {
+            color = Color.BLACK;
+        }
+        return tintDrawable(drawable, color);
+    }
+
     /**
-     * Lifted from SO.
-     * FindBugs surpressed because of lack of public API to alter the cursor color.
+     * Lifted from SO. FindBugs surpressed because of lack of public API to alter the cursor color.
      *
-     * @param editText  TextView to be styled
-     * @param color     The desired cursor colour
-     * @see             <a href="https://stackoverflow.com/a/52564925">StackOverflow url</a>
+     * @param editText TextView to be styled
+     * @param color    The desired cursor colour
+     * @see <a href="https://stackoverflow.com/a/52564925">StackOverflow url</a>
      */
     @SuppressFBWarnings
     public static void setEditTextCursorColor(EditText editText, int color) {
@@ -684,15 +778,11 @@ public final class ThemeUtils {
 
 
     /**
-     * Set the color of the handles when you select text in a
-     * {@link android.widget.EditText} or other view that extends {@link TextView}.
-     * FindBugs surpressed because of lack of public API to alter the {@link TextView} handles color.
+     * Set the color of the handles when you select text in a {@link android.widget.EditText} or other view that extends
+     * {@link TextView}. FindBugs surpressed because of lack of public API to alter the {@link TextView} handles color.
      *
-     * @param view
-     *     The {@link TextView} or a {@link View} that extends {@link TextView}.
-     * @param color
-     *     The color to set for the text handles
-     *
+     * @param view  The {@link TextView} or a {@link View} that extends {@link TextView}.
+     * @param color The color to set for the text handles
      * @see <a href="https://gist.github.com/jaredrummler/2317620559d10ac39b8218a1152ec9d4">External reference</a>
      */
     @SuppressFBWarnings
@@ -735,5 +825,11 @@ public final class ThemeUtils {
         } catch (Exception e) {
             Log_OC.e(TAG, "Error setting TextView handles color", e);
         }
+    }
+
+    public static boolean isDarkModeActive(Context context) {
+        int nightModeFlag = context.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+
+        return Configuration.UI_MODE_NIGHT_YES == nightModeFlag;
     }
 }

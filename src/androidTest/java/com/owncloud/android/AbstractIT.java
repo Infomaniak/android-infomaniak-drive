@@ -11,25 +11,40 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import com.facebook.testing.screenshot.Screenshot;
+import com.nextcloud.client.RetryTestRule;
 import com.nextcloud.client.account.UserAccountManager;
 import com.nextcloud.client.account.UserAccountManagerImpl;
+import com.nextcloud.client.device.BatteryStatus;
+import com.nextcloud.client.device.PowerManagementService;
+import com.nextcloud.client.network.Connectivity;
+import com.nextcloud.client.network.ConnectivityService;
 import com.owncloud.android.datamodel.FileDataStorageManager;
+import com.owncloud.android.datamodel.OCFile;
+import com.owncloud.android.datamodel.UploadsStorageManager;
+import com.owncloud.android.db.OCUpload;
+import com.owncloud.android.files.services.FileUploader;
 import com.owncloud.android.lib.common.OwnCloudClient;
 import com.owncloud.android.lib.common.OwnCloudClientFactory;
 import com.owncloud.android.lib.common.accounts.AccountUtils;
 import com.owncloud.android.lib.common.operations.RemoteOperationResult;
+import com.owncloud.android.lib.resources.e2ee.ToggleEncryptionRemoteOperation;
 import com.owncloud.android.lib.resources.files.ReadFolderRemoteOperation;
 import com.owncloud.android.lib.resources.files.RemoveFileRemoteOperation;
 import com.owncloud.android.lib.resources.files.model.RemoteFile;
+import com.owncloud.android.operations.CreateFolderOperation;
+import com.owncloud.android.operations.UploadFileOperation;
 import com.owncloud.android.utils.FileStorageUtils;
+
+import junit.framework.TestCase;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.io.FileUtils;
+import org.jetbrains.annotations.NotNull;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.runner.RunWith;
+import org.junit.Rule;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -39,7 +54,6 @@ import java.util.Collection;
 
 import androidx.test.espresso.contrib.DrawerActions;
 import androidx.test.espresso.intent.rule.IntentsTestRule;
-import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
 import androidx.test.runner.lifecycle.Stage;
@@ -54,14 +68,17 @@ import static org.junit.Assert.assertTrue;
  * Common base for all integration tests
  */
 
-@RunWith(AndroidJUnit4.class)
 public abstract class AbstractIT {
+    @Rule public RetryTestRule retryTestRule = new RetryTestRule();
 
     protected static OwnCloudClient client;
     protected static Account account;
     protected static Context targetContext;
 
     private Activity currentActivity;
+
+    protected FileDataStorageManager fileDataStorageManager =
+        new FileDataStorageManager(account, targetContext.getContentResolver());
 
     @BeforeClass
     public static void beforeAll() {
@@ -123,15 +140,29 @@ public abstract class AbstractIT {
             RemoteFile remoteFile = (RemoteFile) object;
 
             if (!remoteFile.getRemotePath().equals("/")) {
+                if (remoteFile.isEncrypted()) {
+                    assertTrue(new ToggleEncryptionRemoteOperation(remoteFile.getLocalId(),
+                                                                   remoteFile.getRemotePath(),
+                                                                   false)
+                                   .execute(client)
+                                   .isSuccess());
+                }
+
                 assertTrue(new RemoveFileRemoteOperation(remoteFile.getRemotePath())
-                               .execute(client).isSuccess());
+                               .execute(client)
+                               .isSuccess()
+                          );
             }
         }
     }
 
 
     protected FileDataStorageManager getStorageManager() {
-        return new FileDataStorageManager(account, targetContext.getContentResolver());
+        return fileDataStorageManager;
+    }
+
+    protected Account[] getAllAccounts() {
+        return AccountManager.get(targetContext).getAccounts();
     }
 
     private static void createDummyFiles() throws IOException {
@@ -142,7 +173,7 @@ public abstract class AbstractIT {
         createFile("chunkedFile.txt", 500000);
     }
 
-    private static void createFile(String name, int iteration) throws IOException {
+    public static void createFile(String name, int iteration) throws IOException {
         File file = new File(FileStorageUtils.getSavePath(account.name) + File.separator + name);
         file.createNewFile();
 
@@ -189,7 +220,7 @@ public abstract class AbstractIT {
         InstrumentationRegistry.getInstrumentation().waitForIdleSync();
     }
 
-    protected void openDrawer(IntentsTestRule activityRule) throws InterruptedException {
+    protected void openDrawer(IntentsTestRule activityRule) {
         Activity sut = activityRule.launchActivity(null);
 
         shortSleep();
@@ -229,5 +260,71 @@ public abstract class AbstractIT {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    public OCFile createFolder(String remotePath) {
+        TestCase.assertTrue(new CreateFolderOperation(remotePath, account, targetContext)
+                                .execute(client, getStorageManager())
+                                .isSuccess());
+
+        return getStorageManager().getFileByDecryptedRemotePath(remotePath);
+    }
+
+    public void uploadOCUpload(OCUpload ocUpload) {
+        ConnectivityService connectivityServiceMock = new ConnectivityService() {
+            @Override
+            public boolean isInternetWalled() {
+                return false;
+            }
+
+            @Override
+            public Connectivity getConnectivity() {
+                return Connectivity.CONNECTED_WIFI;
+            }
+        };
+
+        PowerManagementService powerManagementServiceMock = new PowerManagementService() {
+            @NotNull
+            @Override
+            public BatteryStatus getBattery() {
+                return new BatteryStatus();
+            }
+
+            @Override
+            public boolean isPowerSavingEnabled() {
+                return false;
+            }
+
+            @Override
+            public boolean isPowerSavingExclusionAvailable() {
+                return false;
+            }
+        };
+
+        UserAccountManager accountManager = UserAccountManagerImpl.fromContext(targetContext);
+        UploadsStorageManager uploadsStorageManager = new UploadsStorageManager(accountManager,
+                                                                                targetContext.getContentResolver());
+
+        UploadFileOperation newUpload = new UploadFileOperation(
+            uploadsStorageManager,
+            connectivityServiceMock,
+            powerManagementServiceMock,
+            account,
+            null,
+            ocUpload,
+            FileUploader.NameCollisionPolicy.DEFAULT,
+            FileUploader.LOCAL_BEHAVIOUR_COPY,
+            targetContext,
+            false,
+            false
+        );
+        newUpload.addRenameUploadListener(() -> {
+            // dummy
+        });
+
+        newUpload.setRemoteFolderToBeCreated();
+
+        RemoteOperationResult result = newUpload.execute(client, getStorageManager());
+        assertTrue(result.getLogMessage(), result.isSuccess());
     }
 }

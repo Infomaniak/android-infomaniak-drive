@@ -1,23 +1,9 @@
-<!--
-    @author Google LLC
-    Copyright (C) 2018 Google LLC
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
--->
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:height="24dp"
-    android:width="24dp"
+<vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt"
     android:viewportWidth="24"
-    android:viewportHeight="24">
-    <path android:fillColor="#757575" android:pathData="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" />
+    android:viewportHeight="24"
+    android:width="24dp"
+    android:height="24dp">
+    <path
+        android:pathData="M5.25613653 17.5053008C4.91450731 17.8470764 4.9146379 18.4010735 5.25642819 18.742688C5.59821848 19.0843025 6.15223946 19.084172 6.4938687 18.7423964L11.8962605 13.3408207C11.9236178 13.3133952 11.9607639 13.297982 11.999502 13.297982C12.0382402 13.297982 12.0753863 13.3133952 12.1027436 13.3408207L17.5051354 18.7435629C17.7261308 18.964653 18.0482941 19.051054 18.3502696 18.9702197C18.6522451 18.8893854 18.8881556 18.6535963 18.9691357 18.3516719C19.0501159 18.0497475 18.9638629 17.7275574 18.7428676 17.5064673L13.3410591 12.1025586C13.3136325 12.0752024 13.2982185 12.0380579 13.2982185 11.9993214C13.2982185 11.960585 13.3136325 11.9234405 13.3410591 11.8960843L18.7440341 6.49392531C19.0856633 6.15182761 19.0852716 5.59756936 18.7431592 5.25595485C18.4010468 4.91434035 17.8467646 4.91473204 17.5051354 5.25682973L12.1027436 10.6578222C12.0753863 10.6852476 12.0382402 10.7006609 11.999502 10.7006609C11.9607639 10.7006609 11.9236178 10.6852476 11.8962605 10.6578222L6.4938687 5.25682973C6.15223947 4.91505415 5.59821847 4.91492359 5.25642817 5.2565381C4.91463787 5.59815261 4.9145073 6.15214974 5.25613653 6.49392531L10.657945 11.8960843C10.6853716 11.9234405 10.7007855 11.960585 10.7007855 11.9993214C10.7007855 12.0380579 10.6853716 12.0752024 10.657945 12.1025586L5.25613653 17.5053008Z"
+        android:fillColor="#757575" />
 </vector>

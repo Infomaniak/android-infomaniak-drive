@@ -27,14 +27,9 @@ import com.owncloud.android.datamodel.MediaFolderType;
 import com.owncloud.android.datamodel.SyncedFolderDisplayItem;
 import com.owncloud.android.files.services.FileUploader;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 /**
  * Parcelable for {@link SyncedFolderDisplayItem} objects to transport them from/to dialog fragments.
  */
-@NoArgsConstructor
 public class SyncedFolderParcelable implements Parcelable {
     private String folderName;
     private String localPath;
@@ -87,6 +82,9 @@ public class SyncedFolderParcelable implements Parcelable {
         nameCollisionPolicy = FileUploader.NameCollisionPolicy.deserialize(read.readInt());
         section = read.readInt();
         hidden = read.readInt() != 0;
+    }
+
+    public SyncedFolderParcelable() {
     }
 
     @Override

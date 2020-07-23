@@ -52,6 +52,8 @@ import java.util.List;
 
 import androidx.annotation.Nullable;
 
+import static com.infomaniak.drive.Utils.filterShare;
+
 /**
  * Filters out the file actions available in a given {@link Menu} for a given {@link OCFile}
  * according to the current state of the latest.
@@ -181,9 +183,7 @@ public class FileMenuFilter {
     }
 
     /**
-     * Performs the real filtering, to be applied in the {@link Menu} by the caller methods.
-     *
-     * Decides what actions must be shown and hidden.
+     * Decides what actions must be shown and hidden implementing the different rule sets.
      *
      * @param toShow                List to save the options that must be shown in the menu.
      * @param toHide                List to save the options that must be shown in the menu.
@@ -216,6 +216,9 @@ public class FileMenuFilter {
         filterUnsetEncrypted(toShow, toHide, endToEndEncryptionEnabled);
         filterSetPictureAs(toShow, toHide);
         filterStream(toShow, toHide, isMediaSupported);
+
+        // kDrive - Filter share item if needed
+        filterShare(toShow, toHide, isSingleSelection(), files);
     }
 
     private void filterShareFile(List<Integer> toShow, List<Integer> toHide, OCCapability capability) {
@@ -282,7 +285,7 @@ public class FileMenuFilter {
                             List<Integer> toHide,
                             OCCapability capability
     ) {
-        if (deviceInfo.editorSupported()) {
+        if (deviceInfo.editorSupported() || files.iterator().next().isEncrypted()) {
             toHide.add(R.id.action_edit);
             return;
         }

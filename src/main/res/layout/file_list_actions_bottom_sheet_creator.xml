@@ -25,10 +25,11 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
+    android:background="?android:attr/selectableItemBackground"
     android:paddingLeft="@dimen/standard_padding"
     android:paddingTop="@dimen/standard_half_padding"
     android:paddingRight="@dimen/standard_padding"
-    android:paddingBottom="@dimen/standard_padding"
+    android:paddingBottom="@dimen/standard_half_padding"
     tools:ignore="UseCompoundDrawables">
 
     <ImageView
@@ -44,7 +45,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginStart="@dimen/standard_margin"
-        android:layout_marginLeft="@dimen/standard_margin"
         android:text="@string/create_new_presentation"
         android:textColor="@color/text_color"
         android:textSize="@dimen/bottom_sheet_text_size" />

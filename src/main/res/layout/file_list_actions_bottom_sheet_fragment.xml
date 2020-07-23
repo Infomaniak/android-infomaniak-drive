@@ -20,6 +20,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:background="@color/bg_default">
 
@@ -37,6 +38,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:background="?android:attr/selectableItemBackground"
         android:paddingLeft="@dimen/standard_padding"
         android:paddingTop="@dimen/standard_half_padding"
         android:paddingRight="@dimen/standard_padding"
@@ -49,14 +51,13 @@
             android:layout_height="wrap_content"
             android:contentDescription="@null"
             android:src="@drawable/ic_action_upload"
-            android:tint="@color/primary"/>
+            app:tint="@color/primary"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="@dimen/standard_margin"
-            android:layout_marginLeft="@dimen/standard_margin"
             android:text="@string/upload_files"
             android:textColor="@color/text_color"
             android:textSize="@dimen/bottom_sheet_text_size" />
@@ -68,6 +69,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:background="?android:attr/selectableItemBackground"
         android:paddingLeft="@dimen/standard_padding"
         android:paddingTop="@dimen/standard_half_padding"
         android:paddingRight="@dimen/standard_padding"
@@ -80,14 +82,13 @@
             android:layout_height="wrap_content"
             android:contentDescription="@null"
             android:src="@drawable/ic_import"
-            android:tint="@color/primary"/>
+            app:tint="@color/primary"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="@dimen/standard_margin"
-            android:layout_marginLeft="@dimen/standard_margin"
             android:text="@string/upload_content_from_other_apps"
             android:textColor="@color/text_color"
             android:textSize="@dimen/bottom_sheet_text_size" />
@@ -99,6 +100,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:background="?android:attr/selectableItemBackground"
         android:paddingLeft="@dimen/standard_padding"
         android:paddingTop="@dimen/standard_half_padding"
         android:paddingRight="@dimen/standard_padding"
@@ -111,14 +113,13 @@
             android:layout_height="wrap_content"
             android:contentDescription="@null"
             android:src="@drawable/ic_camera"
-            android:tint="@color/primary" />
+            app:tint="@color/primary" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="@dimen/standard_margin"
-            android:layout_marginLeft="@dimen/standard_margin"
             android:text="@string/upload_direct_camera_upload"
             android:textColor="@color/text_color"
             android:textSize="@dimen/bottom_sheet_text_size" />
@@ -129,9 +130,9 @@
         android:id="@+id/divider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginLeft="@dimen/standard_margin"
+        android:layout_marginStart="@dimen/bottom_sheet_menu_item_divider_standard_margin"
         android:layout_marginTop="@dimen/standard_half_margin"
-        android:layout_marginRight="@dimen/standard_margin"
+        android:layout_marginEnd="@dimen/standard_margin"
         android:layout_marginBottom="@dimen/standard_half_margin"
         android:background="@color/list_divider_background"/>
 
@@ -140,6 +141,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:background="?android:attr/selectableItemBackground"
         android:paddingLeft="@dimen/standard_padding"
         android:paddingTop="@dimen/standard_half_padding"
         android:paddingRight="@dimen/standard_padding"
@@ -152,14 +154,13 @@
             android:layout_height="wrap_content"
             android:contentDescription="@null"
             android:src="@drawable/ic_action_create_dir"
-            android:tint="@color/primary"/>
+            app:tint="@color/primary"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="@dimen/standard_margin"
-            android:layout_marginLeft="@dimen/standard_margin"
             android:text="@string/create_new_folder"
             android:textColor="@color/text_color"
             android:textSize="@dimen/bottom_sheet_text_size" />
@@ -169,9 +170,9 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginLeft="@dimen/standard_margin"
+        android:layout_marginStart="@dimen/bottom_sheet_menu_item_divider_standard_margin"
         android:layout_marginTop="@dimen/standard_half_margin"
-        android:layout_marginRight="@dimen/standard_margin"
+        android:layout_marginEnd="@dimen/standard_margin"
         android:layout_marginBottom="@dimen/standard_half_margin"
         android:background="@color/list_divider_background" />
 
@@ -187,6 +188,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:background="?android:attr/selectableItemBackground"
             android:paddingLeft="@dimen/standard_padding"
             android:paddingTop="@dimen/standard_half_padding"
             android:paddingRight="@dimen/standard_padding"
@@ -205,7 +207,6 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="@dimen/standard_margin"
-                android:layout_marginLeft="@dimen/standard_margin"
                 android:text="@string/create_new_document"
                 android:textColor="@color/text_color"
                 android:textSize="@dimen/bottom_sheet_text_size" />
@@ -216,6 +217,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:background="?android:attr/selectableItemBackground"
             android:paddingLeft="@dimen/standard_padding"
             android:paddingTop="@dimen/standard_half_padding"
             android:paddingRight="@dimen/standard_padding"
@@ -234,7 +236,6 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="@dimen/standard_margin"
-                android:layout_marginLeft="@dimen/standard_margin"
                 android:text="@string/create_new_spreadsheet"
                 android:textColor="@color/text_color"
                 android:textSize="@dimen/bottom_sheet_text_size" />
@@ -245,6 +246,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:background="?android:attr/selectableItemBackground"
             android:paddingLeft="@dimen/standard_padding"
             android:paddingTop="@dimen/standard_half_padding"
             android:paddingRight="@dimen/standard_padding"
@@ -263,7 +265,6 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="@dimen/standard_margin"
-                android:layout_marginLeft="@dimen/standard_margin"
                 android:text="@string/create_new_presentation"
                 android:textColor="@color/text_color"
                 android:textSize="@dimen/bottom_sheet_text_size" />
@@ -272,9 +273,9 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginLeft="@dimen/standard_margin"
+            android:layout_marginStart="@dimen/bottom_sheet_menu_item_divider_standard_margin"
             android:layout_marginTop="@dimen/standard_half_margin"
-            android:layout_marginRight="@dimen/standard_margin"
+            android:layout_marginEnd="@dimen/standard_margin"
             android:layout_marginBottom="@dimen/standard_half_margin"
             android:background="@color/list_divider_background" />
     </LinearLayout>
@@ -291,15 +292,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-
         </LinearLayout>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginLeft="@dimen/standard_margin"
+            android:layout_marginStart="@dimen/bottom_sheet_menu_item_divider_standard_margin"
             android:layout_marginTop="@dimen/standard_half_margin"
-            android:layout_marginRight="@dimen/standard_margin"
+            android:layout_marginEnd="@dimen/standard_margin"
             android:layout_marginBottom="@dimen/standard_half_margin"
             android:background="@color/list_divider_background" />
     </LinearLayout>
@@ -309,6 +309,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:background="?android:attr/selectableItemBackground"
         android:paddingLeft="@dimen/standard_padding"
         android:paddingTop="@dimen/standard_half_padding"
         android:paddingRight="@dimen/standard_padding"
@@ -321,14 +322,13 @@
             android:layout_height="wrap_content"
             android:contentDescription="@null"
             android:src="@drawable/ic_post_add"
-            android:tint="@color/primary" />
+            app:tint="@color/primary" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="@dimen/standard_margin"
-            android:layout_marginLeft="@dimen/standard_margin"
             android:text="@string/create_rich_workspace"
             android:textColor="@color/text_color"
             android:textSize="@dimen/bottom_sheet_text_size"

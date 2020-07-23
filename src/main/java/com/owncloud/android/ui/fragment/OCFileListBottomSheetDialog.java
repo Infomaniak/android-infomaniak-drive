@@ -23,7 +23,6 @@ package com.owncloud.android.ui.fragment;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -123,19 +122,23 @@ public class OCFileListBottomSheetDialog extends BottomSheetDialog {
         ThemeUtils.tintDrawable(iconMakeDir.getDrawable(), primaryColor);
 
         headline.setText(getContext().getResources().getString(R.string.add_to_cloud,
-                                                               ThemeUtils.getDefaultDisplayNameForRootFolder(getContext())));
+                ThemeUtils.getDefaultDisplayNameForRootFolder(getContext())));
 
         OCCapability capability = fileActivity.getCapabilities();
-        if (capability.getRichDocuments().isTrue() && capability.getRichDocumentsDirectEditing().isTrue() &&
+        if (capability.getRichDocuments().isTrue() &&
+            capability.getRichDocumentsDirectEditing().isTrue() &&
             android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP &&
-            capability.getRichDocumentsTemplatesAvailable().isTrue()) {
+            capability.getRichDocumentsTemplatesAvailable().isTrue() &&
+            !file.isEncrypted()) {
             templates.setVisibility(View.VISIBLE);
         }
 
         String json = new ArbitraryDataProvider(getContext().getContentResolver())
             .getValue(user.toPlatformAccount(), ArbitraryDataProvider.DIRECT_EDITING);
 
-        if (!json.isEmpty() && android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (!json.isEmpty() &&
+            android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP &&
+            !file.isEncrypted()) {
             DirectEditing directEditing = new Gson().fromJson(json, DirectEditing.class);
 
             if (!directEditing.getCreators().isEmpty()) {
@@ -175,11 +178,15 @@ public class OCFileListBottomSheetDialog extends BottomSheetDialog {
             FileMenuFilter.isEditorAvailable(getContext().getContentResolver(),
                                              user,
                                              MimeTypeUtil.MIMETYPE_TEXT_MARKDOWN) &&
-            file != null) {
-            if (TextUtils.isEmpty(file.getRichWorkspace())) {
-                createRichWorkspace.setVisibility(View.VISIBLE);
-            } else {
+            file != null && !file.isEncrypted()) {
+            // richWorkspace
+            // == "": no info set -> show button
+            // == null: disabled on server side -> hide button
+            // != "": info set -> hide button
+            if (file.getRichWorkspace() == null || !"".equals(file.getRichWorkspace())) {
                 createRichWorkspace.setVisibility(View.GONE);
+            } else {
+                createRichWorkspace.setVisibility(View.VISIBLE);
             }
         } else {
             createRichWorkspace.setVisibility(View.GONE);
@@ -191,8 +198,8 @@ public class OCFileListBottomSheetDialog extends BottomSheetDialog {
         });
 
         setOnShowListener(d ->
-                              BottomSheetBehavior.from((View) view.getParent()).setPeekHeight(view.getMeasuredHeight())
-                         );
+                BottomSheetBehavior.from((View) view.getParent()).setPeekHeight(view.getMeasuredHeight())
+        );
     }
 
     @OnClick(R.id.menu_mkdir)

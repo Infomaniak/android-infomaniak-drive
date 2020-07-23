@@ -23,9 +23,6 @@ package com.owncloud.android.datamodel;
 
 import java.io.Serializable;
 
-import lombok.Getter;
-import lombok.Setter;
-
 /**
  * Synced folder entity containing all information per synced folder.
  */

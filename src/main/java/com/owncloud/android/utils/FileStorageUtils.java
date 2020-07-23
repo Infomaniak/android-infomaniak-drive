@@ -201,6 +201,7 @@ public final class FileStorageUtils {
      */
     public static OCFile fillOCFile(RemoteFile remote) {
         OCFile file = new OCFile(remote.getRemotePath());
+        file.setDecryptedRemotePath(remote.getRemotePath());
         file.setCreationTimestamp(remote.getCreationTimestamp());
         if (MimeType.DIRECTORY.equalsIgnoreCase(remote.getMimeType())) {
             file.setFileLength(remote.getSize());
@@ -449,7 +450,7 @@ public final class FileStorageUtils {
             return true;
         }
 
-        while (!OCFile.ROOT_PATH.equals(file.getRemotePath())) {
+        while (!OCFile.ROOT_PATH.equals(file.getDecryptedRemotePath())) {
             if (file.isEncrypted()) {
                 return true;
             }
@@ -491,20 +492,17 @@ public final class FileStorageUtils {
             // Device has emulated storage; external storage paths should have
             // userId burned into them.
             final String rawUserId;
-            if (SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                rawUserId = "";
-            } else {
-                final String path = Environment.getExternalStorageDirectory().getAbsolutePath();
-                final String[] folders = OCFile.PATH_SEPARATOR.split(path);
-                final String lastFolder = folders[folders.length - 1];
-                boolean isDigit = false;
-                try {
-                    Integer.valueOf(lastFolder);
-                    isDigit = true;
-                } catch (NumberFormatException ignored) {
-                }
-                rawUserId = isDigit ? lastFolder : "";
+            final String path = Environment.getExternalStorageDirectory().getAbsolutePath();
+            final String[] folders = OCFile.PATH_SEPARATOR.split(path);
+            final String lastFolder = folders[folders.length - 1];
+            boolean isDigit = false;
+            try {
+                Integer.valueOf(lastFolder);
+                isDigit = true;
+            } catch (NumberFormatException ignored) {
             }
+            rawUserId = isDigit ? lastFolder : "";
+
             // /storage/emulated/0[1,2,...]
             if (TextUtils.isEmpty(rawUserId)) {
                 rv.add(rawEmulatedStorageTarget);

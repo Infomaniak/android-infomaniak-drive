@@ -9,7 +9,7 @@
  *
  * Copyright (C) 2015 ownCloud Inc.
  * Copyright (C) 2018 Andy Scherzinger
- * Copyright (C) 2019 Chris Narkiewicz <hello@ezaquarii.com>
+ * Copyright (C) 2020 Chris Narkiewicz <hello@ezaquarii.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2,
@@ -45,7 +45,6 @@ import android.util.Log;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 
-import com.evernote.android.job.JobRequest;
 import com.nextcloud.client.account.CurrentAccountProvider;
 import com.nextcloud.client.account.User;
 import com.nextcloud.client.network.ConnectivityService;
@@ -198,13 +197,13 @@ public class FileOperationsHelper {
 
     public void startSyncForFileAndIntent(OCFile file, Intent intent) {
         new Thread(() -> {
-            Account account = fileActivity.getAccount();
+            User user = fileActivity.getUser().orElseThrow(RuntimeException::new);
             FileDataStorageManager storageManager = new FileDataStorageManager(fileActivity.getAccount(),
                                                                                fileActivity.getContentResolver());
 
             // check if file is in conflict (this is known due to latest folder refresh)
             if (file.isInConflict()) {
-                syncFile(file, account, storageManager);
+                syncFile(file, user, storageManager);
                 EventBus.getDefault().post(new SyncEventFinished(intent));
 
                 return;
@@ -219,8 +218,7 @@ public class FileOperationsHelper {
             }
 
             // if offline or walled garden, show old version with warning
-            if (connectivityService.getActiveNetworkType() == JobRequest.NetworkType.ANY ||
-                    connectivityService.isInternetWalled()) {
+            if (!connectivityService.getConnectivity().isConnected() || connectivityService.isInternetWalled()) {
                 DisplayUtils.showSnackMessage(fileActivity, R.string.file_not_synced);
                 EventBus.getDefault().post(new SyncEventFinished(intent));
 
@@ -229,33 +227,34 @@ public class FileOperationsHelper {
 
             // check for changed eTag
             CheckEtagRemoteOperation checkEtagOperation = new CheckEtagRemoteOperation(file.getRemotePath(),
-                file.getEtag());
-            RemoteOperationResult result = checkEtagOperation.execute(account, fileActivity);
+                                                                                       file.getEtag());
+            RemoteOperationResult result = checkEtagOperation.execute(user.toPlatformAccount(), fileActivity);
 
             // eTag changed, sync file
             if (result.getCode() == RemoteOperationResult.ResultCode.ETAG_CHANGED) {
-                syncFile(file, account, storageManager);
+                syncFile(file, user, storageManager);
             }
 
             EventBus.getDefault().post(new SyncEventFinished(intent));
         }).start();
     }
 
-    private void syncFile(OCFile file, Account account, FileDataStorageManager storageManager) {
+    private void syncFile(OCFile file, User user, FileDataStorageManager storageManager) {
         fileActivity.runOnUiThread(() -> fileActivity.showLoadingDialog(fileActivity.getResources()
                 .getString(R.string.sync_in_progress)));
 
-        SynchronizeFileOperation sfo = new SynchronizeFileOperation(file, null, account, true, fileActivity);
+        SynchronizeFileOperation sfo = new SynchronizeFileOperation(file, null, user, true, fileActivity);
         RemoteOperationResult result = sfo.execute(storageManager, fileActivity);
 
         if (result.getCode() == RemoteOperationResult.ResultCode.SYNC_CONFLICT) {
             // ISSUE 5: if the user is not running the app (this is a service!),
             // this can be very intrusive; a notification should be preferred
-            Intent i = new Intent(fileActivity, ConflictsResolveActivity.class);
-            i.setFlags(i.getFlags() | Intent.FLAG_ACTIVITY_NEW_TASK);
-            i.putExtra(ConflictsResolveActivity.EXTRA_FILE, file);
-            i.putExtra(ConflictsResolveActivity.EXTRA_ACCOUNT, account);
-            fileActivity.startActivity(i);
+            Intent intent = ConflictsResolveActivity.createIntent(file,
+                                                                  user.toPlatformAccount(),
+                                                                  Intent.FLAG_ACTIVITY_NEW_TASK,
+                                                                  fileActivity);
+
+            fileActivity.startActivity(intent);
         } else {
             if (file.isDown()) {
                 FileStorageUtils.checkIfFileFinishedSaving(file);
@@ -313,17 +312,17 @@ public class FileOperationsHelper {
                     // since it was registered to observe again, assuming that local files
                     // are linked to a remote file AT MOST, SOMETHING TO BE DONE;
                     SynchronizeFileOperation sfo =
-                            new SynchronizeFileOperation(file, null, user.toPlatformAccount(), true, fileActivity);
+                            new SynchronizeFileOperation(file, null, user, true, fileActivity);
                     RemoteOperationResult result = sfo.execute(storageManager, fileActivity);
                     fileActivity.dismissLoadingDialog();
                     if (result.getCode() == RemoteOperationResult.ResultCode.SYNC_CONFLICT) {
                         // ISSUE 5: if the user is not running the app (this is a service!),
                         // this can be very intrusive; a notification should be preferred
-                        Intent i = new Intent(fileActivity, ConflictsResolveActivity.class);
-                        i.setFlags(i.getFlags() | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        i.putExtra(ConflictsResolveActivity.EXTRA_FILE, file);
-                        i.putExtra(ConflictsResolveActivity.EXTRA_ACCOUNT, user.toPlatformAccount());
-                        fileActivity.startActivity(i);
+                        Intent intent = ConflictsResolveActivity.createIntent(file,
+                                                                              user.toPlatformAccount(),
+                                                                              Intent.FLAG_ACTIVITY_NEW_TASK,
+                                                                              fileActivity);
+                        fileActivity.startActivity(intent);
                     } else {
                         if (!launchables.isEmpty()) {
                             try {
@@ -768,7 +767,7 @@ public class FileOperationsHelper {
             sendIntent.setComponent(new ComponentName(packageName, activityName));
             sendIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse("content://" +
                     context.getResources().getString(R.string.image_cache_provider_authority) +
-                    file.getRemotePath()));
+                                                                   file.getRemotePath()));
             sendIntent.putExtra(Intent.ACTION_SEND, true);      // Send Action
             sendIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
@@ -799,7 +798,7 @@ public class FileOperationsHelper {
                 } else {
                     uri = Uri.parse(UriUtils.URI_CONTENT_SCHEME +
                             context.getResources().getString(R.string.image_cache_provider_authority) +
-                            file.getRemotePath());
+                                        file.getRemotePath());
                 }
 
                 intent.setDataAndType(uri, file.getMimeType());
@@ -865,7 +864,7 @@ public class FileOperationsHelper {
     public void toggleEncryption(OCFile file, boolean shouldBeEncrypted) {
         if (file.isEncrypted() != shouldBeEncrypted) {
             EventBus.getDefault().post(new EncryptionEvent(file.getLocalId(), file.getRemoteId(), file.getRemotePath(),
-                    shouldBeEncrypted));
+                                                           shouldBeEncrypted));
         }
     }
 
@@ -896,7 +895,7 @@ public class FileOperationsHelper {
             Intent service = new Intent(fileActivity, OperationsService.class);
             service.setAction(OperationsService.ACTION_REMOVE);
             service.putExtra(OperationsService.EXTRA_ACCOUNT, fileActivity.getAccount());
-            service.putExtra(OperationsService.EXTRA_REMOTE_PATH, file.getRemotePath());
+            service.putExtra(OperationsService.EXTRA_FILE, file);
             service.putExtra(OperationsService.EXTRA_REMOVE_ONLY_LOCAL, onlyLocalCopy);
             service.putExtra(OperationsService.EXTRA_IN_BACKGROUND, inBackground);
             mWaitingForOpId = fileActivity.getOperationsServiceBinder().queueNewOperation(service);
@@ -908,13 +907,12 @@ public class FileOperationsHelper {
     }
 
 
-    public void createFolder(String remotePath, boolean createFullPath) {
+    public void createFolder(String remotePath) {
         // Create Folder
         Intent service = new Intent(fileActivity, OperationsService.class);
         service.setAction(OperationsService.ACTION_CREATE_FOLDER);
         service.putExtra(OperationsService.EXTRA_ACCOUNT, fileActivity.getAccount());
         service.putExtra(OperationsService.EXTRA_REMOTE_PATH, remotePath);
-        service.putExtra(OperationsService.EXTRA_CREATE_FULL_PATH, createFullPath);
         mWaitingForOpId = fileActivity.getOperationsServiceBinder().queueNewOperation(service);
 
         fileActivity.showLoadingDialog(fileActivity.getString(R.string.wait_a_moment));
@@ -1060,14 +1058,6 @@ public class FileOperationsHelper {
             return -1L;
         }
 
-        long availableBytesOnDevice;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            availableBytesOnDevice = stat.getBlockSizeLong() * stat.getAvailableBlocksLong();
-        } else {
-            availableBytesOnDevice = (long) stat.getBlockSize() * (long) stat.getAvailableBlocks();
-        }
-
-        return availableBytesOnDevice;
+        return stat.getBlockSizeLong() * stat.getAvailableBlocksLong();
     }
-
 }

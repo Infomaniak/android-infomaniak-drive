@@ -32,6 +32,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.MediaMetadataRetriever;
@@ -41,7 +42,6 @@ import android.os.AsyncTask;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.view.Display;
-import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
@@ -76,6 +76,7 @@ import java.util.List;
 import java.util.Locale;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.res.ResourcesCompat;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
@@ -331,7 +332,7 @@ public final class ThumbnailsCacheManager {
                         GetMethod getMethod = null;
                         try {
                             String uri = mClient.getBaseUri() + "/index.php/core/preview.png?file="
-                                    + URLEncoder.encode(file.getRemotePath())
+                                + URLEncoder.encode(file.getRemotePath())
                                     + "&x=" + pxW + "&y=" + pxH + "&a=1&mode=cover&forceIcon=0";
                             getMethod = new GetMethod(uri);
 
@@ -427,21 +428,12 @@ public final class ThumbnailsCacheManager {
         private String mImageKey;
         private FileDataStorageManager mStorageManager;
         private GetMethod getMethod;
-        private boolean roundedCorners = false;
+        private Listener mListener;
+        private boolean gridViewEnabled = false;
 
         public ThumbnailGenerationTask(ImageView imageView, FileDataStorageManager storageManager, Account account)
                 throws IllegalArgumentException {
             this(imageView, storageManager, account, null);
-        }
-
-        public ThumbnailGenerationTask(ImageView imageView,
-                                       FileDataStorageManager storageManager,
-                                       Account account,
-                                       List<ThumbnailGenerationTask> asyncTasks,
-                                       boolean roundedCorners)
-            throws IllegalArgumentException {
-            this(imageView, storageManager, account, asyncTasks);
-            this.roundedCorners = roundedCorners;
         }
 
         public ThumbnailGenerationTask(ImageView imageView, FileDataStorageManager storageManager,
@@ -455,6 +447,14 @@ public final class ThumbnailsCacheManager {
             mStorageManager = storageManager;
             mAccount = account;
             mAsyncTasks = asyncTasks;
+        }
+
+        public ThumbnailGenerationTask(ImageView imageView, FileDataStorageManager storageManager,
+                                       Account account, List<ThumbnailGenerationTask> asyncTasks,
+                                       boolean gridViewEnabled)
+            throws IllegalArgumentException {
+            this(imageView, storageManager, account, asyncTasks);
+            this.gridViewEnabled = gridViewEnabled;
         }
 
         public GetMethod getGetMethod() {
@@ -479,7 +479,7 @@ public final class ThumbnailsCacheManager {
         @Override
         protected Bitmap doInBackground(ThumbnailGenerationTaskObject... params) {
             Bitmap thumbnail = null;
-
+            boolean isError = false;
             try {
                 if (mAccount != null) {
                     OwnCloudAccount ocAccount = new OwnCloudAccount(
@@ -514,9 +514,15 @@ public final class ThumbnailsCacheManager {
 
             } catch(OutOfMemoryError oome) {
                 Log_OC.e(TAG, "Out of memory");
+                isError = true;
             } catch (Throwable t) {
                 // the app should never break due to a problem with thumbnails
                 Log_OC.e(TAG, "Generation of thumbnail for " + mFile + " failed", t);
+                isError = true;
+            } finally {
+                if (isError && mListener != null){
+                    mListener.onError();
+                }
             }
 
             return thumbnail;
@@ -536,18 +542,26 @@ public final class ThumbnailsCacheManager {
                         tagId = String.valueOf(((TrashbinFile) mFile).getRemoteId());
                     }
                     if (String.valueOf(imageView.getTag()).equals(tagId)) {
-                        if (roundedCorners) {
-                            BitmapUtils.setRoundedBitmap(bitmap, imageView);
+                        if (gridViewEnabled){
+                            BitmapUtils.setRoundedBitmapForGridMode(bitmap, imageView);
                         } else {
-                            imageView.setImageBitmap(bitmap);
+                        BitmapUtils.setRoundedBitmap(bitmap, imageView);
                         }
                     }
                 }
             }
 
+            if (mListener !=null){
+                mListener.onSuccess();
+            }
+
             if (mAsyncTasks != null) {
                 mAsyncTasks.remove(this);
             }
+        }
+
+        public void setListener(Listener listener){
+            mListener = listener;
         }
 
         private Bitmap doThumbnailFromOCFileInBackground() {
@@ -605,7 +619,7 @@ public final class ThumbnailsCacheManager {
                                 String uri;
                                 if (file instanceof OCFile) {
                                     uri = mClient.getBaseUri() + "/index.php/apps/files/api/v1/thumbnail/" +
-                                            pxW + "/" + pxH + Uri.encode(file.getRemotePath(), "/");
+                                        pxW + "/" + pxH + Uri.encode(file.getRemotePath(), "/");
                                 } else {
                                     uri = mClient.getBaseUri() + "/index.php/apps/files_trashbin/preview?fileId=" +
                                             file.getLocalId() + "&x=" + pxW + "&y=" + pxH;
@@ -694,6 +708,11 @@ public final class ThumbnailsCacheManager {
                 }
             }
             return thumbnail;
+        }
+
+        public interface Listener{
+            void onSuccess();
+            void onError();
         }
 
     }
@@ -865,17 +884,12 @@ public final class ThumbnailsCacheManager {
             Drawable thumbnail = null;
 
             try {
-                if (mAccount != null) {
-                    OwnCloudAccount ocAccount = new OwnCloudAccount(mAccount, mContext);
-                    mClient = OwnCloudClientManagerFactory.getDefaultSingleton().getClientFor(ocAccount, mContext);
-                }
-
                 thumbnail = doAvatarInBackground();
-
             } catch (OutOfMemoryError oome) {
                 Log_OC.e(TAG, "Out of memory");
             } catch (Throwable t) {
                 // the app should never break due to a problem with avatars
+                thumbnail = ResourcesCompat.getDrawable(mResources, R.drawable.account_circle_white, null);
                 Log_OC.e(TAG, "Generation of avatar for " + mUserId + " failed", t);
             }
 
@@ -886,9 +900,8 @@ public final class ThumbnailsCacheManager {
             if (drawable != null) {
                 AvatarGenerationListener listener = mAvatarGenerationListener.get();
                 if (listener != null) {
-                    AvatarGenerationTask avatarWorkerTask = getAvatarWorkerTask(mCallContext);
                     String accountName = mUserId + "@" + mServerName;
-                    if (this == avatarWorkerTask && listener.shouldCallGeneratedCallback(accountName, mCallContext)) {
+                    if (listener.shouldCallGeneratedCallback(accountName, mCallContext)) {
                         listener.avatarGenerated(drawable, mCallContext);
                     }
                 }
@@ -920,9 +933,14 @@ public final class ThumbnailsCacheManager {
             avatar = getBitmapFromDiskCache(avatarKey);
 
             // Download avatar from server, only if older than 60 min or avatar does not exist
-            if ((System.currentTimeMillis() - timestamp >= 60 * 60 * 1000 || avatar == null) && mClient != null) {
+            if ((System.currentTimeMillis() - timestamp >= 60 * 60 * 1000 || avatar == null)) {
                 GetMethod get = null;
                 try {
+                    if (mAccount != null) {
+                        OwnCloudAccount ocAccount = new OwnCloudAccount(mAccount, mContext);
+                        mClient = OwnCloudClientManagerFactory.getDefaultSingleton().getClientFor(ocAccount, mContext);
+                    }
+
                     int px = getAvatarDimension();
                     String uri = mClient.getBaseUri() + "/index.php/avatar/" + Uri.encode(mUserId) + "/" + px;
                     Log_OC.d("Avatar", "URI: " + uri);
@@ -994,7 +1012,7 @@ public final class ThumbnailsCacheManager {
                 try {
                     return TextDrawable.createAvatar(mAccount, mAvatarRadius);
                 } catch (Exception e1) {
-                    return mResources.getDrawable(R.drawable.ic_user);
+                    return ResourcesCompat.getDrawable(mResources, R.drawable.ic_user, null);
                 }
             } else {
                 return BitmapUtils.bitmapToCircularBitmapDrawable(mResources, avatar);
@@ -1012,54 +1030,6 @@ public final class ThumbnailsCacheManager {
                 // Cancel previous task
                 bitmapWorkerTask.cancel(true);
                 Log_OC.v(TAG, "Cancelled generation of thumbnail for a reused imageView");
-            } else {
-                // The same work is already in progress
-                return false;
-            }
-        }
-        // No task associated with the ImageView, or an existing task was cancelled
-        return true;
-    }
-
-    public static boolean cancelPotentialAvatarWork(Object file, Object callContext) {
-        if (callContext instanceof ImageView) {
-            return cancelPotentialAvatarWork(file, (ImageView) callContext);
-        } else if (callContext instanceof MenuItem) {
-            return cancelPotentialAvatarWork(file, (MenuItem)callContext);
-        }
-
-        return false;
-    }
-
-    public static boolean cancelPotentialAvatarWork(Object file, ImageView imageView) {
-        final AvatarGenerationTask avatarWorkerTask = getAvatarWorkerTask(imageView);
-
-        if (avatarWorkerTask != null) {
-            final Object usernameData = avatarWorkerTask.mUserId;
-            // If usernameData is not yet set or it differs from the new data
-            if (usernameData == null || !usernameData.equals(file)) {
-                // Cancel previous task
-                avatarWorkerTask.cancel(true);
-                Log_OC.v(TAG, "Cancelled generation of avatar for a reused imageView");
-            } else {
-                // The same work is already in progress
-                return false;
-            }
-        }
-        // No task associated with the ImageView, or an existing task was cancelled
-        return true;
-    }
-
-    public static boolean cancelPotentialAvatarWork(Object file, MenuItem menuItem) {
-        final AvatarGenerationTask avatarWorkerTask = getAvatarWorkerTask(menuItem);
-
-        if (avatarWorkerTask != null) {
-            final Object usernameData = avatarWorkerTask.mUserId;
-            // If usernameData is not yet set or it differs from the new data
-            if (usernameData == null || !usernameData.equals(file)) {
-                // Cancel previous task
-                avatarWorkerTask.cancel(true);
-                Log_OC.v(TAG, "Cancelled generation of avatar for a reused imageView");
             } else {
                 // The same work is already in progress
                 return false;
@@ -1091,17 +1061,19 @@ public final class ThumbnailsCacheManager {
         return null;
     }
 
-    public static Bitmap addVideoOverlay(Bitmap thumbnail){
-        Drawable playButtonDrawable = MainApp.getAppContext().getResources().getDrawable(R.drawable.view_play);
+    public static Bitmap addVideoOverlay(Bitmap thumbnail) {
+        Drawable playButtonDrawable = ResourcesCompat.getDrawable(MainApp.getAppContext().getResources(),
+                                                                  R.drawable.view_play,
+                                                                  null);
         Bitmap playButton = BitmapUtils.drawableToBitmap(playButtonDrawable);
 
         Bitmap resizedPlayButton = Bitmap.createScaledBitmap(playButton,
-                (int) (thumbnail.getWidth() * 0.3),
-                (int) (thumbnail.getHeight() * 0.3), true);
+                                                             (int) (thumbnail.getWidth() * 0.3),
+                                                             (int) (thumbnail.getHeight() * 0.3), true);
 
         Bitmap resultBitmap = Bitmap.createBitmap(thumbnail.getWidth(),
-                thumbnail.getHeight(),
-                Bitmap.Config.ARGB_8888);
+                                                  thumbnail.getHeight(),
+                                                  Bitmap.Config.ARGB_8888);
 
         Canvas c = new Canvas(resultBitmap);
 
@@ -1134,25 +1106,6 @@ public final class ThumbnailsCacheManager {
 
         return resultBitmap;
     }
-
-    public static AvatarGenerationTask getAvatarWorkerTask(Object callContext) {
-        if (callContext instanceof ImageView) {
-            return getAvatarWorkerTask(((ImageView)callContext).getDrawable());
-        } else if (callContext instanceof MenuItem) {
-            return getAvatarWorkerTask(((MenuItem)callContext).getIcon());
-        }
-
-        return null;
-    }
-
-    private static AvatarGenerationTask getAvatarWorkerTask(Drawable drawable) {
-        if (drawable instanceof AsyncAvatarDrawable) {
-            final AsyncAvatarDrawable asyncDrawable = (AsyncAvatarDrawable) drawable;
-            return asyncDrawable.getAvatarWorkerTask();
-        }
-        return null;
-    }
-
 
     public static class AsyncThumbnailDrawable extends BitmapDrawable {
         private final WeakReference<ThumbnailGenerationTask> bitmapWorkerTaskReference;
@@ -1194,28 +1147,32 @@ public final class ThumbnailsCacheManager {
         }
     }
 
-    public static class AsyncAvatarDrawable extends BitmapDrawable {
-        private final WeakReference<AvatarGenerationTask> avatarWorkerTaskReference;
+    /**
+     * adapted from https://stackoverflow.com/a/8113368
+     */
+    private static Bitmap handlePNG(Bitmap source, int newWidth, int newHeight) {
+        int sourceWidth = source.getWidth();
+        int sourceHeight = source.getHeight();
 
-        public AsyncAvatarDrawable(Resources res, Drawable bitmap, AvatarGenerationTask avatarWorkerTask) {
-            super(res, BitmapUtils.drawableToBitmap(bitmap));
-            avatarWorkerTaskReference = new WeakReference<>(avatarWorkerTask);
-        }
+        float xScale = (float) newWidth / sourceWidth;
+        float yScale = (float) newHeight / sourceHeight;
+        float scale = Math.max(xScale, yScale);
 
-        public AvatarGenerationTask getAvatarWorkerTask() {
-            return avatarWorkerTaskReference.get();
-        }
-    }
+        float scaledWidth = scale * sourceWidth;
+        float scaledHeight = scale * sourceHeight;
 
-    private static Bitmap handlePNG(Bitmap bitmap, int pxW, int pxH) {
-        Bitmap resultBitmap = Bitmap.createBitmap(pxW, pxH, Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(resultBitmap);
+        float left = (newWidth - scaledWidth) / 2;
+        float top = (newHeight - scaledHeight) / 2;
 
-        // TODO check based on https://github.com/nextcloud/android/pull/3459#discussion_r339935975
-        c.drawColor(MainApp.getAppContext().getResources().getColor(R.color.background_color_png));
-        c.drawBitmap(bitmap, 0, 0, null);
+        RectF targetRect = new RectF(left, top, left + scaledWidth, top + scaledHeight);
 
-        return resultBitmap;
+        Bitmap dest = Bitmap.createBitmap(newWidth, newHeight, Bitmap.Config.ARGB_8888);
+
+        Canvas canvas = new Canvas(dest);
+        canvas.drawColor(MainApp.getAppContext().getResources().getColor(R.color.background_color_png));
+        canvas.drawBitmap(source, null, targetRect, null);
+
+        return dest;
     }
 
     public static void generateResizedImage(OCFile file) {

@@ -6,7 +6,7 @@
  *
  * Copyright (C) 2017 Mario Danic
  * Copyright (C) 2017 Nextcloud
- * Copyright (C) 2019 Chris Narkiewicz <hello@ezaquarii.com>
+ * Copyright (C) 2020 Chris Narkiewicz <hello@ezaquarii.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE
@@ -31,9 +31,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
 
-import com.evernote.android.job.JobManager;
-import com.evernote.android.job.JobRequest;
-import com.evernote.android.job.util.support.PersistableBundleCompat;
 import com.nextcloud.client.account.UserAccountManager;
 import com.nextcloud.client.core.Clock;
 import com.nextcloud.client.device.PowerManagementService;
@@ -48,8 +45,6 @@ import com.owncloud.android.datamodel.SyncedFolderProvider;
 import com.owncloud.android.datamodel.UploadsStorageManager;
 import com.owncloud.android.db.OCUpload;
 import com.owncloud.android.files.services.FileUploader;
-import com.owncloud.android.jobs.FilesSyncJob;
-import com.owncloud.android.jobs.OfflineSyncJob;
 import com.owncloud.android.lib.common.utils.Log_OC;
 
 import org.lukhnos.nnio.file.FileVisitResult;
@@ -61,10 +56,6 @@ import org.lukhnos.nnio.file.attribute.BasicFileAttributes;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nullable;
 
 import static com.owncloud.android.datamodel.OCFile.PATH_SEPARATOR;
 
@@ -128,20 +119,6 @@ public final class FilesSyncHelper {
                 }
             }
         }
-    }
-
-    public static void startFilesSyncJobNow(@Nullable PersistableBundleCompat bundle) {
-        JobRequest.Builder builder = new JobRequest.Builder(FilesSyncJob.TAG)
-            .startNow()
-            .setUpdateCurrent(false);
-
-        if (bundle != null) {
-            builder.setExtras(bundle);
-        }
-
-        builder
-            .build()
-            .schedule();
     }
 
     public static void insertAllDBEntries(AppPreferences preferences,
@@ -227,8 +204,7 @@ public final class FilesSyncHelper {
         }
 
         new Thread(() -> {
-            if (connectivityService.getActiveNetworkType() != JobRequest.NetworkType.ANY &&
-                    !connectivityService.isInternetWalled()) {
+            if (connectivityService.getConnectivity().isConnected() && !connectivityService.isInternetWalled()) {
                 FileUploader.retryFailedUploads(
                     context,
                     null,
@@ -243,26 +219,9 @@ public final class FilesSyncHelper {
     }
 
     public static void scheduleFilesSyncIfNeeded(Context context, BackgroundJobManager jobManager) {
-        // always run this because it also allows us to perform retries of manual uploads
-        new JobRequest.Builder(FilesSyncJob.TAG)
-                .setPeriodic(900000L, 300000L)
-                .setUpdateCurrent(true)
-                .build()
-                .schedule();
-
+        jobManager.schedulePeriodicFilesSyncJob();
         if (context != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             jobManager.scheduleContentObserverJob();
-        }
-    }
-
-    public static void scheduleOfflineSyncIfNeeded() {
-        Set<JobRequest> jobRequests = JobManager.instance().getAllJobRequestsForTag(OfflineSyncJob.TAG);
-        if (jobRequests.isEmpty()) {
-            new JobRequest.Builder(OfflineSyncJob.TAG)
-                .setPeriodic(TimeUnit.MINUTES.toMillis(15), TimeUnit.MINUTES.toMillis(5))
-                .setUpdateCurrent(false)
-                .build()
-                .schedule();
         }
     }
 }

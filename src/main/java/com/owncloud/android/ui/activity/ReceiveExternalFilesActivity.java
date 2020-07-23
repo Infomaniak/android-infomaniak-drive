@@ -38,8 +38,6 @@ import android.content.res.ColorStateList;
 import android.content.res.Resources.NotFoundException;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -124,6 +122,8 @@ import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 
+import static com.owncloud.android.utils.DisplayUtils.openSortingOrderDialogFragment;
+
 /**
  * This can be used to upload things to an ownCloud instance.
  */
@@ -166,6 +166,7 @@ public class ReceiveExternalFilesActivity extends FileActivity
     private TextView mEmptyListHeadline;
     private ImageView mEmptyListIcon;
     private ProgressBar mEmptyListProgress;
+    private MaterialButton sortButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -274,6 +275,7 @@ public class ReceiveExternalFilesActivity extends FileActivity
     @Override
     public void onSortingOrderChosen(FileSortOrder newSortOrder) {
         preferences.setSortOrder(mFile, newSortOrder);
+        sortButton.setText(DisplayUtils.getSortOrderStringId(newSortOrder));
         populateDirectoryList();
     }
 
@@ -705,7 +707,7 @@ public class ReceiveExternalFilesActivity extends FileActivity
     }
 
     private void populateDirectoryList() {
-        setContentView(R.layout.uploader_layout);
+        setContentView(R.layout.receive_external_files);
         setupEmptyList();
         setupToolbar();
         ActionBar actionBar = getSupportActionBar();
@@ -775,26 +777,20 @@ public class ReceiveExternalFilesActivity extends FileActivity
                 btnChooseFolder.setBackgroundTintList(ColorStateList.valueOf(Color.GRAY));
             }
 
-            if (getSupportActionBar() != null) {
-                getSupportActionBar().setBackgroundDrawable(new ColorDrawable(
-                        ThemeUtils.primaryColor(getAccount(), false, this)));
-            }
+            ThemeUtils.colorStatusBar(this);
 
-            ThemeUtils.colorStatusBar(this, ThemeUtils.primaryDarkColor(getAccount(), this)); //kDrive
-
-            ThemeUtils.colorToolbarProgressBar(this, ThemeUtils.primaryColor(getAccount(), false, this));
-
-            Drawable backArrow = getResources().getDrawable(R.drawable.ic_arrow_back);
-
-            if (actionBar != null) {
-                actionBar.setHomeAsUpIndicator(ThemeUtils.tintDrawable(backArrow, ThemeUtils.fontColor(this)));
-            }
+            ThemeUtils.tintBackButton(actionBar, this);
 
             Button btnNewFolder = findViewById(R.id.uploader_cancel);
             btnNewFolder.setTextColor(ThemeUtils.primaryColor(this, true));
             btnNewFolder.setOnClickListener(this);
 
             mListView.setOnItemClickListener(this);
+
+            sortButton = findViewById(R.id.sort_button);
+            FileSortOrder sortOrder = preferences.getSortOrderByFolder(mFile);
+            sortButton.setText(DisplayUtils.getSortOrderStringId(sortOrder));
+            sortButton.setOnClickListener(l -> openSortingOrderDialogFragment(getSupportFragmentManager(), sortOrder));
         }
     }
 
@@ -1042,7 +1038,7 @@ public class ReceiveExternalFilesActivity extends FileActivity
         newFolderMenuItem.setEnabled(mFile.canWrite());
 
         // hacky as no default way is provided
-        ThemeUtils.themeSearchView(searchView, true, this);
+        ThemeUtils.themeSearchView(searchView, this);
 
         return true;
     }
@@ -1062,12 +1058,6 @@ public class ReceiveExternalFilesActivity extends FileActivity
                 break;
             case R.id.action_switch_account:
                 showAccountChooserDialog();
-                break;
-            case R.id.action_sort:
-                SortingOrderDialogFragment mSortingOrderDialogFragment = SortingOrderDialogFragment.newInstance(
-                    preferences.getSortOrderByFolder(mFile));
-                mSortingOrderDialogFragment.show(getSupportFragmentManager(),
-                        SortingOrderDialogFragment.SORTING_ORDER_FRAGMENT);
                 break;
             default:
                 retval = super.onOptionsItemSelected(item);
@@ -1118,9 +1108,9 @@ public class ReceiveExternalFilesActivity extends FileActivity
 
                     } else {
                         OCFile currentFile = (mFile == null) ? null :
-                                getStorageManager().getFileByPath(mFile.getRemotePath());
+                            getStorageManager().getFileByPath(mFile.getRemotePath());
                         OCFile currentDir = (getCurrentFolder() == null) ? null :
-                                getStorageManager().getFileByPath(getCurrentFolder().getRemotePath());
+                            getStorageManager().getFileByPath(getCurrentFolder().getRemotePath());
 
                         if (currentDir == null) {
                             // current folder was removed from the server

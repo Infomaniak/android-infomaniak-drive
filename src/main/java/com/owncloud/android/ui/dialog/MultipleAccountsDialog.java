@@ -29,7 +29,6 @@ package com.owncloud.android.ui.dialog;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -52,8 +51,6 @@ import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.content.ContextCompat;
-import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -85,16 +82,11 @@ public class MultipleAccountsDialog extends DialogFragment implements Injectable
         final ReceiveExternalFilesActivity parent = (ReceiveExternalFilesActivity) getActivity();
         AlertDialog.Builder builder = new AlertDialog.Builder(parent);
 
-        Drawable tintedCheck = DrawableCompat.wrap(ContextCompat.getDrawable(parent, R.drawable.account_circle_white));
-        int tint = ThemeUtils.primaryColor(getContext());
-        DrawableCompat.setTint(tintedCheck, tint);
-
-
         UserListAdapter adapter = new UserListAdapter(parent,
                                                       accountManager,
                                                       getAccountListItems(),
-                                                      tintedCheck,
                                                       this,
+                                                      false,
                                                       false);
 
         listView.setHasFixedSize(true);
@@ -131,7 +123,13 @@ public class MultipleAccountsDialog extends DialogFragment implements Injectable
     }
 
     @Override
-    public void onClick(User user) {
+    public void onOptionItemClicked(User user, View view) {
+        // By default, access account if option is clicked
+        onAccountClicked(user);
+    }
+
+    @Override
+    public void onAccountClicked(User user) {
         final ReceiveExternalFilesActivity parentActivity = (ReceiveExternalFilesActivity) getActivity();
         if (parentActivity != null) {
             parentActivity.changeAccount(user.toPlatformAccount());

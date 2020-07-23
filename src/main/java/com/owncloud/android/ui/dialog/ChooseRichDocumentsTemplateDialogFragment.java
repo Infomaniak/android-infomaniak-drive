@@ -22,7 +22,6 @@
 
 package com.owncloud.android.ui.dialog;
 
-import android.accounts.Account;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
@@ -48,9 +47,7 @@ import com.owncloud.android.datamodel.OCFile;
 import com.owncloud.android.datamodel.Template;
 import com.owncloud.android.files.CreateFileFromTemplateOperation;
 import com.owncloud.android.files.FetchTemplateOperation;
-import com.owncloud.android.lib.common.OwnCloudAccount;
 import com.owncloud.android.lib.common.OwnCloudClient;
-import com.owncloud.android.lib.common.OwnCloudClientManagerFactory;
 import com.owncloud.android.lib.common.operations.RemoteOperationResult;
 import com.owncloud.android.lib.common.utils.Log_OC;
 import com.owncloud.android.lib.resources.files.ReadFileRemoteOperation;
@@ -158,14 +155,12 @@ public class ChooseRichDocumentsTemplateDialogFragment extends DialogFragment im
         fileName.getBackground().setColorFilter(accentColor, PorterDuff.Mode.SRC_ATOP);
 
         try {
-            Account account = currentAccount.getCurrentAccount();
-            OwnCloudAccount ocAccount = new OwnCloudAccount(account, activity);
-            client = OwnCloudClientManagerFactory.getDefaultSingleton().getClientFor(ocAccount, getContext());
-
-            new FetchTemplateTask(this, client).execute(type);
-        } catch (Exception e) {
-            Log_OC.e(TAG, "Loading stream url not possible: " + e);
+            client = clientFactory.create(currentAccount.getUser());
+        } catch (ClientFactory.CreationException e) {
+            throw new RuntimeException(e); // we'll NPE without the client
         }
+
+        new FetchTemplateTask(this, client).execute(type);
 
         listView.setHasFixedSize(true);
         listView.setLayoutManager(new GridLayoutManager(activity, 2));

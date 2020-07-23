@@ -9,6 +9,8 @@ import com.owncloud.android.R;
 import com.owncloud.android.datamodel.OCFile;
 import com.owncloud.android.utils.DisplayUtils;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,14 +32,7 @@ public class Utils {
      * @return if open
      */
     public static boolean openOnlyOffice(Activity activity, User user, OCFile file) {
-        String type;
-        if (isDoc(file)) {
-            type = "text";
-        } else if (isSpreadsheet(file)) {
-            type = "spreadsheet";
-        } else if (isPresentation(file)) {
-            type = "presentation";
-        } else {
+        if (!isDoc(file) && !isSpreadsheet(file) && !isPresentation(file)) {
             return false;
         }
 
@@ -52,7 +47,7 @@ public class Utils {
 
         String fileID = file.getRemoteId().replaceAll("^0*", "");
 
-        String url = "https://drive.infomaniak.com/app/drive/" + driveID + "/preview/" + type + "/" + fileID;
+        String url = "https://drive.infomaniak.com/app/office/" + driveID + "/" + fileID;
 
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(Uri.parse(url));
@@ -155,6 +150,15 @@ public class Utils {
 
                 DisplayUtils.showSnackMessage(activity, R.string.prefs_calendar_contacts_no_store_error);
             }
+        }
+    }
+
+    public static void filterShare(List<Integer> toShow, List<Integer> toHide, boolean isSingleSelection, Collection<OCFile> files) {
+        int shareAction = R.id.action_share;
+        if (isSingleSelection && files.iterator().next().canReshare()) {
+            toShow.add(shareAction);
+        } else {
+            toHide.add(shareAction);
         }
     }
 }

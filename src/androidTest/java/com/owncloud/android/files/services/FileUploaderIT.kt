@@ -5,6 +5,7 @@
  * @author Tobias Kaminsky
  * Copyright (C) 2020 Tobias Kaminsky
  * Copyright (C) 2020 Nextcloud GmbH
+ * Copyright (C) 2020 Chris Narkiewicz <hello@ezaquarii.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,10 +22,11 @@
  */
 package com.owncloud.android.files.services
 
-import com.evernote.android.job.JobRequest
 import com.nextcloud.client.account.UserAccountManager
 import com.nextcloud.client.account.UserAccountManagerImpl
+import com.nextcloud.client.device.BatteryStatus
 import com.nextcloud.client.device.PowerManagementService
+import com.nextcloud.client.network.Connectivity
 import com.nextcloud.client.network.ConnectivityService
 import com.owncloud.android.AbstractIT
 import com.owncloud.android.datamodel.OCFile
@@ -45,17 +47,8 @@ class FileUploaderIT : AbstractIT() {
     var uploadsStorageManager: UploadsStorageManager? = null
 
     val connectivityServiceMock: ConnectivityService = object : ConnectivityService {
-        override fun isInternetWalled(): Boolean {
-            return false
-        }
-
-        override fun isOnlineWithWifi(): Boolean {
-            return true
-        }
-
-        override fun getActiveNetworkType(): JobRequest.NetworkType {
-            return JobRequest.NetworkType.ANY
-        }
+        override fun isInternetWalled(): Boolean = false
+        override fun getConnectivity(): Connectivity = Connectivity.CONNECTED_WIFI
     }
 
     private val powerManagementServiceMock: PowerManagementService = object : PowerManagementService {
@@ -65,8 +58,8 @@ class FileUploaderIT : AbstractIT() {
         override val isPowerSavingExclusionAvailable: Boolean
             get() = false
 
-        override val isBatteryCharging: Boolean
-            get() = false
+        override val battery: BatteryStatus
+            get() = BatteryStatus()
     }
 
     @Before
@@ -84,20 +77,24 @@ class FileUploaderIT : AbstractIT() {
         val file = File(getSavePath(account.name) + "/chunkedFile.txt")
         val ocUpload = OCUpload(file.absolutePath, "/testFile.txt", account.name)
 
-        assertTrue(UploadFileOperation(
-            uploadsStorageManager,
-            connectivityServiceMock,
-            powerManagementServiceMock,
-            account,
-            null,
-            ocUpload,
-            FileUploader.NameCollisionPolicy.DEFAULT,
-            FileUploader.LOCAL_BEHAVIOUR_COPY,
-            targetContext,
-            false,
-            false)
-            .setRemoteFolderToBeCreated()
-            .execute(client, storageManager).isSuccess)
+        assertTrue(
+            UploadFileOperation(
+                uploadsStorageManager,
+                connectivityServiceMock,
+                powerManagementServiceMock,
+                account,
+                null,
+                ocUpload,
+                FileUploader.NameCollisionPolicy.DEFAULT,
+                FileUploader.LOCAL_BEHAVIOUR_COPY,
+                targetContext,
+                false,
+                false
+            )
+                .setRemoteFolderToBeCreated()
+                .execute(client, storageManager)
+                .isSuccess
+        )
 
         val result = ReadFileRemoteOperation("/testFile.txt").execute(client)
         assertTrue(result.isSuccess)
@@ -106,19 +103,23 @@ class FileUploaderIT : AbstractIT() {
 
         val ocUpload2 = OCUpload(getSavePath(account.name) + "/empty.txt", "/testFile.txt", account.name)
 
-        assertTrue(UploadFileOperation(
-            uploadsStorageManager,
-            connectivityServiceMock,
-            powerManagementServiceMock,
-            account,
-            null,
-            ocUpload2,
-            FileUploader.NameCollisionPolicy.OVERWRITE,
-            FileUploader.LOCAL_BEHAVIOUR_COPY,
-            targetContext,
-            false,
-            false)
-            .execute(client, storageManager).isSuccess)
+        assertTrue(
+            UploadFileOperation(
+                uploadsStorageManager,
+                connectivityServiceMock,
+                powerManagementServiceMock,
+                account,
+                null,
+                ocUpload2,
+                FileUploader.NameCollisionPolicy.OVERWRITE,
+                FileUploader.LOCAL_BEHAVIOUR_COPY,
+                targetContext,
+                false,
+                false
+            )
+                .execute(client, storageManager)
+                .isSuccess
+        )
 
         val result2 = ReadFileRemoteOperation("/testFile.txt").execute(client)
         assertTrue(result2.isSuccess)
@@ -144,7 +145,8 @@ class FileUploaderIT : AbstractIT() {
             UploadFileOperation.CREATED_BY_USER,
             false,
             false,
-            FileUploader.NameCollisionPolicy.DEFAULT)
+            FileUploader.NameCollisionPolicy.DEFAULT
+        )
 
         longSleep()
 
@@ -161,7 +163,8 @@ class FileUploaderIT : AbstractIT() {
             account,
             ocFile2,
             FileUploader.LOCAL_BEHAVIOUR_COPY,
-            FileUploader.NameCollisionPolicy.OVERWRITE)
+            FileUploader.NameCollisionPolicy.OVERWRITE
+        )
 
         shortSleep()
 
@@ -181,20 +184,24 @@ class FileUploaderIT : AbstractIT() {
         val file = File(getSavePath(account.name) + "/chunkedFile.txt")
         val ocUpload = OCUpload(file.absolutePath, "/testFile.txt", account.name)
 
-        assertTrue(UploadFileOperation(
-            uploadsStorageManager,
-            connectivityServiceMock,
-            powerManagementServiceMock,
-            account,
-            null,
-            ocUpload,
-            FileUploader.NameCollisionPolicy.DEFAULT,
-            FileUploader.LOCAL_BEHAVIOUR_COPY,
-            targetContext,
-            false,
-            false)
-            .setRemoteFolderToBeCreated()
-            .execute(client, storageManager).isSuccess)
+        assertTrue(
+            UploadFileOperation(
+                uploadsStorageManager,
+                connectivityServiceMock,
+                powerManagementServiceMock,
+                account,
+                null,
+                ocUpload,
+                FileUploader.NameCollisionPolicy.DEFAULT,
+                FileUploader.LOCAL_BEHAVIOUR_COPY,
+                targetContext,
+                false,
+                false
+            )
+                .setRemoteFolderToBeCreated()
+                .execute(client, storageManager)
+                .isSuccess
+        )
 
         val result = ReadFileRemoteOperation("/testFile.txt").execute(client)
         assertTrue(result.isSuccess)
@@ -204,22 +211,26 @@ class FileUploaderIT : AbstractIT() {
         val file2 = File(getSavePath(account.name) + "/empty.txt")
         val ocUpload2 = OCUpload(file2.absolutePath, "/testFile.txt", account.name)
 
-        assertTrue(UploadFileOperation(
-            uploadsStorageManager,
-            connectivityServiceMock,
-            powerManagementServiceMock,
-            account,
-            null,
-            ocUpload2,
-            FileUploader.NameCollisionPolicy.RENAME,
-            FileUploader.LOCAL_BEHAVIOUR_COPY,
-            targetContext,
-            false,
-            false)
-            .addRenameUploadListener {
-                renameListenerWasTriggered = true
-            }
-            .execute(client, storageManager).isSuccess)
+        assertTrue(
+            UploadFileOperation(
+                uploadsStorageManager,
+                connectivityServiceMock,
+                powerManagementServiceMock,
+                account,
+                null,
+                ocUpload2,
+                FileUploader.NameCollisionPolicy.RENAME,
+                FileUploader.LOCAL_BEHAVIOUR_COPY,
+                targetContext,
+                false,
+                false
+            )
+                .addRenameUploadListener {
+                    renameListenerWasTriggered = true
+                }
+                .execute(client, storageManager)
+                .isSuccess
+        )
 
         val result2 = ReadFileRemoteOperation("/testFile.txt").execute(client)
         assertTrue(result2.isSuccess)
@@ -251,7 +262,8 @@ class FileUploaderIT : AbstractIT() {
             UploadFileOperation.CREATED_BY_USER,
             false,
             false,
-            FileUploader.NameCollisionPolicy.DEFAULT)
+            FileUploader.NameCollisionPolicy.DEFAULT
+        )
 
         longSleep()
 
@@ -268,7 +280,8 @@ class FileUploaderIT : AbstractIT() {
             account,
             ocFile2,
             FileUploader.LOCAL_BEHAVIOUR_COPY,
-            FileUploader.NameCollisionPolicy.RENAME)
+            FileUploader.NameCollisionPolicy.RENAME
+        )
 
         shortSleep()
 
@@ -291,20 +304,24 @@ class FileUploaderIT : AbstractIT() {
         val file = File(getSavePath(account.name) + "/chunkedFile.txt")
         val ocUpload = OCUpload(file.absolutePath, "/testFile.txt", account.name)
 
-        assertTrue(UploadFileOperation(
-            uploadsStorageManager,
-            connectivityServiceMock,
-            powerManagementServiceMock,
-            account,
-            null,
-            ocUpload,
-            FileUploader.NameCollisionPolicy.DEFAULT,
-            FileUploader.LOCAL_BEHAVIOUR_COPY,
-            targetContext,
-            false,
-            false)
-            .setRemoteFolderToBeCreated()
-            .execute(client, storageManager).isSuccess)
+        assertTrue(
+            UploadFileOperation(
+                uploadsStorageManager,
+                connectivityServiceMock,
+                powerManagementServiceMock,
+                account,
+                null,
+                ocUpload,
+                FileUploader.NameCollisionPolicy.DEFAULT,
+                FileUploader.LOCAL_BEHAVIOUR_COPY,
+                targetContext,
+                false,
+                false
+            )
+                .setRemoteFolderToBeCreated()
+                .execute(client, storageManager)
+                .isSuccess
+        )
 
         val result = ReadFileRemoteOperation("/testFile.txt").execute(client)
         assertTrue(result.isSuccess)
@@ -313,19 +330,22 @@ class FileUploaderIT : AbstractIT() {
 
         val ocUpload2 = OCUpload(getSavePath(account.name) + "/empty.txt", "/testFile.txt", account.name)
 
-        assertFalse(UploadFileOperation(
-            uploadsStorageManager,
-            connectivityServiceMock,
-            powerManagementServiceMock,
-            account,
-            null,
-            ocUpload2,
-            FileUploader.NameCollisionPolicy.CANCEL,
-            FileUploader.LOCAL_BEHAVIOUR_COPY,
-            targetContext,
-            false,
-            false)
-            .execute(client, storageManager).isSuccess)
+        assertFalse(
+            UploadFileOperation(
+                uploadsStorageManager,
+                connectivityServiceMock,
+                powerManagementServiceMock,
+                account,
+                null,
+                ocUpload2,
+                FileUploader.NameCollisionPolicy.CANCEL,
+                FileUploader.LOCAL_BEHAVIOUR_COPY,
+                targetContext,
+                false,
+                false
+            )
+                .execute(client, storageManager).isSuccess
+        )
 
         val result2 = ReadFileRemoteOperation("/testFile.txt").execute(client)
         assertTrue(result2.isSuccess)
@@ -351,7 +371,8 @@ class FileUploaderIT : AbstractIT() {
             UploadFileOperation.CREATED_BY_USER,
             false,
             false,
-            FileUploader.NameCollisionPolicy.DEFAULT)
+            FileUploader.NameCollisionPolicy.DEFAULT
+        )
 
         longSleep()
 
@@ -368,7 +389,8 @@ class FileUploaderIT : AbstractIT() {
             account,
             ocFile2,
             FileUploader.LOCAL_BEHAVIOUR_COPY,
-            FileUploader.NameCollisionPolicy.CANCEL)
+            FileUploader.NameCollisionPolicy.CANCEL
+        )
 
         shortSleep()
 

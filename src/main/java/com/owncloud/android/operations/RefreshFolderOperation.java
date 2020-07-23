@@ -46,6 +46,7 @@ import com.owncloud.android.syncadapter.FileSyncAdapter;
 import com.owncloud.android.utils.DataHolderUtil;
 import com.owncloud.android.utils.EncryptionUtils;
 import com.owncloud.android.utils.FileStorageUtils;
+import com.owncloud.android.utils.MimeType;
 import com.owncloud.android.utils.MimeTypeUtil;
 
 import java.util.ArrayList;
@@ -56,6 +57,8 @@ import java.util.Vector;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import static com.owncloud.android.datamodel.OCFile.PATH_SEPARATOR;
 
 
 /**
@@ -73,9 +76,9 @@ public class RefreshFolderOperation extends RemoteOperation {
     private static final String TAG = RefreshFolderOperation.class.getSimpleName();
 
     public static final String EVENT_SINGLE_FOLDER_CONTENTS_SYNCED =
-        RefreshFolderOperation.class.getName() + ".EVENT_SINGLE_FOLDER_CONTENTS_SYNCED";
+            RefreshFolderOperation.class.getName() + ".EVENT_SINGLE_FOLDER_CONTENTS_SYNCED";
     public static final String EVENT_SINGLE_FOLDER_SHARES_SYNCED =
-        RefreshFolderOperation.class.getName() + ".EVENT_SINGLE_FOLDER_SHARES_SYNCED";
+            RefreshFolderOperation.class.getName() + ".EVENT_SINGLE_FOLDER_SHARES_SYNCED";
 
     /** Time stamp for the synchronization process in progress */
     private long mCurrentSyncTime;
@@ -330,17 +333,17 @@ public class RefreshFolderOperation extends RemoteOperation {
                 String remoteFolderETag = remoteFolder.getEtag();
                 if (remoteFolderETag != null) {
                     mRemoteFolderChanged =
-                        !(remoteFolderETag.equalsIgnoreCase(mLocalFolder.getEtag()));
+                            !(remoteFolderETag.equalsIgnoreCase(mLocalFolder.getEtag()));
                 } else {
                     Log_OC.e(TAG, "Checked " + mAccount.name + remotePath + " : " +
-                        "No ETag received from server");
+                            "No ETag received from server");
                 }
             }
 
             result = new RemoteOperationResult(ResultCode.OK);
 
             Log_OC.i(TAG, "Checked " + mAccount.name + remotePath + " : " +
-                (mRemoteFolderChanged ? "changed" : "not changed"));
+                    (mRemoteFolderChanged ? "changed" : "not changed"));
 
         } else {
             // check failed
@@ -349,10 +352,10 @@ public class RefreshFolderOperation extends RemoteOperation {
             }
             if (result.isException()) {
                 Log_OC.e(TAG, "Checked " + mAccount.name + remotePath + " : " +
-                    result.getLogMessage(), result.getException());
+                        result.getLogMessage(), result.getException());
             } else {
                 Log_OC.e(TAG, "Checked " + mAccount.name + remotePath + " : " +
-                    result.getLogMessage());
+                        result.getLogMessage());
             }
         }
 
@@ -385,9 +388,9 @@ public class RefreshFolderOperation extends RemoteOperation {
         if (mStorageManager.fileExists(mLocalFolder.getFileId())) {
             String currentSavePath = FileStorageUtils.getSavePath(mAccount.name);
             mStorageManager.removeFolder(
-                mLocalFolder,
-                true,
-                mLocalFolder.isDown() && mLocalFolder.getStoragePath().startsWith(currentSavePath)
+                    mLocalFolder,
+                    true,
+                    mLocalFolder.isDown() && mLocalFolder.getStoragePath().startsWith(currentSavePath)
             );
         }
     }
@@ -422,14 +425,14 @@ public class RefreshFolderOperation extends RemoteOperation {
         // update permission
         mLocalFolder.setPermissions(remoteFolder.getPermissions());
 
-        // update richWorkpace
+        // update richWorkspace
         mLocalFolder.setRichWorkspace(remoteFolder.getRichWorkspace());
 
         DecryptedFolderMetadata metadata = getDecryptedFolderMetadata(encryptedAncestor);
 
         // get current data about local contents of the folder to synchronize
         Map<String, OCFile> localFilesMap = prefillLocalFilesMap(metadata,
-                                                                 mStorageManager.getFolderContent(mLocalFolder, false));
+                mStorageManager.getFolderContent(mLocalFolder, false));
 
         // loop to update every child
         OCFile remoteFile;
@@ -476,6 +479,10 @@ public class RefreshFolderOperation extends RemoteOperation {
         }
 
         // save updated contents in local database
+        // update file name for encrypted files
+        if (metadata != null) {
+            updateFileNameForEncryptedFile(metadata, mLocalFolder);
+        }
         mStorageManager.saveFolder(remoteFolder, updatedFiles, localFilesMap.values());
 
         mChildren = updatedFiles;
@@ -493,15 +500,25 @@ public class RefreshFolderOperation extends RemoteOperation {
     }
 
     private void updateFileNameForEncryptedFile(@NonNull DecryptedFolderMetadata metadata, OCFile updatedFile) {
-        updatedFile.setEncryptedFileName(updatedFile.getFileName());
         try {
             String decryptedFileName = metadata.getFiles().get(updatedFile.getFileName()).getEncrypted()
-                .getFilename();
+                    .getFilename();
             String mimetype = metadata.getFiles().get(updatedFile.getFileName()).getEncrypted().getMimetype();
-            updatedFile.setFileName(decryptedFileName);
+
+            OCFile parentFile = mStorageManager.getFileById(updatedFile.getParentId());
+            String decryptedRemotePath = parentFile.getDecryptedRemotePath() + decryptedFileName;
+
+            if (updatedFile.isFolder()) {
+                decryptedRemotePath += "/";
+            }
+            updatedFile.setDecryptedRemotePath(decryptedRemotePath);
 
             if (mimetype == null || mimetype.isEmpty()) {
-                updatedFile.setMimeType("application/octet-stream");
+                if (updatedFile.isFolder()) {
+                    updatedFile.setMimeType(MimeType.DIRECTORY);
+                } else {
+                    updatedFile.setMimeType("application/octet-stream");
+                }
             } else {
                 updatedFile.setMimeType(mimetype);
             }
@@ -515,13 +532,17 @@ public class RefreshFolderOperation extends RemoteOperation {
             updatedFile.setFileId(localFile.getFileId());
             updatedFile.setLastSyncDateForData(localFile.getLastSyncDateForData());
             updatedFile.setModificationTimestampAtLastSyncForData(
-                localFile.getModificationTimestampAtLastSyncForData()
+                    localFile.getModificationTimestampAtLastSyncForData()
             );
-            updatedFile.setStoragePath(localFile.getStoragePath());
+            if (localFile.isEncrypted()) {
+                updatedFile.setStoragePath(mLocalFolder.getRemotePath() + PATH_SEPARATOR + localFile.getFileName());
+            } else {
+                updatedFile.setStoragePath(localFile.getStoragePath());
+            }
 
             // eTag will not be updated unless file CONTENTS are synchronized
             if (!updatedFile.isFolder() && localFile.isDown() &&
-                !updatedFile.getEtag().equals(localFile.getEtag())) {
+                    !updatedFile.getEtag().equals(localFile.getEtag())) {
                 updatedFile.setEtagInConflict(updatedFile.getEtag());
             }
 
@@ -531,8 +552,8 @@ public class RefreshFolderOperation extends RemoteOperation {
                 updatedFile.setFileLength(remoteFile.getFileLength());
                 updatedFile.setMountType(remoteFile.getMountType());
             } else if (remoteFolderChanged && MimeTypeUtil.isImage(remoteFile) &&
-                remoteFile.getModificationTimestamp() !=
-                    localFile.getModificationTimestamp()) {
+                    remoteFile.getModificationTimestamp() !=
+                            localFile.getModificationTimestamp()) {
                 updatedFile.setUpdateThumbnailNeeded(true);
                 Log.d(TAG, "Image " + remoteFile.getFileName() + " updated on the server");
             }
@@ -556,8 +577,11 @@ public class RefreshFolderOperation extends RemoteOperation {
         for (OCFile file : localFiles) {
             String remotePath = file.getRemotePath();
 
-            if (metadata != null && !file.isFolder()) {
+            if (metadata != null) {
                 remotePath = file.getParentRemotePath() + file.getEncryptedFileName();
+                if (file.isFolder() && !remotePath.endsWith(PATH_SEPARATOR)) {
+                    remotePath = remotePath + PATH_SEPARATOR;
+                }
             }
             localFilesMap.put(remotePath, file);
         }
@@ -584,10 +608,10 @@ public class RefreshFolderOperation extends RemoteOperation {
                     mFailsInKeptInSyncFound++;
                     if (contentsResult.getException() != null) {
                         Log_OC.e(TAG, "Error while synchronizing favourites : "
-                            + contentsResult.getLogMessage(), contentsResult.getException());
+                                + contentsResult.getLogMessage(), contentsResult.getException());
                     } else {
                         Log_OC.e(TAG, "Error while synchronizing favourites : "
-                            + contentsResult.getLogMessage());
+                                + contentsResult.getLogMessage());
                     }
                 }
             }   // won't let these fails break the synchronization process

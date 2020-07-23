@@ -40,6 +40,13 @@
         app:showAsAction="never"
         android:showAsAction="never" />
 
+    <!-- kDrive - Share item in file menu -->
+    <item
+        android:id="@+id/action_share"
+        android:title="@string/share"
+        app:showAsAction="never"
+        android:showAsAction="never" />
+
     <item
         android:id="@+id/action_see_details"
         android:title="@string/actionbar_see_details"

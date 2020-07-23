@@ -31,13 +31,11 @@ import android.accounts.AuthenticatorException;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.content.SyncRequest;
 import android.content.pm.PackageManager;
 import android.content.res.Resources.NotFoundException;
 import android.net.Uri;
@@ -61,6 +59,7 @@ import com.nextcloud.client.preferences.AppPreferences;
 import com.nextcloud.java.util.Optional;
 import com.owncloud.android.MainApp;
 import com.owncloud.android.R;
+import com.owncloud.android.databinding.FilesBinding;
 import com.owncloud.android.datamodel.FileDataStorageManager;
 import com.owncloud.android.datamodel.OCFile;
 import com.owncloud.android.datamodel.VirtualFolderType;
@@ -107,7 +106,6 @@ import com.owncloud.android.ui.fragment.FileFragment;
 import com.owncloud.android.ui.fragment.OCFileListFragment;
 import com.owncloud.android.ui.fragment.PhotoFragment;
 import com.owncloud.android.ui.fragment.TaskRetainerFragment;
-import com.owncloud.android.ui.fragment.contactsbackup.ContactListFragment;
 import com.owncloud.android.ui.helpers.FileOperationsHelper;
 import com.owncloud.android.ui.helpers.UriUploader;
 import com.owncloud.android.ui.preview.PreviewImageActivity;
@@ -145,7 +143,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SearchView;
-import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -166,14 +163,14 @@ public class FileDisplayActivity extends FileActivity
     public static final String ALL_FILES = "ALL_FILES";
     public static final String PHOTO_SEARCH = "PHOTO_SEARCH";
 
+    private FilesBinding binding;
+
     private SyncBroadcastReceiver mSyncBroadcastReceiver;
     private UploadFinishReceiver mUploadFinishReceiver;
     private DownloadFinishReceiver mDownloadFinishReceiver;
     private RemoteOperationResult mLastSslUntrustedServerResult;
 
     private boolean mDualPane;
-    private View mLeftFragmentContainer;
-    private View mRightFragmentContainer;
 
     public static final String TAG_PUBLIC_LINK = "PUBLIC_LINK";
     public static final String FTAG_CHOOSER_DIALOG = "CHOOSER_DIALOG";
@@ -221,6 +218,7 @@ public class FileDisplayActivity extends FileActivity
     private SearchView searchView;
     private PlayerServiceConnection mPlayerConnection;
     private Account mLastDisplayedAccount;
+    private int menuItemId = -1;
 
     @Inject
     AppPreferences preferences;
@@ -254,24 +252,17 @@ public class FileDisplayActivity extends FileActivity
         /// USER INTERFACE
 
         // Inflate and set the layout view
-        setContentView(R.layout.files);
+        binding = FilesBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         // setup toolbar
-        setupToolbar();
+        setupHomeSearchToolbar();
 
-        // setup drawer
-        if (MainApp.isOnlyOnDevice()) {
-            setupDrawer(R.id.nav_on_device);
-        } else {
-            setupDrawer(R.id.nav_all_files);
-        }
+        mMenuButton.setOnClickListener(v -> openDrawer());
+
+        mSwitchAccountButton.setOnClickListener(v -> showManageAccountsDialog());
 
         mDualPane = getResources().getBoolean(R.bool.large_land_layout);
-        mLeftFragmentContainer = findViewById(R.id.left_fragment_container);
-        mRightFragmentContainer = findViewById(R.id.right_fragment_container);
-
-        // Action bar setup
-        getSupportActionBar().setHomeButtonEnabled(true);
 
         // Init Fragment without UI to retain AsyncTask across configuration changes
         FragmentManager fm = getSupportFragmentManager();
@@ -300,14 +291,10 @@ public class FileDisplayActivity extends FileActivity
             if (PermissionUtil.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                 // Show explanation to the user and then request permission
-                Snackbar snackbar = Snackbar.make(findViewById(R.id.ListLayout), R.string.permission_storage_access,
+                Snackbar snackbar = Snackbar.make(binding.ListLayout,
+                                                  R.string.permission_storage_access,
                         Snackbar.LENGTH_INDEFINITE)
-                        .setAction(R.string.common_ok, new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                PermissionUtil.requestWriteExternalStoreagePermission(FileDisplayActivity.this);
-                            }
-                        });
+                        .setAction(R.string.common_ok, v -> PermissionUtil.requestWriteExternalStoreagePermission(this));
                 ThemeUtils.colorSnackbar(this, snackbar);
                 snackbar.show();
             } else {
@@ -327,9 +314,6 @@ public class FileDisplayActivity extends FileActivity
             createMinFragments(savedInstanceState);
             syncAndUpdateFolder(true);
         }
-
-        setIndeterminate(mSyncInProgress);
-        // always AFTER setContentView(...) in onCreate(); to work around bug in its implementation
 
         upgradeNotificationForInstantUpload();
         checkOutdatedServer();
@@ -389,7 +373,7 @@ public class FileDisplayActivity extends FileActivity
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         switch (requestCode) {
             case PermissionUtil.PERMISSIONS_WRITE_EXTERNAL_STORAGE: {
@@ -500,11 +484,11 @@ public class FileDisplayActivity extends FileActivity
         }
     }
 
-    //Is called with the flag FLAG_ACTIVITY_SINGLE_TOP and set the new file and intent
+    // Is called with the flag FLAG_ACTIVITY_SINGLE_TOP and set the new file and intent
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-
+        setIntent(intent);
 
         if (ACTION_DETAILS.equalsIgnoreCase(intent.getAction())) {
             OCFile file = intent.getParcelableExtra(EXTRA_FILE);
@@ -638,27 +622,27 @@ public class FileDisplayActivity extends FileActivity
 
     private void updateFragmentsVisibility(boolean existsSecondFragment) {
         if (mDualPane) {
-            if (mLeftFragmentContainer.getVisibility() != View.VISIBLE) {
-                mLeftFragmentContainer.setVisibility(View.VISIBLE);
+            if (binding.leftFragmentContainer.getVisibility() != View.VISIBLE) {
+                binding.leftFragmentContainer.setVisibility(View.VISIBLE);
             }
-            if (mRightFragmentContainer.getVisibility() != View.VISIBLE) {
-                mRightFragmentContainer.setVisibility(View.VISIBLE);
+            if (binding.rightFragmentContainer.getVisibility() != View.VISIBLE) {
+                binding.rightFragmentContainer.setVisibility(View.VISIBLE);
             }
 
         } else if (existsSecondFragment) {
-            if (mLeftFragmentContainer.getVisibility() != View.GONE) {
-                mLeftFragmentContainer.setVisibility(View.GONE);
+            if (binding.leftFragmentContainer.getVisibility() != View.GONE) {
+                binding.leftFragmentContainer.setVisibility(View.GONE);
             }
-            if (mRightFragmentContainer.getVisibility() != View.VISIBLE) {
-                mRightFragmentContainer.setVisibility(View.VISIBLE);
+            if (binding.rightFragmentContainer.getVisibility() != View.VISIBLE) {
+                binding.rightFragmentContainer.setVisibility(View.VISIBLE);
             }
 
         } else {
-            if (mLeftFragmentContainer.getVisibility() != View.VISIBLE) {
-                mLeftFragmentContainer.setVisibility(View.VISIBLE);
+            if (binding.leftFragmentContainer.getVisibility() != View.VISIBLE) {
+                binding.leftFragmentContainer.setVisibility(View.VISIBLE);
             }
-            if (mRightFragmentContainer.getVisibility() != View.GONE) {
-                mRightFragmentContainer.setVisibility(View.GONE);
+            if (binding.rightFragmentContainer.getVisibility() != View.GONE) {
+                binding.rightFragmentContainer.setVisibility(View.GONE);
             }
         }
     }
@@ -698,7 +682,6 @@ public class FileDisplayActivity extends FileActivity
         OCFileListFragment fileListFragment = getListOfFilesFragment();
         if (fileListFragment != null) {
             fileListFragment.listDirectory(MainApp.isOnlyOnDevice(), fromSearch);
-            setupToolbar();
         }
     }
 
@@ -714,12 +697,12 @@ public class FileDisplayActivity extends FileActivity
                                          boolean success) {
         FileFragment secondFragment = getSecondFragment();
         boolean waitedPreview = mWaitingToPreview != null
-                && mWaitingToPreview.getRemotePath().equals(downloadedRemotePath);
+            && mWaitingToPreview.getRemotePath().equals(downloadedRemotePath);
         if (secondFragment instanceof FileDetailFragment) {
             FileDetailFragment detailsFragment = (FileDetailFragment) secondFragment;
             OCFile fileInFragment = detailsFragment.getFile();
             if (fileInFragment != null &&
-                    !downloadedRemotePath.equals(fileInFragment.getRemotePath())) {
+                !downloadedRemotePath.equals(fileInFragment.getRemotePath())) {
                 // the user browsed to other file ; forget the automatic preview
                 mWaitingToPreview = null;
 
@@ -775,21 +758,21 @@ public class FileDisplayActivity extends FileActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.activity_file_display, menu);
-        menu.findItem(R.id.action_create_dir).setVisible(false);
 
         menu.findItem(R.id.action_select_all).setVisible(false);
         MenuItem searchMenuItem = menu.findItem(R.id.action_search);
-        searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
+        searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
         searchMenuItem.setVisible(false);
+        mSearchText.setOnClickListener(v -> {
+            showSearchView();
+            searchView.setIconified(false);
+        });
 
-        ThemeUtils.themeSearchView(searchView, true, this);
+        ThemeUtils.themeSearchView(searchView, this);
 
         // populate list of menu items to show/hide when drawer is opened/closed
-        mDrawerMenuItemstoShowHideList = new ArrayList<>(4);
-        mDrawerMenuItemstoShowHideList.add(menu.findItem(R.id.action_sort));
-        mDrawerMenuItemstoShowHideList.add(menu.findItem(R.id.action_sync_account));
-        mDrawerMenuItemstoShowHideList.add(menu.findItem(R.id.action_switch_view));
-        mDrawerMenuItemstoShowHideList.add(menu.findItem(R.id.action_search));
+        mDrawerMenuItemstoShowHideList = new ArrayList<>(1);
+        mDrawerMenuItemstoShowHideList.add(searchMenuItem);
 
         //focus the SearchView
         if (!TextUtils.isEmpty(searchQuery)) {
@@ -848,10 +831,6 @@ public class FileDisplayActivity extends FileActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         boolean retval = true;
         switch (item.getItemId()) {
-            case R.id.action_sync_account: {
-                startSynchronization();
-                break;
-            }
             case android.R.id.home: {
                 FileFragment second = getSecondFragment();
                 OCFile currentDir = getCurrentDir();
@@ -866,29 +845,6 @@ public class FileDisplayActivity extends FileActivity
                 }
                 break;
             }
-            case R.id.action_sort: {
-                FragmentManager fm = getSupportFragmentManager();
-                FragmentTransaction ft = fm.beginTransaction();
-                ft.addToBackStack(null);
-
-                SortingOrderDialogFragment mSortingOrderDialogFragment = SortingOrderDialogFragment.newInstance(
-                    preferences.getSortOrderByFolder(getListOfFilesFragment().getCurrentFile()));
-                mSortingOrderDialogFragment.show(ft, SortingOrderDialogFragment.SORTING_ORDER_FRAGMENT);
-
-                break;
-            }
-            case R.id.action_switch_view: {
-                if (isGridView()) {
-                    item.setTitle(getString(R.string.action_switch_grid_view));
-                    item.setIcon(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_view_module));
-                    getListOfFilesFragment().setListAsPreferred();
-                } else {
-                    item.setTitle(getApplicationContext().getString(R.string.action_switch_list_view));
-                    item.setIcon(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_view_list));
-                    getListOfFilesFragment().setGridAsPreferred();
-                }
-                break;
-            }
             case R.id.action_select_all: {
                 getListOfFilesFragment().selectAllFiles(true);
                 break;
@@ -898,38 +854,6 @@ public class FileDisplayActivity extends FileActivity
                 break;
         }
         return retval;
-    }
-
-    private void startSynchronization() {
-        Log_OC.d(TAG, "Got to start sync");
-        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.KITKAT) {
-            Log_OC.d(TAG, "Canceling all syncs for " + MainApp.getAuthority());
-            ContentResolver.cancelSync(null, MainApp.getAuthority());
-            // cancel the current synchronizations of any ownCloud account
-            Bundle bundle = new Bundle();
-            bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-            bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-            Log_OC.d(TAG, "Requesting sync for " + getAccount().name + " at " +
-                    MainApp.getAuthority());
-            ContentResolver.requestSync(
-                    getAccount(),
-                    MainApp.getAuthority(), bundle);
-        } else {
-            Log_OC.d(TAG, "Requesting sync for " + getAccount().name + " at " +
-                    MainApp.getAuthority() + " with new API");
-            SyncRequest.Builder builder = new SyncRequest.Builder();
-            builder.setSyncAdapter(getAccount(), MainApp.getAuthority());
-            builder.setExpedited(true);
-            builder.setManual(true);
-            builder.syncOnce();
-
-            // Fix bug in Android Lollipop when you click on refresh the whole account
-            Bundle extras = new Bundle();
-            builder.setExtras(extras);
-
-            SyncRequest request = builder.build();
-            ContentResolver.requestSync(request);
-        }
     }
 
     /**
@@ -1155,6 +1079,8 @@ public class FileDisplayActivity extends FileActivity
             // Remove the list to the original state
             listOfFiles.performSearch("", true);
 
+            hideSearchView(getCurrentDir());
+
             setDrawerIndicatorEnabled(isDrawerIndicatorAvailable());
         } else if (isDrawerOpen) {
             // close drawer first
@@ -1203,6 +1129,8 @@ public class FileDisplayActivity extends FileActivity
     protected void onResume() {
         Log_OC.v(TAG, "onResume() start");
         super.onResume();
+        // Instead of onPostCreate, starting the loading in onResume for children fragments
+        getListOfFilesFragment().setLoading(mSyncInProgress);
         syncAndUpdateFolder(false);
 
         OCFile startFile = null;
@@ -1248,16 +1176,27 @@ public class FileDisplayActivity extends FileActivity
         registerReceiver(mDownloadFinishReceiver, downloadIntentFilter);
 
         // setup drawer
-        int menuItemId = getIntent().getIntExtra(FileDisplayActivity.DRAWER_MENU_ID, -1);
+        menuItemId = getIntent().getIntExtra(FileDisplayActivity.DRAWER_MENU_ID, menuItemId);
 
         if (menuItemId == -1) {
             if (MainApp.isOnlyOnDevice()) {
                 setDrawerMenuItemChecked(R.id.nav_on_device);
+                setupToolbar();
             } else {
                 setDrawerMenuItemChecked(R.id.nav_all_files);
+                setupHomeSearchToolbar();
             }
         } else {
+            if (menuItemId == R.id.nav_all_files) {
+                setupHomeSearchToolbar();
+            } else {
+                setupToolbar();
+            }
             setDrawerMenuItemChecked(menuItemId);
+        }
+
+        if (getListOfFilesFragment() instanceof PhotoFragment) {
+            updateActionBarTitleAndHomeButtonByString(getString(R.string.drawer_item_photos));
         }
 
         Log_OC.v(TAG, "onResume() end");
@@ -1321,9 +1260,9 @@ public class FileDisplayActivity extends FileActivity
 
                     } else {
                         OCFile currentFile = (getFile() == null) ? null :
-                                getStorageManager().getFileByPath(getFile().getRemotePath());
+                            getStorageManager().getFileByPath(getFile().getRemotePath());
                         OCFile currentDir = (getCurrentDir() == null) ? null :
-                                getStorageManager().getFileByPath(getCurrentDir().getRemotePath());
+                            getStorageManager().getFileByPath(getCurrentDir().getRemotePath());
 
                         if (currentDir == null) {
                             // current folder was removed from the server
@@ -1393,8 +1332,7 @@ public class FileDisplayActivity extends FileActivity
                         DataHolderUtil.getInstance().delete(intent.getStringExtra(FileSyncAdapter.EXTRA_RESULT));
 
                         Log_OC.d(TAG, "Setting progress visibility to " + mSyncInProgress);
-                        setIndeterminate(mSyncInProgress);
-
+                        getListOfFilesFragment().setLoading(mSyncInProgress);
                         setBackgroundText();
                     }
                 }
@@ -1431,10 +1369,18 @@ public class FileDisplayActivity extends FileActivity
     private void setBackgroundText() {
         final OCFileListFragment ocFileListFragment = getListOfFilesFragment();
         if (ocFileListFragment != null) {
-            if (mSyncInProgress) {
+            if (mSyncInProgress ||
+                getFile().getFileLength() > 0 && getStorageManager().getFolderContent(getFile(), false).isEmpty()) {
                 ocFileListFragment.setEmptyListLoadingMessage();
             } else {
-                ocFileListFragment.setEmptyListMessage(ExtendedListFragment.SearchType.NO_SEARCH);
+                if (MainApp.isOnlyOnDevice()) {
+                    ocFileListFragment.setMessageForEmptyList(R.string.file_list_empty_headline,
+                                                              R.string.file_list_empty_on_device,
+                                                              R.drawable.ic_list_empty_folder,
+                                                              true);
+                } else {
+                    ocFileListFragment.setEmptyListMessage(ExtendedListFragment.SearchType.NO_SEARCH);
+                }
             }
         } else {
             Log_OC.e(TAG, "OCFileListFragment is null");
@@ -1458,7 +1404,7 @@ public class FileDisplayActivity extends FileActivity
                 boolean sameAccount = getAccount() != null && accountName.equals(getAccount().name);
                 OCFile currentDir = getCurrentDir();
                 boolean isDescendant = currentDir != null && uploadedRemotePath != null &&
-                        uploadedRemotePath.startsWith(currentDir.getRemotePath());
+                    uploadedRemotePath.startsWith(currentDir.getRemotePath());
 
                 if (sameAccount && isDescendant) {
                     String linkedToRemotePath =
@@ -1510,9 +1456,7 @@ public class FileDisplayActivity extends FileActivity
                         // TODO what about other kind of previews?
                     }
                 }
-
-                setIndeterminate(false);
-
+                getListOfFilesFragment().setLoading(false);
             } finally {
                 if (intent != null) {
                     removeStickyBroadcast(intent);
@@ -1585,13 +1529,13 @@ public class FileDisplayActivity extends FileActivity
             OCFile currentDir = getCurrentDir();
             return currentDir != null &&
                     downloadedRemotePath != null &&
-                    downloadedRemotePath.startsWith(currentDir.getRemotePath());
+                downloadedRemotePath.startsWith(currentDir.getRemotePath());
         }
 
         private boolean isAscendant(String linkedToRemotePath) {
             OCFile currentDir = getCurrentDir();
             return currentDir != null &&
-                    currentDir.getRemotePath().startsWith(linkedToRemotePath);
+                currentDir.getRemotePath().startsWith(linkedToRemotePath);
         }
 
         private boolean isSameAccount(Intent intent) {
@@ -1937,7 +1881,7 @@ public class FileDisplayActivity extends FileActivity
                     fileDetailFragment.getFileDetailSharingFragment().refreshPublicShareFromDB();
                 }
                 Snackbar snackbar = Snackbar.make(
-                        findViewById(android.R.id.content),
+                        binding.getRoot(),
                         ErrorMessageAdapter.getErrorCauseMessage(result, operation, getResources()),
                         Snackbar.LENGTH_LONG
                 );
@@ -2149,11 +2093,11 @@ public class FileDisplayActivity extends FileActivity
 
 
     private void requestForDownload() {
-        Account account = getAccount();
+        User user = getUser().orElseThrow(RuntimeException::new);
         //if (!mWaitingToPreview.isDownloading()) {
-        if (!mDownloaderBinder.isDownloading(account, mWaitingToPreview)) {
+        if (!mDownloaderBinder.isDownloading(user.toPlatformAccount(), mWaitingToPreview)) {
             Intent i = new Intent(this, FileDownloader.class);
-            i.putExtra(FileDownloader.EXTRA_ACCOUNT, account);
+            i.putExtra(FileDownloader.EXTRA_USER, user);
             i.putExtra(FileDownloader.EXTRA_FILE, mWaitingToPreview);
             startService(i);
         }
@@ -2225,7 +2169,11 @@ public class FileDisplayActivity extends FileActivity
                                         null
                                 );
 
-                                setIndeterminate(true);
+                                OCFileListFragment fragment = getListOfFilesFragment();
+
+                                if (fragment != null) {
+                                    fragment.setLoading(true);
+                                }
 
                                 setBackgroundText();
 
@@ -2239,10 +2187,10 @@ public class FileDisplayActivity extends FileActivity
     }
 
     private void requestForDownload(OCFile file, String downloadBehaviour, String packageName, String activityName) {
-        Account account = getAccount();
-        if (!mDownloaderBinder.isDownloading(account, mWaitingToPreview)) {
+        final User currentUser = getUser().orElseThrow(RuntimeException::new);
+        if (!mDownloaderBinder.isDownloading(currentUser.toPlatformAccount(), mWaitingToPreview)) {
             Intent i = new Intent(this, FileDownloader.class);
-            i.putExtra(FileDownloader.EXTRA_ACCOUNT, account);
+            i.putExtra(FileDownloader.EXTRA_USER, currentUser);
             i.putExtra(FileDownloader.EXTRA_FILE, file);
             i.putExtra(SendShareDialog.PACKAGE_NAME, packageName);
             i.putExtra(SendShareDialog.ACTIVITY_NAME, activityName);
@@ -2403,10 +2351,8 @@ public class FileDisplayActivity extends FileActivity
     }
 
     public void startContactListFragment(OCFile file) {
-        Intent intent = new Intent(this, ContactsPreferenceActivity.class);
-        intent.putExtra(ContactListFragment.FILE_NAME, Parcels.wrap(file));
-        intent.putExtra(ContactListFragment.ACCOUNT, Parcels.wrap(getAccount()));
-        startActivity(intent);
+        final User user = getUser().orElseThrow(RuntimeException::new);
+        ContactsPreferenceActivity.startActivityWithContactsFile(this, user, file);
     }
 
     /**
@@ -2435,11 +2381,11 @@ public class FileDisplayActivity extends FileActivity
     public void cancelTransference(OCFile file) {
         getFileOperationsHelper().cancelTransference(file);
         if (mWaitingToPreview != null &&
-                mWaitingToPreview.getRemotePath().equals(file.getRemotePath())) {
+            mWaitingToPreview.getRemotePath().equals(file.getRemotePath())) {
             mWaitingToPreview = null;
         }
         if (mWaitingToSend != null &&
-                mWaitingToSend.getRemotePath().equals(file.getRemotePath())) {
+            mWaitingToSend.getRemotePath().equals(file.getRemotePath())) {
             mWaitingToSend = null;
         }
         onTransferStateChanged(file, false, false);
@@ -2480,26 +2426,11 @@ public class FileDisplayActivity extends FileActivity
         return getListOfFilesFragment().isGridEnabled();
     }
 
-    public void allFilesOption() {
-        browseToRoot();
-    }
-
-    public void setActionBarTitle(@StringRes final int title) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (getSupportActionBar() != null) {
-                    ThemeUtils.setColoredTitle(getSupportActionBar(), title, getBaseContext());
-                }
-            }
-        });
-    }
-
     @Override
     public void showFiles(boolean onDeviceOnly) {
         super.showFiles(onDeviceOnly);
         if (onDeviceOnly) {
-            setActionBarTitle(R.string.drawer_item_on_device);
+            updateActionBarTitleAndHomeButtonByString(getString(R.string.drawer_item_on_device));
         }
         getListOfFilesFragment().refreshDirectory();
     }
@@ -2585,8 +2516,12 @@ public class FileDisplayActivity extends FileActivity
             setFile(file);
 
             User user = optionalUser.get();
-            setAccountInDrawer(user);
             setupDrawer();
+
+            mSwitchAccountButton.setTag(user.getAccountName());
+            DisplayUtils.setAvatar(user, this, getResources()
+                                       .getDimension(R.dimen.nav_drawer_menu_avatar_radius), getResources(),
+                                   mSwitchAccountButton, this);
 
             final String lastDisplayedAccountName = mLastDisplayedAccount != null ? mLastDisplayedAccount.name : null;
             final boolean accountChanged = !user.getAccountName().equals(lastDisplayedAccountName);
@@ -2608,14 +2543,14 @@ public class FileDisplayActivity extends FileActivity
         }
 
         EventBus.getDefault().post(new TokenPushEvent());
-        checkForNewDevVersionNecessary(findViewById(R.id.root_layout), getApplicationContext());
+        checkForNewDevVersionNecessary(getApplicationContext());
     }
 
     @Override
     protected void onRestart() {
         super.onRestart();
 
-        checkForNewDevVersionNecessary(findViewById(R.id.root_layout), getApplicationContext());
+        checkForNewDevVersionNecessary(getApplicationContext());
     }
 
     public void setSearchQuery(String query) {
@@ -2662,7 +2597,6 @@ public class FileDisplayActivity extends FileActivity
         if (optionalNewUser.isPresent()) {
             user = optionalNewUser.get();
             setUser(user);
-            updateAccountList();
         } else {
             dismissLoadingDialog();
             DisplayUtils.showSnackMessage(this, getString(R.string.associated_account_not_found));

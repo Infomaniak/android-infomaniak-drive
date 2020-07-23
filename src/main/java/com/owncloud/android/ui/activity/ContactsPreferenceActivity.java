@@ -2,8 +2,10 @@
  * Nextcloud Android client application
  *
  * @author Tobias Kaminsky
+ * @author Chris Narkiewicz <hello@ezaquarii.com>
  * Copyright (C) 2017 Tobias Kaminsky
  * Copyright (C) 2017 Nextcloud GmbH.
+ * Copyright (C) 2020 Chris Narkiewicz <hello@ezaquarii.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -18,30 +20,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.owncloud.android.ui.activity;
 
-import android.accounts.Account;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.evernote.android.job.JobManager;
-import com.evernote.android.job.JobRequest;
-import com.evernote.android.job.util.support.PersistableBundleCompat;
 import com.nextcloud.client.account.User;
-import com.owncloud.android.MainApp;
+import com.nextcloud.client.jobs.BackgroundJobManager;
 import com.owncloud.android.R;
 import com.owncloud.android.datamodel.OCFile;
-import com.owncloud.android.jobs.ContactsBackupJob;
-import com.owncloud.android.lib.common.utils.Log_OC;
 import com.owncloud.android.ui.fragment.FileFragment;
 import com.owncloud.android.ui.fragment.contactsbackup.ContactListFragment;
 import com.owncloud.android.ui.fragment.contactsbackup.ContactsBackupFragment;
 
-import org.parceler.Parcels;
-
-import java.util.Set;
+import javax.inject.Inject;
 
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentManager;
@@ -52,11 +45,35 @@ import androidx.fragment.app.FragmentTransaction;
  */
 public class ContactsPreferenceActivity extends FileActivity implements FileFragment.ContainerActivity {
     public static final String TAG = ContactsPreferenceActivity.class.getSimpleName();
-
+    private static final String EXTRA_FILE = "FILE";
+    private static final String EXTRA_USER = "USER";
+    /**
+     * Warning: default for this extra is different between this activity and {@link ContactsBackupFragment}
+     */
+    public static final String EXTRA_SHOW_SIDEBAR = "SHOW_SIDEBAR";
     public static final String PREFERENCE_CONTACTS_AUTOMATIC_BACKUP = "PREFERENCE_CONTACTS_AUTOMATIC_BACKUP";
     public static final String PREFERENCE_CONTACTS_LAST_BACKUP = "PREFERENCE_CONTACTS_LAST_BACKUP";
     public static final String BACKUP_TO_LIST = "BACKUP_TO_LIST";
-    public static final String EXTRA_SHOW_SIDEBAR = "SHOW_SIDEBAR";
+
+    public static void startActivity(Context context) {
+        Intent intent = new Intent(context, ContactsPreferenceActivity.class);
+        context.startActivity(intent);
+    }
+
+    public static void startActivityWithContactsFile(Context context, User user, OCFile file) {
+        Intent intent = new Intent(context, ContactsPreferenceActivity.class);
+        intent.putExtra(EXTRA_FILE, file);
+        intent.putExtra(EXTRA_USER, user);
+        context.startActivity(intent);
+    }
+
+    public static void startActivityWithoutSidebar(Context context) {
+        Intent intent = new Intent(context, ContactsPreferenceActivity.class);
+        intent.putExtra(EXTRA_SHOW_SIDEBAR, false);
+        context.startActivity(intent);
+    }
+
+    @Inject BackgroundJobManager backgroundJobManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,66 +105,18 @@ public class ContactsPreferenceActivity extends FileActivity implements FileFrag
         if (savedInstanceState == null) {
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             if (intent == null || intent.getParcelableExtra(ContactListFragment.FILE_NAME) == null ||
-                    intent.getParcelableExtra(ContactListFragment.ACCOUNT) == null) {
-                ContactsBackupFragment fragment = new ContactsBackupFragment();
-                Bundle bundle = new Bundle();
-                bundle.putBoolean(EXTRA_SHOW_SIDEBAR, showSidebar);
-                fragment.setArguments(bundle);
+                    intent.getParcelableExtra(ContactListFragment.USER) == null) {
+                ContactsBackupFragment fragment = ContactsBackupFragment.create(showSidebar);
                 transaction.add(R.id.frame_container, fragment);
             } else {
-                OCFile file = Parcels.unwrap(intent.getParcelableExtra(ContactListFragment.FILE_NAME));
-                Account account = Parcels.unwrap(intent.getParcelableExtra(ContactListFragment.ACCOUNT));
-                ContactListFragment contactListFragment = ContactListFragment.newInstance(file, account);
+                OCFile file = intent.getParcelableExtra(ContactListFragment.FILE_NAME);
+                User user = intent.getParcelableExtra(ContactListFragment.USER);
+                ContactListFragment contactListFragment = ContactListFragment.newInstance(file, user);
                 transaction.add(R.id.frame_container, contactListFragment);
             }
             transaction.commit();
         }
     }
-
-    public static void startContactBackupJob(Account account) {
-        Log_OC.d(TAG, "start daily contacts backup job");
-
-        PersistableBundleCompat bundle = new PersistableBundleCompat();
-        bundle.putString(ContactsBackupJob.ACCOUNT, account.name);
-
-        cancelPreviousContactBackupJobForAccount(MainApp.getAppContext(), account);
-
-        new JobRequest.Builder(ContactsBackupJob.TAG)
-                .setExtras(bundle)
-                .setPeriodic(24 * 60 * 60 * 1000)
-                .build()
-                .schedule();
-    }
-
-    public static void cancelPreviousContactBackupJobForAccount(Context context, Account account) {
-        Log_OC.d(TAG, "disabling existing contacts backup job for account: " + account.name);
-
-        JobManager jobManager = JobManager.create(context);
-        Set<JobRequest> jobs = jobManager.getAllJobRequestsForTag(ContactsBackupJob.TAG);
-
-        for (JobRequest jobRequest : jobs) {
-            PersistableBundleCompat extras = jobRequest.getExtras();
-            if (extras != null && extras.getString(ContactsBackupJob.ACCOUNT, "").equalsIgnoreCase(account.name) &&
-                    jobRequest.isPeriodic()) {
-                jobManager.cancel(jobRequest.getJobId());
-            }
-        }
-    }
-
-    public static void cancelContactBackupJobForAccount(Context context, User user) {
-        Log_OC.d(TAG, "disabling contacts backup job for account: " + user.getAccountName());
-
-        JobManager jobManager = JobManager.create(context);
-        Set<JobRequest> jobs = jobManager.getAllJobRequestsForTag(ContactsBackupJob.TAG);
-
-        for (JobRequest jobRequest : jobs) {
-            PersistableBundleCompat extras = jobRequest.getExtras();
-            if (extras.getString(ContactsBackupJob.ACCOUNT, "").equalsIgnoreCase(user.getAccountName())) {
-                jobManager.cancel(jobRequest.getJobId());
-            }
-        }
-    }
-
 
     @Override
     public void showFiles(boolean onDeviceOnly) {

@@ -33,6 +33,7 @@
     <string name="activity_chooser_title">Wyślij link do…</string>
     <string name="activity_icon">Aktywność</string>
     <string name="add_to_cloud">Dodaj do %1$s</string>
+    <string name="appbar_search_in">Szukaj w %s</string>
     <string name="associated_account_not_found">Nie znaleziono powiązanego konta!</string>
     <string name="auth_access_failed">Dostęp nieudany: %1$s</string>
     <string name="auth_account_does_not_exist">Konto nie jest jeszcze dodane na tym urządzeniu</string>
@@ -114,6 +115,7 @@
     <string name="common_send">Wyślij</string>
     <string name="common_share">Udostępnij</string>
     <string name="common_switch_account">Przełącz konto</string>
+    <string name="common_switch_to_account">Przełącz na konto</string>
     <string name="common_unknown">nieznane</string>
     <string name="common_yes">Tak</string>
     <string name="community_beta_headline">Sprawdź wersję deweloperską</string>
@@ -266,6 +268,7 @@
     <string name="etm_background_jobs">Zadania w tle</string>
     <string name="etm_background_jobs_cancel_all">Anuluj wszystkie zadania</string>
     <string name="etm_background_jobs_prune">Skróć nieaktywne zadania</string>
+    <string name="etm_background_jobs_schedule_test_job">Zaplanuj zadanie testowe</string>
     <string name="etm_background_jobs_start_test_job">Rozpocznij zadanie testowe</string>
     <string name="etm_background_jobs_stop_test_job">Zatrzymaj zadanie testowe</string>
     <string name="etm_migrations">Migracje (aktualizacja aplikacji)</string>
@@ -287,19 +290,20 @@
     <string name="file_list_empty">Wyślij lub zsynchronizuj pliki z urządzeniami.</string>
     <string name="file_list_empty_favorite_headline">Brak ulubionych</string>
     <string name="file_list_empty_favorites_filter">Twoje wyszukiwanie nie zwróciło żadnych ulubionych plików.</string>
-    <string name="file_list_empty_favorites_filter_list">Tutaj znajdziesz pliki i katalogi oznaczone jako ulubione.</string>
+    <string name="file_list_empty_favorites_filter_list">Tutaj pojawią się pliki i katalogi oznaczone jako ulubione.</string>
     <string name="file_list_empty_headline">Brak plików</string>
     <string name="file_list_empty_headline_search">Brak wyników w tym katalogu</string>
     <string name="file_list_empty_headline_server_search">Brak wyników</string>
     <string name="file_list_empty_headline_server_search_photos">Brak zdjęć</string>
     <string name="file_list_empty_headline_server_search_videos">Brak plików wideo</string>
     <string name="file_list_empty_moving">Pusto. Możesz dodać katalog.</string>
+    <string name="file_list_empty_on_device">Tutaj pojawią się pobrane pliki i katalogi.</string>
     <string name="file_list_empty_recently_added">Nie znaleziono żadnych ostatnio dodanych plików</string>
     <string name="file_list_empty_recently_added_filter">Brak ostatnio dodanych plików.</string>
     <string name="file_list_empty_recently_modified">Nie znaleziono żadnych plików modyfikowanych w ciągu ostatnich 7 dni</string>
     <string name="file_list_empty_recently_modified_filter">Brak plików zmodyfikowanych w ciągu ostatnich 7 dni.</string>
     <string name="file_list_empty_search">Może jest w innym katalogu?</string>
-    <string name="file_list_empty_shared">Tutaj pokażą się pliki i katalogi, które udostępnisz.</string>
+    <string name="file_list_empty_shared">Tutaj pojawią się pliki i katalogi, które udostępnisz.</string>
     <string name="file_list_empty_shared_headline">Nic nie udostępniasz</string>
     <string name="file_list_empty_text_photos">Wyślij zdjęcia lub włącz automatyczne wysyłanie.</string>
     <string name="file_list_empty_text_photos_filter">Brak zdjęć.</string>
@@ -417,12 +421,12 @@
     <string name="move_file_error">Wystąpił błąd podczas próby przeniesienia tego pliku lub katalogu</string>
     <string name="move_file_invalid_into_descendent">Nie można przenieść katalogu do jednego z jego podkatalogów</string>
     <string name="move_file_invalid_overwrite">Plik już istnieje w katalogu docelowym</string>
-    <string name="move_file_not_found">Nie można przenieść pliku. Sprawdź, czy plik istnieje.</string>
+    <string name="move_file_not_found">Nie można przenieść. Sprawdź, czy plik istnieje.</string>
     <string name="move_to">Przenieś do…</string>
     <string name="network_error_connect_timeout_exception">Wystąpił błąd podczas oczekiwania na serwer. Nie można ukończyć operacji.</string>
     <string name="network_error_socket_exception">Wystąpił błąd podczas połączenia z serwerem</string>
     <string name="network_error_socket_timeout_exception">Wystąpił błąd podczas oczekiwania na serwer. Nie można ukończyć operacji.</string>
-    <string name="network_host_not_available">Nie można ukończyć operacji. Serwer jest niedostępny.</string>
+    <string name="network_host_not_available">Nie można ukończyć operacji. Serwer niedostępny.</string>
     <string name="new_comment">Nowy komentarz…</string>
     <string name="new_media_folder_detected">Wykryty nowy katalog multimediów %1$s.</string>
     <string name="new_media_folder_photos">zdjęcie</string>
@@ -589,7 +593,7 @@
     <string name="share_internal_link_to_folder_text">Wewnętrzny link udostępniania działa tylko dla użytkowników z dostępem do tego katalogu</string>
     <string name="share_known_remote_clarification">%1$s ( w %2$s )</string>
     <string name="share_link_empty_password">Musisz wprowadzić hasło</string>
-    <string name="share_link_file_error">Wystąpił błąd podczas udostępniania tego pliku lub katalogu</string>
+    <string name="share_link_file_error">Wystąpił błąd podczas próby udostępnienia tego pliku lub katalogu.</string>
     <string name="share_link_file_no_exist">Nie można udostępnić. Sprawdź, czy plik istnieje.</string>
     <string name="share_link_forbidden_permissions">do udostępniania tego pliku</string>
     <string name="share_link_optional_password_title">Wprowadź opcjonalne hasło</string>
@@ -628,7 +632,7 @@
     <string name="shared_with_you_by">Udostępnione przez %1$s</string>
     <string name="sharee_add_failed">Udostępnienie nie powiodło się</string>
     <string name="signup_with_provider">Zarejestruj się u usługodawcy</string>
-    <string name="single_sign_on_request_token" formatted="true">Pozwolić %1$s na dostęp do Twojego konta Nextcloud %2$s?</string>
+    <string name="single_sign_on_request_token" formatted="true">Zezwolić %1$s na dostęp do Twojego konta Nextcloud %2$s?</string>
     <string name="sort_by">Sortuj według</string>
     <string name="sort_by_modification_date_ascending">Od najnowszych</string>
     <string name="sort_by_modification_date_descending">Od najstarszych</string>
@@ -714,7 +718,7 @@
     <string name="timeout_richDocuments">Ładowanie potrwa długo...</string>
     <string name="trashbin_activity_title">Usunięte pliki</string>
     <string name="trashbin_empty_headline">Brak usuniętych plików</string>
-    <string name="trashbin_empty_message">Stąd będziesz mógł odzyskać usunięte pliki.</string>
+    <string name="trashbin_empty_message">Tutaj będziesz mógł odzyskać usunięte pliki.</string>
     <string name="trashbin_file_not_deleted">Plik %1$s nie może zostać usunięty!</string>
     <string name="trashbin_file_not_restored">Plik %1$s nie może zostać przywrócony!</string>
     <string name="trashbin_loading_failed">Ładowanie kosza nie powiodło się!</string>
@@ -727,7 +731,7 @@
     <string name="unshare_link_forbidden_permissions">aby anulować udostępnianie tego pliku</string>
     <string name="unsharing_failed">Zatrzymywanie udostępnienia nie powiodło się</string>
     <string name="untrusted_domain">Dostęp przez niezaufaną domenę. Więcej informacji można znaleźć w dokumentacji.</string>
-    <string name="update_link_file_error">Wystąpił błąd podczas próby aktualizacji udostępniania.</string>
+    <string name="update_link_file_error">Wystąpił błąd podczas próby aktualizacji udostępnienia.</string>
     <string name="update_link_file_no_exist">Nie można zaktualizować. Sprawdź, czy plik istnieje.</string>
     <string name="update_link_forbidden_permissions">aby zaktualizować te udostępnianie</string>
     <string name="updating_share_failed">Zmiana udostępniania nie powiodła się</string>

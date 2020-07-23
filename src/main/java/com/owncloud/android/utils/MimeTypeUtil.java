@@ -164,20 +164,20 @@ public final class MimeTypeUtil {
         int drawableId;
 
         if (isSharedViaLink) {
-            drawableId = R.drawable.folder_public;
+            drawableId = R.drawable.folder_shared_link;
         } else if (isSharedViaUsers) {
-            drawableId = R.drawable.shared_with_me_folder;
+            drawableId = R.drawable.folder_shared_users;
         } else if (isEncrypted) {
-            drawableId = R.drawable.ic_list_encrypted_folder;
+            drawableId = R.drawable.folder_encrypted;
         } else if (WebdavEntry.MountType.EXTERNAL == mountType) {
             drawableId = R.drawable.folder_external;
         } else if (WebdavEntry.MountType.GROUP == mountType) {
-            drawableId = R.drawable.ic_folder_group;
+            drawableId = R.drawable.folder_group;
         } else {
             drawableId = R.drawable.folder;
         }
 
-        return ThemeUtils.tintDrawable(drawableId, ThemeUtils.elementColor(account, context));
+        return ThemeUtils.tintDrawable(drawableId, ThemeUtils.elementColor(account, context, true));
     }
 
     public static Drawable getDefaultFolderIcon(Context context) {
@@ -301,7 +301,7 @@ public final class MimeTypeUtil {
      */
     public static boolean isImage(ServerFileInterface file) {
         return MimeTypeUtil.isImage(file.getMimeType())
-                || MimeTypeUtil.isImage(getMimeTypeFromPath(file.getRemotePath()));
+            || MimeTypeUtil.isImage(getMimeTypeFromPath(file.getRemotePath()));
     }
 
     /**
@@ -310,7 +310,7 @@ public final class MimeTypeUtil {
      */
     public static boolean isText(OCFile file) {
         return MimeTypeUtil.isText(file.getMimeType())
-                || MimeTypeUtil.isText(getMimeTypeFromPath(file.getRemotePath()));
+            || MimeTypeUtil.isText(getMimeTypeFromPath(file.getRemotePath()));
     }
 
     /**

@@ -75,6 +75,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -175,8 +176,8 @@ public class FileDetailActivitiesFragment extends Fragment implements
 
         setupView();
 
-        onCreateSwipeToRefresh(swipeEmptyListRefreshLayout);
-        onCreateSwipeToRefresh(swipeListRefreshLayout);
+        ThemeUtils.colorSwipeRefreshLayout(getContext(), swipeEmptyListRefreshLayout);
+        ThemeUtils.colorSwipeRefreshLayout(getContext(), swipeListRefreshLayout);
 
         fetchAndSetData(-1);
 
@@ -250,11 +251,11 @@ public class FileDetailActivitiesFragment extends Fragment implements
         OCCapability capability = storageManager.getCapability(account.name);
         OwnCloudVersion serverVersion = accountManager.getServerVersion(account);
         restoreFileVersionSupported = capability.getFilesVersioning().isTrue() &&
-                serverVersion.compareTo(OwnCloudVersion.nextcloud_14) >= 0;
+            serverVersion.compareTo(OwnCloudVersion.nextcloud_14) >= 0;
 
         emptyContentProgressBar.getIndeterminateDrawable().setColorFilter(ThemeUtils.primaryAccentColor(getContext()),
-                PorterDuff.Mode.SRC_IN);
-        emptyContentIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_activity_light_grey));
+                                                                          PorterDuff.Mode.SRC_IN);
+        emptyContentIcon.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_activity, null));
 
         adapter = new ActivityAndVersionListAdapter(getContext(),
                                                     accountManager,
@@ -414,7 +415,9 @@ public class FileDetailActivitiesFragment extends Fragment implements
 
     private void setEmptyContent(String headline, String message) {
         if (emptyContentContainer != null && emptyContentMessage != null) {
-            emptyContentIcon.setImageDrawable(requireContext().getResources().getDrawable(R.drawable.ic_activity_light_grey));
+            emptyContentIcon.setImageDrawable(ResourcesCompat.getDrawable(requireContext().getResources(),
+                                                                          R.drawable.ic_activity,
+                                                                          null));
             emptyContentHeadline.setText(headline);
             emptyContentMessage.setText(message);
 
@@ -427,7 +430,9 @@ public class FileDetailActivitiesFragment extends Fragment implements
     private void setErrorContent(String message) {
         if (emptyContentContainer != null && emptyContentMessage != null) {
             emptyContentHeadline.setText(R.string.common_error);
-            emptyContentIcon.setImageDrawable(requireContext().getResources().getDrawable(R.drawable.ic_list_empty_error));
+            emptyContentIcon.setImageDrawable(ResourcesCompat.getDrawable(requireContext().getResources(),
+                                                                          R.drawable.ic_list_empty_error,
+                                                                          null));
             emptyContentMessage.setText(message);
 
             emptyContentMessage.setVisibility(View.VISIBLE);
@@ -446,15 +451,6 @@ public class FileDetailActivitiesFragment extends Fragment implements
             }
             isLoadingActivities = false;
         });
-    }
-
-    protected void onCreateSwipeToRefresh(SwipeRefreshLayout refreshLayout) {
-        int primaryColor = ThemeUtils.primaryColor(getContext());
-        int darkColor = ThemeUtils.primaryDarkColor(getContext());
-        int accentColor = ThemeUtils.primaryAccentColor(getContext());
-
-        // Colors in animations
-        refreshLayout.setColorSchemeColors(accentColor, primaryColor, darkColor);
     }
 
     @Override

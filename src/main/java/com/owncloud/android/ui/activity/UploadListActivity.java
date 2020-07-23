@@ -36,43 +36,31 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
 
-import com.evernote.android.job.Job;
-import com.evernote.android.job.JobManager;
-import com.evernote.android.job.util.support.PersistableBundleCompat;
-import com.nextcloud.client.account.User;
 import com.nextcloud.client.account.UserAccountManager;
 import com.nextcloud.client.core.Clock;
 import com.nextcloud.client.device.PowerManagementService;
+import com.nextcloud.client.jobs.BackgroundJobManager;
 import com.nextcloud.client.network.ConnectivityService;
-import com.nextcloud.java.util.Optional;
 import com.owncloud.android.R;
+import com.owncloud.android.databinding.UploadListLayoutBinding;
+import com.owncloud.android.datamodel.OCFile;
 import com.owncloud.android.datamodel.UploadsStorageManager;
 import com.owncloud.android.files.services.FileUploader;
 import com.owncloud.android.files.services.FileUploader.FileUploaderBinder;
-import com.owncloud.android.jobs.FilesSyncJob;
 import com.owncloud.android.lib.common.operations.RemoteOperation;
 import com.owncloud.android.lib.common.operations.RemoteOperationResult;
 import com.owncloud.android.lib.common.utils.Log_OC;
 import com.owncloud.android.operations.CheckCurrentCredentialsOperation;
-import com.owncloud.android.ui.EmptyRecyclerView;
 import com.owncloud.android.ui.adapter.UploadListAdapter;
 import com.owncloud.android.ui.decoration.MediaGridItemDecoration;
 import com.owncloud.android.utils.FilesSyncHelper;
 import com.owncloud.android.utils.ThemeUtils;
 
-import java.util.Set;
-
 import javax.inject.Inject;
 
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import butterknife.BindString;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
 
 /**
  * Activity listing pending, active, and completed uploads. User can delete
@@ -89,26 +77,6 @@ public class UploadListActivity extends FileActivity {
 
     public SwipeRefreshLayout swipeListRefreshLayout;
 
-    @BindView(R.id.empty_list_view_text)
-    public TextView emptyContentMessage;
-
-    @BindView(R.id.empty_list_view_headline)
-    public TextView emptyContentHeadline;
-
-    @BindView(R.id.empty_list_icon)
-    public ImageView emptyContentIcon;
-
-    @BindView(android.R.id.list)
-    public EmptyRecyclerView recyclerView;
-
-    @BindString(R.string.upload_list_empty_headline)
-    public String noResultsHeadline;
-
-    @BindString(R.string.upload_list_empty_text_auto_upload)
-    public String noResultsMessage;
-
-    private Unbinder unbinder;
-
     @Inject
     UserAccountManager userAccountManager;
 
@@ -124,6 +92,22 @@ public class UploadListActivity extends FileActivity {
     @Inject
     Clock clock;
 
+    @Inject
+    BackgroundJobManager backgroundJobManager;
+
+    private UploadListLayoutBinding binding;
+
+    public static Intent createIntent(OCFile file, Account account, Integer flag, Context context) {
+        Intent intent = new Intent(context, UploadListActivity.class);
+        if (flag != null) {
+            intent.setFlags(intent.getFlags() | flag);
+        }
+        intent.putExtra(ConflictsResolveActivity.EXTRA_FILE, file);
+        intent.putExtra(ConflictsResolveActivity.EXTRA_ACCOUNT, account);
+
+        return intent;
+    }
+
     @Override
     public void showFiles(boolean onDeviceOnly) {
         super.showFiles(onDeviceOnly);
@@ -136,10 +120,10 @@ public class UploadListActivity extends FileActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.upload_list_layout);
-        unbinder = ButterKnife.bind(this);
+        binding = UploadListLayoutBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        swipeListRefreshLayout = findViewById(R.id.swipe_containing_list);
+        swipeListRefreshLayout = binding.swipeContainingList;
 
         // this activity has no file really bound, it's for multiple accounts at the same time; should no inherit
         // from FileActivity; moreover, some behaviours inherited from FileActivity should be delegated to Fragments;
@@ -149,26 +133,25 @@ public class UploadListActivity extends FileActivity {
         // setup toolbar
         setupToolbar();
 
+        updateActionBarTitleAndHomeButtonByString(getString(R.string.uploads_view_title));
+
         // setup drawer
         setupDrawer(R.id.nav_uploads);
 
         setupContent();
-
-        if (getSupportActionBar() != null) {
-            ThemeUtils.setColoredTitle(getSupportActionBar(), R.string.uploads_view_title, this);
-        }
     }
 
     private void setupContent() {
-        recyclerView = findViewById(android.R.id.list);
-        recyclerView.setEmptyView(findViewById(R.id.empty_list_view));
-        findViewById(R.id.empty_list_progress).setVisibility(View.GONE);
-        emptyContentIcon.setImageResource(R.drawable.uploads);
-        emptyContentIcon.getDrawable().mutate();
-        emptyContentIcon.setAlpha(0.5f);
-        emptyContentIcon.setVisibility(View.VISIBLE);
-        emptyContentHeadline.setText(noResultsHeadline);
-        emptyContentMessage.setText(noResultsMessage);
+        binding.list.setEmptyView(binding.emptyList.getRoot());
+        binding.emptyList.getRoot().setVisibility(View.GONE);
+        binding.emptyList.emptyListProgress.setVisibility(View.GONE);
+        binding.emptyList.emptyListIcon.setImageResource(R.drawable.uploads);
+        binding.emptyList.emptyListIcon.getDrawable().mutate();
+        binding.emptyList.emptyListIcon.setAlpha(0.5f);
+        binding.emptyList.emptyListIcon.setVisibility(View.VISIBLE);
+        binding.emptyList.emptyListViewHeadline.setText(getString(R.string.upload_list_empty_headline));
+        binding.emptyList.emptyListViewText.setText(getString(R.string.upload_list_empty_text_auto_upload));
+        binding.emptyList.emptyListViewText.setVisibility(View.VISIBLE);
 
         uploadListAdapter = new UploadListAdapter(this,
                                                   uploadsStorageManager,
@@ -182,11 +165,11 @@ public class UploadListActivity extends FileActivity {
         uploadListAdapter.setLayoutManager(lm);
 
         int spacing = getResources().getDimensionPixelSize(R.dimen.media_grid_spacing);
-        recyclerView.addItemDecoration(new MediaGridItemDecoration(spacing));
-        recyclerView.setLayoutManager(lm);
-        recyclerView.setAdapter(uploadListAdapter);
+        binding.list.addItemDecoration(new MediaGridItemDecoration(spacing));
+        binding.list.setLayoutManager(lm);
+        binding.list.setAdapter(uploadListAdapter);
 
-
+        ThemeUtils.colorSwipeRefreshLayout(this, swipeListRefreshLayout);
         swipeListRefreshLayout.setOnRefreshListener(this::refresh);
 
         loadItems();
@@ -204,14 +187,7 @@ public class UploadListActivity extends FileActivity {
     }
 
     private void refresh() {
-        // scan for missing auto uploads files
-        Set<Job> jobs = JobManager.instance().getAllJobsForTag(FilesSyncJob.TAG);
-
-        if (jobs.isEmpty()) {
-            PersistableBundleCompat persistableBundleCompat = new PersistableBundleCompat();
-            persistableBundleCompat.putBoolean(FilesSyncJob.OVERRIDE_POWER_SAVING, true);
-            FilesSyncHelper.startFilesSyncJobNow(persistableBundleCompat);
-        }
+        backgroundJobManager.startImmediateFilesSyncJob(false, true);
 
         // retry failed uploads
         new Thread(() -> FileUploader.retryFailedUploads(
@@ -232,11 +208,6 @@ public class UploadListActivity extends FileActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        ThemeUtils.setColoredTitle(getSupportActionBar(), R.string.uploads_view_title, this);
-        final Optional<User> optionalUser = getUser();
-        if (optionalUser.isPresent()) {
-            setAccountInDrawer(optionalUser.get());
-        }
     }
 
     @Override
@@ -393,10 +364,5 @@ public class UploadListActivity extends FileActivity {
             }
 
         }
-    }
-
-    public void onDestroy() {
-        super.onDestroy();
-        unbinder.unbind();
     }
 }

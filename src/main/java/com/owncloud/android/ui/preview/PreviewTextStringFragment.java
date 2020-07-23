@@ -113,7 +113,8 @@ public class PreviewTextStringFragment extends PreviewTextFragment {
             fabMain.setVisibility(View.VISIBLE);
             fabMain.setEnabled(true);
             fabMain.setOnClickListener(v -> edit());
-            ThemeUtils.tintFloatingActionButton(fabMain, R.drawable.ic_edit, getContext());
+            ThemeUtils.tintFloatingActionButton(fabMain, requireContext());
+            ThemeUtils.drawableFloatingActionButton(fabMain, R.drawable.ic_edit, requireContext());
         }
 
         return view;
@@ -137,15 +138,6 @@ public class PreviewTextStringFragment extends PreviewTextFragment {
             mSearchView.setQuery(mSearchQuery, true);
             mSearchView.clearFocus();
         }
-    }
-
-    @Override
-    public void onPrepareOptionsMenu(@NonNull Menu menu) {
-        super.onPrepareOptionsMenu(menu);
-
-        menu.findItem(R.id.action_sync_account).setVisible(false);
-        menu.findItem(R.id.action_sort).setVisible(false);
-        menu.findItem(R.id.action_switch_view).setVisible(false);
     }
 
     void loadAndShowTextPreview() {

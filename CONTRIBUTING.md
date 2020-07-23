@@ -72,6 +72,7 @@ If your issue appears to be a bug, and hasn't been reported, open a new issue.
 
 
 ### Bug workflow
+Every bug should be triaged in approved/needs info in a given time.
 * approved: at least one other is able to reproduce it
 * needs info: something unclear, or not able to reproduce
   * if no response within 1 months, bug will be closed
@@ -271,23 +272,27 @@ Source code of app:
 
 #### UI tests
 We use [shot](https://github.com/Karumi/Shot) for taking screenshots and compare them 
-- check screenshots: ```./gradlew executeScreenshotTests ```
+- check screenshots: ```./gradlew gplayDebugExecuteScreenshotTests ```
 - update/generate new screenshots: ```scripts/updateScreenshots.sh ``` 
     - in this script are samples how to only execute a given class/test
     - this will fire up docker & emulator to ensure that screenshots look the same
 - creating own UI comparision tests: 
     - add IntentsTestRule for launching activity directly:
+
     ```java
- @Rule public IntentsTestRule<SettingsActivity> activityRule = new IntentsTestRule<>(SettingsActivity.class,
+    @Rule public IntentsTestRule<SettingsActivity> activityRule = new IntentsTestRule<>(SettingsActivity.class,
                                                                                         true,
                                                                                         false);
-```
+    ```
+
     -  in test method:
+
     ```java 
-Activity activity = activityRule.launchActivity(null); 
-…do something, e.g. navigate, create folder, etc. … 
-  Screenshot.snapActivity(activity).record();
-  ```
+    Activity activity = activityRule.launchActivity(null); 
+    …do something, e.g. navigate, create folder, etc. … 
+     Screenshot.snapActivity(activity).record();
+    ```
+
     - best practise is to first create test with emulator too see behaviour and then create screenshots
 
 ## File naming

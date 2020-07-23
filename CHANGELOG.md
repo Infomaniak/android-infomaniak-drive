@@ -1,4 +1,15 @@
-3.11.1 RC1 (April, 16, 2020)
+## 3.12.0 (June, 10, 2020)
+
+- add circle support for searching/displaying
+- if no offline editor is available, use OO/Cool/Text
+- add possibility to set expiration date on user/group shares (NC18+)
+- rich workspaces can be disabled on server side
+- improved loading view
+- requires Android 4.2 or newer
+
+For a full list, please see https://github.com/nextcloud/android/milestone/42
+
+## 3.11.1 (April, 23, 2020)
 
 - Crash while browsing files
 - auto upload:
@@ -7,20 +18,9 @@
  - fix hanging UI after saving
 - open office files online if no local app installed
 
-For a full list, please see https://github.com/nextcloud/android/milestone/41
+For a full list, please see https://github.com/nextcloud/android/milestone/47
 
-3.11.0 RC4 (March, 23, 2020)
-
-- not enough space dialog @Shagequi
-- fix shared search
-- upload existing images in auto upload @koying @ArisuOngaku
-- allow deep links @Charon77
-- support for circle
-- last version supporting Android 4.1
-
-For a full list, please see https://github.com/nextcloud/android/milestone/41
-
-3.11.0 RC3 (March, 18, 2020)
+## 3.11.0 (March, 26, 2020)
 
 - not enough space dialog @Shagequi
 - fix shared search
@@ -28,25 +28,6 @@ For a full list, please see https://github.com/nextcloud/android/milestone/41
 - allow deep links @Charon77
 - support for circle
 - last version supporting Android 4.1
-
-For a full list, please see https://github.com/nextcloud/android/milestone/41
-
-3.11.0 RC2 (March, 11, 2020)
-
-- not enough space dialog @Shagequi
-- fix shared search
-- upload existing images in auto upload @koying @ArisuOngaku
-- allow deep links @Charon77
-- last version supporting Android 4.1
-
-For a full list, please see https://github.com/nextcloud/android/milestone/41
-
-## 3.11.0 RC1 (March, 05, 2020)
-
-- not enough space dialog @Shagequi
-- fix shared search
-- upload existing images in auto upload @koying @ArisuOngaku @AndyScherzinger
-- allow deep links @Charon77
 
 For a full list, please see https://github.com/nextcloud/android/milestone/41
 

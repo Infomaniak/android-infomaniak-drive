@@ -24,6 +24,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
@@ -186,15 +187,8 @@ public class SyncedFolderPreferencesDialogFragment extends DialogFragment {
         mUploadOnWifiCheckbox = view.findViewById(R.id.setting_instant_upload_on_wifi_checkbox);
         ThemeUtils.tintCheckbox(mUploadOnWifiCheckbox, accentColor);
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            view.findViewById(R.id.setting_instant_upload_on_charging_container).setVisibility(View.GONE);
-        } else {
-            view.findViewById(R.id.setting_instant_upload_on_charging_container).setVisibility(View.VISIBLE);
-
-            mUploadOnChargingCheckbox = view.findViewById(
-                    R.id.setting_instant_upload_on_charging_checkbox);
-            ThemeUtils.tintCheckbox(mUploadOnChargingCheckbox, accentColor);
-        }
+        mUploadOnChargingCheckbox = view.findViewById(R.id.setting_instant_upload_on_charging_checkbox);
+        ThemeUtils.tintCheckbox(mUploadOnChargingCheckbox, accentColor);
 
         mUploadExistingCheckbox = view.findViewById(R.id.setting_instant_upload_existing_checkbox);
         ThemeUtils.tintCheckbox(mUploadExistingCheckbox, accentColor);
@@ -236,9 +230,8 @@ public class SyncedFolderPreferencesDialogFragment extends DialogFragment {
         }
 
         mUploadOnWifiCheckbox.setChecked(mSyncedFolder.isWifiOnly());
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            mUploadOnChargingCheckbox.setChecked(mSyncedFolder.isChargingOnly());
-        }
+        mUploadOnChargingCheckbox.setChecked(mSyncedFolder.isChargingOnly());
+
         mUploadExistingCheckbox.setChecked(mSyncedFolder.isExisting());
         mUploadUseSubfoldersCheckbox.setChecked(mSyncedFolder.isSubfolderByDate());
 
@@ -305,6 +298,12 @@ public class SyncedFolderPreferencesDialogFragment extends DialogFragment {
     }
 
     private void checkWritableFolder() {
+        if (!mSyncedFolder.isEnabled()) {
+            mView.findViewById(R.id.setting_instant_behaviour_container).setEnabled(false);
+            mView.findViewById(R.id.setting_instant_behaviour_container).setAlpha(alphaDisabled);
+            return;
+        }
+
         if (mSyncedFolder.getLocalPath() != null && new File(mSyncedFolder.getLocalPath()).canWrite()) {
             mView.findViewById(R.id.setting_instant_behaviour_container).setEnabled(true);
             mView.findViewById(R.id.setting_instant_behaviour_container).setAlpha(alphaEnabled);
@@ -330,10 +329,8 @@ public class SyncedFolderPreferencesDialogFragment extends DialogFragment {
         view.findViewById(R.id.setting_instant_upload_on_wifi_container).setEnabled(enable);
         view.findViewById(R.id.setting_instant_upload_on_wifi_container).setAlpha(alpha);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            view.findViewById(R.id.setting_instant_upload_on_charging_container).setEnabled(enable);
-            view.findViewById(R.id.setting_instant_upload_on_charging_container).setAlpha(alpha);
-        }
+        view.findViewById(R.id.setting_instant_upload_on_charging_container).setEnabled(enable);
+        view.findViewById(R.id.setting_instant_upload_on_charging_container).setAlpha(alpha);
 
         view.findViewById(R.id.setting_instant_upload_existing_container).setEnabled(enable);
         view.findViewById(R.id.setting_instant_upload_existing_container).setAlpha(alpha);
@@ -346,6 +343,22 @@ public class SyncedFolderPreferencesDialogFragment extends DialogFragment {
 
         view.findViewById(R.id.local_folder_container).setEnabled(enable);
         view.findViewById(R.id.local_folder_container).setAlpha(alpha);
+
+        view.findViewById(R.id.setting_instant_name_collision_policy_container).setEnabled(enable);
+        view.findViewById(R.id.setting_instant_name_collision_policy_container).setAlpha(alpha);
+
+        if (enable) {
+            int accentColor = ThemeUtils.primaryAccentColor(getContext());
+            ThemeUtils.tintCheckbox(mUploadOnWifiCheckbox, accentColor);
+            ThemeUtils.tintCheckbox(mUploadOnChargingCheckbox, accentColor);
+            ThemeUtils.tintCheckbox(mUploadExistingCheckbox, accentColor);
+            ThemeUtils.tintCheckbox(mUploadUseSubfoldersCheckbox, accentColor);
+        } else {
+            ThemeUtils.tintCheckbox(mUploadOnWifiCheckbox, Color.GRAY);
+            ThemeUtils.tintCheckbox(mUploadOnChargingCheckbox, Color.GRAY);
+            ThemeUtils.tintCheckbox(mUploadExistingCheckbox, Color.GRAY);
+            ThemeUtils.tintCheckbox(mUploadUseSubfoldersCheckbox, Color.GRAY);
+        }
 
         checkWritableFolder();
     }
@@ -361,25 +374,22 @@ public class SyncedFolderPreferencesDialogFragment extends DialogFragment {
         view.findViewById(R.id.delete).setOnClickListener(new OnSyncedFolderDeleteClickListener());
 
         view.findViewById(R.id.setting_instant_upload_on_wifi_container).setOnClickListener(
-                new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        mSyncedFolder.setWifiOnly(!mSyncedFolder.isWifiOnly());
-                        mUploadOnWifiCheckbox.toggle();
-                    }
-                });
+            new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mSyncedFolder.setWifiOnly(!mSyncedFolder.isWifiOnly());
+                    mUploadOnWifiCheckbox.toggle();
+                }
+            });
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-
-            view.findViewById(R.id.setting_instant_upload_on_charging_container).setOnClickListener(
-                    new OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            mSyncedFolder.setChargingOnly(!mSyncedFolder.isChargingOnly());
-                            mUploadOnChargingCheckbox.toggle();
-                        }
-                    });
-        }
+        view.findViewById(R.id.setting_instant_upload_on_charging_container).setOnClickListener(
+            new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mSyncedFolder.setChargingOnly(!mSyncedFolder.isChargingOnly());
+                    mUploadOnChargingCheckbox.toggle();
+                }
+            });
 
         view.findViewById(R.id.setting_instant_upload_existing_container).setOnClickListener(
               new OnClickListener() {

@@ -47,6 +47,7 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.widget.Toast;
 
+import com.nextcloud.client.account.User;
 import com.nextcloud.client.account.UserAccountManager;
 import com.nextcloud.client.account.UserAccountManagerImpl;
 import com.nextcloud.client.preferences.AppPreferences;
@@ -198,10 +199,11 @@ public class DocumentsStorageProvider extends DocumentsProvider {
 
         OCFile ocFile = document.getFile();
         Account account = document.getAccount();
+        final User user = accountManager.getUser(account.name).orElseThrow(RuntimeException::new); // should exist
 
         if (!ocFile.isDown()) {
             Intent i = new Intent(getContext(), FileDownloader.class);
-            i.putExtra(FileDownloader.EXTRA_ACCOUNT, account);
+            i.putExtra(FileDownloader.EXTRA_USER, user);
             i.putExtra(FileDownloader.EXTRA_FILE, ocFile);
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
                 context.startForegroundService(i);
@@ -223,18 +225,19 @@ public class DocumentsStorageProvider extends DocumentsProvider {
             OCFile finalFile = ocFile;
             Thread syncThread = new Thread(() -> {
                 try {
-                    FileDataStorageManager storageManager = new FileDataStorageManager(account, context.getContentResolver());
-                    RemoteOperationResult result = new SynchronizeFileOperation(finalFile, null, account,
+                    FileDataStorageManager storageManager = new FileDataStorageManager(user.toPlatformAccount(),
+                                                                                       context.getContentResolver());
+                    RemoteOperationResult result = new SynchronizeFileOperation(finalFile, null, user,
                                                                                 true, context)
                         .execute(storageManager, context);
                     if (result.getCode() == RemoteOperationResult.ResultCode.SYNC_CONFLICT) {
                         // ISSUE 5: if the user is not running the app (this is a service!),
                         // this can be very intrusive; a notification should be preferred
-                        Intent i = new Intent(context, ConflictsResolveActivity.class);
-                        i.setFlags(i.getFlags() | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        i.putExtra(ConflictsResolveActivity.EXTRA_FILE, finalFile);
-                        i.putExtra(ConflictsResolveActivity.EXTRA_ACCOUNT, account);
-                        context.startActivity(i);
+                        Intent intent = ConflictsResolveActivity.createIntent(finalFile,
+                                                                              user.toPlatformAccount(),
+                                                                              Intent.FLAG_ACTIVITY_NEW_TASK,
+                                                                              context);
+                        context.startActivity(intent);
                     } else {
                         FileStorageUtils.checkIfFileFinishedSaving(finalFile);
                         if (!result.isSuccess()) {
@@ -265,7 +268,7 @@ public class DocumentsStorageProvider extends DocumentsProvider {
             try {
                 Handler handler = new Handler(context.getMainLooper());
                 return ParcelFileDescriptor.open(file, accessMode, handler, l -> {
-                    RemoteOperationResult result = new SynchronizeFileOperation(newFile, oldFile, account, true,
+                    RemoteOperationResult result = new SynchronizeFileOperation(newFile, oldFile, user, true,
                                                                                 context)
                         .execute(document.getClient(), document.getStorageManager());
 
@@ -469,7 +472,9 @@ public class DocumentsStorageProvider extends DocumentsProvider {
         String newDirPath = targetFolder.getRemotePath() + displayName + PATH_SEPARATOR;
         FileDataStorageManager storageManager = targetFolder.getStorageManager();
 
-        RemoteOperationResult result = new CreateFolderOperation(newDirPath, true)
+        RemoteOperationResult result = new CreateFolderOperation(newDirPath,
+                                                                 accountManager.getCurrentAccount(),
+                                                                 getContext())
             .execute(targetFolder.getClient(), storageManager);
 
         if (!result.isSuccess()) {
@@ -578,8 +583,12 @@ public class DocumentsStorageProvider extends DocumentsProvider {
 
         recursiveRevokePermission(document);
 
-        RemoteOperationResult result = new RemoveFileOperation(document.getRemotePath(), false,
-                                                               document.getAccount(), true, context)
+        OCFile file = document.getStorageManager().getFileByPath(document.getRemotePath());
+        RemoteOperationResult result = new RemoveFileOperation(file,
+                                                               false,
+                                                               document.getAccount(),
+                                                               true,
+                                                               context)
             .execute(document.getClient(), document.getStorageManager());
 
         if (!result.isSuccess()) {

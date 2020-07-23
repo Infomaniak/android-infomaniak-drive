@@ -4,6 +4,7 @@
  * @author Andy Scherzinger
  * Copyright (C) 2016 Andy Scherzinger
  * Copyright (C) 2016 Nextcloud
+ * Copyright (C) 2020 Chris Narkiewicz <hello@ezaquarii.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE
@@ -47,6 +48,9 @@ import com.nextcloud.client.account.User;
 import com.nextcloud.client.core.Clock;
 import com.nextcloud.client.device.PowerManagementService;
 import com.nextcloud.client.di.Injectable;
+import com.nextcloud.client.jobs.BackgroundJobManager;
+import com.nextcloud.client.jobs.MediaFoldersDetectionWork;
+import com.nextcloud.client.jobs.NotificationWork;
 import com.nextcloud.client.preferences.AppPreferences;
 import com.nextcloud.java.util.Optional;
 import com.owncloud.android.BuildConfig;
@@ -61,14 +65,11 @@ import com.owncloud.android.datamodel.SyncedFolder;
 import com.owncloud.android.datamodel.SyncedFolderDisplayItem;
 import com.owncloud.android.datamodel.SyncedFolderProvider;
 import com.owncloud.android.files.services.FileUploader;
-import com.owncloud.android.jobs.MediaFoldersDetectionJob;
-import com.owncloud.android.jobs.NotificationJob;
 import com.owncloud.android.ui.adapter.SyncedFolderAdapter;
 import com.owncloud.android.ui.decoration.MediaGridItemDecoration;
 import com.owncloud.android.ui.dialog.SyncedFolderPreferencesDialogFragment;
 import com.owncloud.android.ui.dialog.parcel.SyncedFolderParcelable;
 import com.owncloud.android.utils.DisplayUtils;
-import com.owncloud.android.utils.FilesSyncHelper;
 import com.owncloud.android.utils.PermissionUtil;
 import com.owncloud.android.utils.ThemeUtils;
 
@@ -84,11 +85,11 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.Lifecycle;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
@@ -140,6 +141,7 @@ public class SyncedFoldersActivity extends FileActivity implements SyncedFolderA
     @Inject AppPreferences preferences;
     @Inject PowerManagementService powerManagementService;
     @Inject Clock clock;
+    @Inject BackgroundJobManager backgroundJobManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,7 +155,7 @@ public class SyncedFoldersActivity extends FileActivity implements SyncedFolderA
         ButterKnife.bind(this);
 
         if (getIntent() != null && getIntent().getExtras() != null) {
-            final String accountName = getIntent().getExtras().getString(NotificationJob.KEY_NOTIFICATION_ACCOUNT);
+            final String accountName = getIntent().getExtras().getString(NotificationWork.KEY_NOTIFICATION_ACCOUNT);
             Optional<User> optionalUser = getUser();
             if (optionalUser.isPresent() && accountName != null) {
                 User user = optionalUser.get();
@@ -163,11 +165,11 @@ public class SyncedFoldersActivity extends FileActivity implements SyncedFolderA
                 }
             }
 
-            path = getIntent().getStringExtra(MediaFoldersDetectionJob.KEY_MEDIA_FOLDER_PATH);
-            type = getIntent().getIntExtra(MediaFoldersDetectionJob.KEY_MEDIA_FOLDER_TYPE, -1);
+            path = getIntent().getStringExtra(MediaFoldersDetectionWork.KEY_MEDIA_FOLDER_PATH);
+            type = getIntent().getIntExtra(MediaFoldersDetectionWork.KEY_MEDIA_FOLDER_TYPE, -1);
 
             // Cancel notification
-            int notificationId = getIntent().getIntExtra(MediaFoldersDetectionJob.NOTIFICATION_ID, 0);
+            int notificationId = getIntent().getIntExtra(MediaFoldersDetectionWork.NOTIFICATION_ID, 0);
             NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Activity.NOTIFICATION_SERVICE);
             notificationManager.cancel(notificationId);
@@ -175,9 +177,7 @@ public class SyncedFoldersActivity extends FileActivity implements SyncedFolderA
 
         // setup toolbar
         setupToolbar();
-        if (getSupportActionBar() != null){
-            getSupportActionBar().setTitle(R.string.drawer_synced_folders);
-        }
+        updateActionBarTitleAndHomeButtonByString(getString(R.string.drawer_synced_folders));
 
         // setup drawer
         setupDrawer(R.id.nav_synced_folders);
@@ -188,12 +188,6 @@ public class SyncedFoldersActivity extends FileActivity implements SyncedFolderA
         }
 
         setupContent();
-
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            ThemeUtils.setColoredTitle(getSupportActionBar(), getString(R.string.drawer_synced_folders), this);
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
 
         if (ThemeUtils.themingEnabled(this)) {
             setTheme(R.style.FallbackThemingTheme);
@@ -637,8 +631,7 @@ public class SyncedFoldersActivity extends FileActivity implements SyncedFolderA
         }
 
         if (syncedFolderDisplayItem.isEnabled()) {
-            FilesSyncHelper.startFilesSyncJobNow(null);
-
+            backgroundJobManager.startImmediateFilesSyncJob(false, false);
             showBatteryOptimizationInfo();
         }
     }
@@ -779,7 +772,7 @@ public class SyncedFoldersActivity extends FileActivity implements SyncedFolderA
             // existing synced folder setup to be updated
             syncedFolderProvider.updateSyncFolder(item);
             if (item.isEnabled()) {
-                FilesSyncHelper.startFilesSyncJobNow(null);
+                backgroundJobManager.startImmediateFilesSyncJob(false, false);
             } else {
                 String syncedFolderInitiatedKey = "syncedFolderIntitiated_" + item.getId();
 
@@ -797,7 +790,7 @@ public class SyncedFoldersActivity extends FileActivity implements SyncedFolderA
         if (storedId != -1) {
             item.setId(storedId);
             if (item.isEnabled()) {
-                FilesSyncHelper.startFilesSyncJobNow(null);
+                backgroundJobManager.startImmediateFilesSyncJob(false, false);
             } else {
                 String syncedFolderInitiatedKey = "syncedFolderIntitiated_" + item.getId();
                 arbitraryDataProvider.deleteKeyForAccount("global", syncedFolderInitiatedKey);
@@ -882,7 +875,7 @@ public class SyncedFoldersActivity extends FileActivity implements SyncedFolderA
 
     private void showBatteryOptimizationInfo() {
         if (powerManagementService.isPowerSavingExclusionAvailable() || checkIfBatteryOptimizationEnabled()) {
-            AlertDialog alertDialog = new AlertDialog.Builder(this, R.style.Theme_ownCloud_Dialog)
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this, R.style.Theme_ownCloud_Dialog)
                 .setTitle(getString(R.string.battery_optimization_title))
                 .setMessage(getString(R.string.battery_optimization_message))
                 .setPositiveButton(getString(R.string.battery_optimization_disable), (dialog, which) -> {
@@ -906,12 +899,15 @@ public class SyncedFoldersActivity extends FileActivity implements SyncedFolderA
                     }
                 })
                 .setNegativeButton(getString(R.string.battery_optimization_close), (dialog, which) -> dialog.dismiss())
-                .setIcon(R.drawable.ic_battery_alert)
-                .show();
+                .setIcon(R.drawable.ic_battery_alert);
 
-            int color = ThemeUtils.primaryAccentColor(this);
-            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(color);
-            alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(color);
+            if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.RESUMED)) {
+                AlertDialog alertDialog = alertDialogBuilder.show();
+
+                int color = ThemeUtils.primaryAccentColor(this);
+                alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(color);
+                alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(color);
+            }
         }
     }
 

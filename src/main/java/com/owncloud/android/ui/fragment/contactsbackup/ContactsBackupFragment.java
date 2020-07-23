@@ -36,17 +36,16 @@ import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.TextView;
 
-import com.evernote.android.job.JobRequest;
-import com.evernote.android.job.util.support.PersistableBundleCompat;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.nextcloud.client.account.User;
+import com.nextcloud.client.di.Injectable;
+import com.nextcloud.client.jobs.BackgroundJobManager;
 import com.nextcloud.java.util.Optional;
 import com.owncloud.android.R;
 import com.owncloud.android.datamodel.ArbitraryDataProvider;
 import com.owncloud.android.datamodel.FileDataStorageManager;
 import com.owncloud.android.datamodel.OCFile;
-import com.owncloud.android.jobs.ContactsBackupJob;
 import com.owncloud.android.lib.common.operations.RemoteOperationResult;
 import com.owncloud.android.operations.RefreshFolderOperation;
 import com.owncloud.android.ui.activity.ContactsPreferenceActivity;
@@ -62,6 +61,8 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
@@ -75,8 +76,13 @@ import third_parties.daveKoeller.AlphanumComparator;
 import static com.owncloud.android.ui.activity.ContactsPreferenceActivity.PREFERENCE_CONTACTS_AUTOMATIC_BACKUP;
 import static com.owncloud.android.ui.activity.ContactsPreferenceActivity.PREFERENCE_CONTACTS_LAST_BACKUP;
 
-public class ContactsBackupFragment extends FileFragment implements DatePickerDialog.OnDateSetListener {
+public class ContactsBackupFragment extends FileFragment implements DatePickerDialog.OnDateSetListener, Injectable {
     public static final String TAG = ContactsBackupFragment.class.getSimpleName();
+    private static final String ARG_SHOW_SIDEBAR = "SHOW_SIDEBAR";
+    private static final String KEY_CALENDAR_PICKER_OPEN = "IS_CALENDAR_PICKER_OPEN";
+    private static final String KEY_CALENDAR_DAY = "CALENDAR_DAY";
+    private static final String KEY_CALENDAR_MONTH = "CALENDAR_MONTH";
+    private static final String KEY_CALENDAR_YEAR = "CALENDAR_YEAR";
 
     @BindView(R.id.contacts_automatic_backup)
     public SwitchCompat backupSwitch;
@@ -90,21 +96,25 @@ public class ContactsBackupFragment extends FileFragment implements DatePickerDi
     @BindView(R.id.contacts_backup_now)
     public MaterialButton backupNow;
 
+    @Inject BackgroundJobManager backgroundJobManager;
+
     private Date selectedDate;
     private boolean calendarPickerOpen;
 
     private DatePickerDialog datePickerDialog;
 
     private CompoundButton.OnCheckedChangeListener onCheckedChangeListener;
-
-    private static final String KEY_CALENDAR_PICKER_OPEN = "IS_CALENDAR_PICKER_OPEN";
-    private static final String KEY_CALENDAR_DAY = "CALENDAR_DAY";
-    private static final String KEY_CALENDAR_MONTH = "CALENDAR_MONTH";
-    private static final String KEY_CALENDAR_YEAR = "CALENDAR_YEAR";
     private ArbitraryDataProvider arbitraryDataProvider;
     private Account account;
     private boolean showSidebar = true;
 
+    public static ContactsBackupFragment create(boolean showSidebar) {
+        ContactsBackupFragment fragment = new ContactsBackupFragment();
+        Bundle bundle = new Bundle();
+        bundle.putBoolean(ARG_SHOW_SIDEBAR, showSidebar);
+        fragment.setArguments(bundle);
+        return fragment;
+    }
 
     @Override
     public View onCreateView(@NonNull final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -119,7 +129,7 @@ public class ContactsBackupFragment extends FileFragment implements DatePickerDi
         setHasOptionsMenu(true);
 
         if (getArguments() != null) {
-            showSidebar = getArguments().getBoolean(ContactsPreferenceActivity.EXTRA_SHOW_SIDEBAR);
+            showSidebar = getArguments().getBoolean(ARG_SHOW_SIDEBAR);
         }
 
         final ContactsPreferenceActivity contactsPreferenceActivity = (ContactsPreferenceActivity) getActivity();
@@ -130,10 +140,9 @@ public class ContactsBackupFragment extends FileFragment implements DatePickerDi
 
         if (actionBar != null) {
             ThemeUtils.setColoredTitle(actionBar, getString(R.string.actionbar_contacts), getContext());
-            actionBar.setDisplayHomeAsUpEnabled(true);
 
-            Drawable backArrow = getResources().getDrawable(R.drawable.ic_arrow_back);
-            actionBar.setHomeAsUpIndicator(ThemeUtils.tintDrawable(backArrow, ThemeUtils.fontColor(getContext())));
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            ThemeUtils.tintBackButton(actionBar, getContext());
         }
 
         arbitraryDataProvider = new ArbitraryDataProvider(getContext().getContentResolver());
@@ -322,40 +331,36 @@ public class ContactsBackupFragment extends FileFragment implements DatePickerDi
     }
 
     private void startContactsBackupJob() {
-        final ContactsPreferenceActivity contactsPreferenceActivity = (ContactsPreferenceActivity) getActivity();
-
-        PersistableBundleCompat bundle = new PersistableBundleCompat();
-        bundle.putString(ContactsBackupJob.ACCOUNT, contactsPreferenceActivity.getAccount().name);
-        bundle.putBoolean(ContactsBackupJob.FORCE, true);
-
-        new JobRequest.Builder(ContactsBackupJob.TAG)
-                .setExtras(bundle)
-                .startNow()
-                .setUpdateCurrent(false)
-                .build()
-                .schedule();
-
-        DisplayUtils.showSnackMessage(getView().findViewById(R.id.contacts_linear_layout),
-                R.string.contacts_preferences_backup_scheduled);
+        ContactsPreferenceActivity activity = (ContactsPreferenceActivity)getActivity();
+        if (activity != null) {
+            Optional<User> optionalUser = activity.getUser();
+            if (optionalUser.isPresent()) {
+                backgroundJobManager.startImmediateContactsBackup(optionalUser.get());
+                DisplayUtils.showSnackMessage(getView().findViewById(R.id.contacts_linear_layout),
+                                              R.string.contacts_preferences_backup_scheduled);
+            }
+        }
     }
 
-    private void setAutomaticBackup(final boolean bool) {
+    private void setAutomaticBackup(final boolean enabled) {
 
-        final ContactsPreferenceActivity contactsPreferenceActivity = (ContactsPreferenceActivity) getActivity();
-
-        if (bool) {
-            ContactsPreferenceActivity.startContactBackupJob(contactsPreferenceActivity.getAccount());
+        final ContactsPreferenceActivity activity = (ContactsPreferenceActivity) getActivity();
+        if (activity == null) {
+            return;
+        }
+        Optional<User> optionalUser = activity.getUser();
+        if (!optionalUser.isPresent()) {
+            return;
+        }
+        User user = optionalUser.get();
+        if (enabled) {
+            backgroundJobManager.schedulePeriodicContactsBackup(user);
         } else {
-            Optional<User> user = contactsPreferenceActivity.getUser();
-
-            if (user.isPresent()) {
-                ContactsPreferenceActivity.cancelContactBackupJobForAccount(contactsPreferenceActivity,
-                                                                            user.get());
-            }
+            backgroundJobManager.cancelPeriodicContactsBackup(user);
         }
 
         arbitraryDataProvider.storeOrUpdateKeyValue(account.name, PREFERENCE_CONTACTS_AUTOMATIC_BACKUP,
-                String.valueOf(bool));
+                String.valueOf(enabled));
     }
 
     private boolean checkAndAskForContactsReadPermission() {
@@ -523,8 +528,8 @@ public class ContactsBackupFragment extends FileFragment implements DatePickerDi
         }
 
         if (backupToRestore != null) {
-            Fragment contactListFragment = ContactListFragment.newInstance(backupToRestore,
-                    contactsPreferenceActivity.getAccount());
+            final User user = contactsPreferenceActivity.getUser().orElseThrow(RuntimeException::new);
+            Fragment contactListFragment = ContactListFragment.newInstance(backupToRestore, user);
 
             contactsPreferenceActivity.getSupportFragmentManager().
                     beginTransaction()

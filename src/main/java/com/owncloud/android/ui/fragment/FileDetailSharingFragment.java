@@ -245,7 +245,7 @@ public class FileDetailSharingFragment extends Fragment implements ShareeListAda
             FileDetailSharingFragmentHelper.setupSearchView(
                 (SearchManager) fileDisplayActivity.getSystemService(Context.SEARCH_SERVICE), searchView,
                 fileDisplayActivity.getComponentName());
-            ThemeUtils.themeSearchView(searchView, false, requireContext());
+            ThemeUtils.themeSearchView(searchView, requireContext());
         } else {
             searchView.setVisibility(View.GONE);
             shareByLinkContainer.setVisibility(View.GONE);
@@ -427,7 +427,8 @@ public class FileDetailSharingFragment extends Fragment implements ShareeListAda
                 shareByLinkAllowEditing.isChecked(),
                 publicShare.getPermissions()
         );
-        menu.findItem(R.id.action_hide_file_download).setEnabled(false); //kDrive
+        SharingMenuHelper.setupHideFileDownload(menu.findItem(R.id.action_hide_file_download),
+            publicShare.isHideFileDownload(), capabilities);
         SharingMenuHelper.setupPasswordMenuItem(
                 menu.findItem(R.id.action_password),
                 publicShare.isPasswordProtected()
@@ -606,7 +607,7 @@ public class FileDetailSharingFragment extends Fragment implements ShareeListAda
         } else {
             // Get public share
             publicShare = fileDataStorageManager.getFirstShareByPathAndType(file.getRemotePath(),
-                ShareType.PUBLIC_LINK, "");
+                                                                            ShareType.PUBLIC_LINK, "");
 
             // Update public share section
             updatePublicShareSection();

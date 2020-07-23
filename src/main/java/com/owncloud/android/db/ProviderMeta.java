@@ -31,7 +31,7 @@ import com.owncloud.android.MainApp;
  */
 public class ProviderMeta {
     public static final String DB_NAME = "filelist";
-    public static final int DB_VERSION = 55;
+    public static final int DB_VERSION = 57;
 
     private ProviderMeta() {
         // No instance
@@ -89,6 +89,7 @@ public class ProviderMeta {
         public static final String FILE_CONTENT_TYPE = "content_type";
         public static final String FILE_STORAGE_PATH = "media_path";
         public static final String FILE_PATH = "path";
+        public static final String FILE_PATH_DECRYPTED = "path_decrypted";
         public static final String FILE_ACCOUNT_OWNER = "file_owner";
         public static final String FILE_LAST_SYNC_DATE = "last_sync_date";// _for_properties, but let's keep it as it is
         public static final String FILE_LAST_SYNC_DATE_FOR_DATA = "last_sync_date_for_data";
@@ -199,6 +200,7 @@ public class ProviderMeta {
         public static final String CAPABILITIES_DEFAULT_SORT_ORDER = CAPABILITIES_ACCOUNT_NAME
                 + " collate nocase asc";
         public static final String CAPABILITIES_DIRECT_EDITING_ETAG = "direct_editing_etag";
+        public static final String CAPABILITIES_ETAG = "etag";
 
         //Columns of Uploads table
         public static final String UPLOADS_LOCAL_PATH = "local_path";

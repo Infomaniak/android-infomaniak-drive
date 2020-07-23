@@ -30,7 +30,7 @@
     <string name="activities_no_results_headline">Ainda sem atividade</string>
     <string name="activities_no_results_message">Ainda sem eventos como adições, alterações ou partilhas</string>
     <string name="activity_chooser_send_file_title">Enviar</string>
-    <string name="activity_chooser_title">Enviar ligação para…</string>
+    <string name="activity_chooser_title">Enviar hiperligação para…</string>
     <string name="activity_icon">Actividade</string>
     <string name="add_to_cloud">Adicionar a %1$s</string>
     <string name="associated_account_not_found">Conta associada não encontrada!</string>
@@ -43,7 +43,6 @@
     <string name="auth_check_server">Verificar servidor</string>
     <string name="auth_connection_established">Ligação estabelecida</string>
     <string name="auth_expired_basic_auth_toast">Por favor, introduza a sua palavra-passe atual</string>
-    <string name="auth_fail_get_user_name">O seu servidor não está a retornar um ID de usuário correto. Por favor, contacte o administrador. </string>
     <string name="auth_host_address">Endereço do servidor</string>
     <string name="auth_host_url">Endereço do servidor https://…</string>
     <string name="auth_illegal_login_used">URL usado com dados login inválidos</string>
@@ -71,7 +70,6 @@
     <string name="auth_unsupported_multiaccount">%1$s não suporta contas múltiplas</string>
     <string name="auth_username">Nome de utilizador</string>
     <string name="auth_wrong_connection_title">Não foi possível estabelecer ligação</string>
-    <string name="auth_wtf_reenter_URL">Estado inesperado. Digite novamente o endereço do servidor</string>
     <string name="auto_upload_file_behaviour_kept_in_folder">mantido na pasta original, dado ser readonly</string>
     <string name="auto_upload_on_wifi">Carregar ficheiros apenas em redes Wi-Fi sem contagem do tráfego</string>
     <string name="auto_upload_path">/AutoUpload</string>
@@ -93,7 +91,7 @@
     <string name="clear_notifications_failed">Falha ao limpar notificações.</string>
     <string name="clipboard_label">Texto copiado a partir de %1$s</string>
     <string name="clipboard_no_text_to_copy">Não existe nada para copiar para o clipboard</string>
-    <string name="clipboard_text_copied">Link copiado</string>
+    <string name="clipboard_text_copied">Hiperligação copiada</string>
     <string name="clipboard_unexpected_error">Erro inesperado ao copiar para o clipboard</string>
     <string name="common_back">Anterior</string>
     <string name="common_cancel">Cancelar</string>
@@ -112,14 +110,12 @@
     <string name="common_save">Guardar</string>
     <string name="common_send">Enviar</string>
     <string name="common_share">Partilhar</string>
-    <string name="common_switch_account">Mudar Conta</string>
     <string name="common_unknown">desconhecido</string>
     <string name="common_yes">Sim</string>
     <string name="community_beta_headline">Teste a versão de desenvolvimento</string>
     <string name="community_beta_text">Inclui todas as futuras e mais recentes funcionalidades. Falhas/erros podem ocorrer, se e quando tal acontecer, por favor, reporte as suas descobertas.</string>
     <string name="community_contribute_forum_forum">fórum</string>
     <string name="community_contribute_forum_text">Ajude outros em</string>
-    <string name="community_contribute_github_text">Reveja, emende e escreva código, veja %1$s para detalhes</string>
     <string name="community_contribute_headline">Contribua activamente</string>
     <string name="community_contribute_irc_text">Junte-se à conversação em IRC:</string>
     <string name="community_contribute_translate_text">a aplicação</string>
@@ -161,7 +157,6 @@
     <string name="copy_file_error">Ocorreu um erro quando tentava copiar este ficheiro ou pasta</string>
     <string name="copy_file_invalid_into_descendent">Não é possível copiar a pasta para uma das suas próprias pastas internas</string>
     <string name="copy_file_invalid_overwrite">O ficheiro já existe na pasta de destino</string>
-    <string name="copy_file_not_found">Não é possível copiar. Por favor, verifique se o ficheiro existe</string>
     <string name="copy_link">Copiar hiperligação</string>
     <string name="copy_move_to_encrypted_folder_not_supported">Copiar/mover para pasta encriptada não é actualmente suportado.</string>
     <string name="copy_to">Copiar para…</string>
@@ -267,7 +262,6 @@
     <string name="file_list_empty">Envie algum conteúdo ou sincronize com os seus dispositivos</string>
     <string name="file_list_empty_favorite_headline">Ainda sem favoritos</string>
     <string name="file_list_empty_favorites_filter">A sua pesquisa não devolveu ficheiros favoritos.</string>
-    <string name="file_list_empty_favorites_filter_list">Os seus ficheiros e pastas favoritos serão mostrados aqui</string>
     <string name="file_list_empty_headline">Sem ficheiros aqui</string>
     <string name="file_list_empty_headline_search">Sem resultados nesta pasta</string>
     <string name="file_list_empty_headline_server_search">Sem resultados</string>
@@ -279,7 +273,6 @@
     <string name="file_list_empty_recently_modified">Não foi encontrado nenhum arquivo modificado nos últimos 7 dias</string>
     <string name="file_list_empty_recently_modified_filter">Sem arquivos modificados nos últimos 7 dias.</string>
     <string name="file_list_empty_search">Poderá estar numa pasta diferente?</string>
-    <string name="file_list_empty_shared">Os ficheiros e pastas que partilha serão mostrados aqui</string>
     <string name="file_list_empty_shared_headline">Ainda sem partilhas</string>
     <string name="file_list_empty_text_photos">Envie algumas fotografias ou ative o envio automático.</string>
     <string name="file_list_empty_text_photos_filter">Sem fotografias.</string>
@@ -390,12 +383,8 @@
     <string name="move_file_error">Ocorreu um ocorreu quando tentava mover este ficheiro ou pasta</string>
     <string name="move_file_invalid_into_descendent">Não é possível mover a pasta para uma das suas próprias pastas internas</string>
     <string name="move_file_invalid_overwrite">O ficheiro já existe na pasta de destino</string>
-    <string name="move_file_not_found">Não é possível mover o ficheiro. Por favor, verifique se este existe</string>
     <string name="move_to">Movido para…</string>
-    <string name="network_error_connect_timeout_exception">Impossível concluir a operação porque ocorreu um erro na resposta do servidor</string>
     <string name="network_error_socket_exception">Ocorreu um erro na conexão com o servidor</string>
-    <string name="network_error_socket_timeout_exception">Impossível concluir a operação porque ocorreu um erro na resposta do servidor</string>
-    <string name="network_host_not_available">Impossível concluir a operação porque o servidor não responde</string>
     <string name="new_comment">Novo comentário…</string>
     <string name="new_media_folder_detected">Nova %1$s pasta multimédia detectada.</string>
     <string name="new_media_folder_photos">photo</string>
@@ -538,12 +527,10 @@
     <string name="share_email_clarification">%1$s (email)</string>
     <string name="share_expiration_date_label">Expira %1$s</string>
     <string name="share_file">Partilhar %1$s</string>
-    <string name="share_get_public_link_button">Obter ligação</string>
+    <string name="share_get_public_link_button">Obter hiperligação</string>
     <string name="share_group_clarification">%1$s (grupo)</string>
     <string name="share_known_remote_clarification">%1$s ( em %2$s )</string>
     <string name="share_link_empty_password">Você deve introduzir uma palavra-passe</string>
-    <string name="share_link_file_error">Ocorreu um erro enquanto tentava partilhar este ficheiro ou pasta</string>
-    <string name="share_link_file_no_exist">Não é possível partilhar. Por favor verifique se o ficheiro existe</string>
     <string name="share_link_forbidden_permissions">para partilhar este ficheiro</string>
     <string name="share_link_optional_password_title">Insira uma palavra-passe opcional</string>
     <string name="share_link_password_title">Introduza uma palavra-passe</string>
@@ -568,7 +555,7 @@
     <string name="share_via_link_menu_password_label">Protegido com Senha (%1$s)</string>
     <string name="share_via_link_password_label">Proteger com palavra-passe</string>
     <string name="share_via_link_password_title">Protegido</string>
-    <string name="share_via_link_section_title">Compartilhar hiperligação</string>
+    <string name="share_via_link_section_title">Partilhar hiperligação</string>
     <string name="share_via_link_send_link_label">Enviar hiperligação</string>
     <string name="share_via_link_unset_password">Retirar</string>
     <string name="share_with_edit_title">Partilhar com %1$s</string>
@@ -663,7 +650,6 @@ Aproveite o novo e melhorado envio automático.</string>
     <string name="timeout_richDocuments">O carregamento é demorado...</string>
     <string name="trashbin_activity_title">Ficheiros eliminados</string>
     <string name="trashbin_empty_headline">Sem ficheiros eliminados.</string>
-    <string name="trashbin_empty_message">Poderá recuperar ficheiros eliminados a partir daqui</string>
     <string name="trashbin_file_not_deleted">Ficheiro %1$s não pôde ser apagado!</string>
     <string name="trashbin_file_not_restored">Ficheiro %1$s não pôde ser restaurado!</string>
     <string name="trashbin_loading_failed">Carregamento do cesto do lixo falhou!</string>
@@ -671,13 +657,9 @@ Aproveite o novo e melhorado envio automático.</string>
     <string name="unread_comments">Existem comentários não lidos</string>
     <string name="unset_encrypted">Encriptação não definida</string>
     <string name="unset_favorite">Remover dos favoritos</string>
-    <string name="unshare_link_file_error">Ocorreu um erro enquanto retirava a partilha deste ficheiro ou pasta</string>
-    <string name="unshare_link_file_no_exist">Não é possível retirar a partilha. Verifique se o ficheiro existe</string>
     <string name="unshare_link_forbidden_permissions">para cancelar a partilha deste ficheiro</string>
     <string name="unsharing_failed">Cancelamento da partilha falhou</string>
     <string name="untrusted_domain">Acesso através de domínio não confiável. Por favor, verifique a documentação para mais informações.</string>
-    <string name="update_link_file_error">Ocorreu um erro ao tentar atualizar a partilha</string>
-    <string name="update_link_file_no_exist">Impossível atualizar. Confirme que o ficheiro existe</string>
     <string name="update_link_forbidden_permissions">para atualizar esta partilha</string>
     <string name="updating_share_failed">Actualização da partilha falhou</string>
     <string name="upload_cannot_create_file">Não é possível criar ficheiro local</string>

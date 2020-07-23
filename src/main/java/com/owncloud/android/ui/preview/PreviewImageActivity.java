@@ -22,7 +22,6 @@
  */
 package com.owncloud.android.ui.preview;
 
-import android.accounts.Account;
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -30,6 +29,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.text.TextUtils;
@@ -117,6 +117,8 @@ public class PreviewImageActivity extends FileActivity implements
 
         // ActionBar
         updateActionBarTitleAndHomeButton(null);
+
+        ThemeUtils.tintBackButton(actionBar, this, Color.WHITE);
 
         mFullScreenAnchorView = getWindow().getDecorView();
         // to keep our UI controls visibility in line with system bars visibility
@@ -395,8 +397,9 @@ public class PreviewImageActivity extends FileActivity implements
             Log_OC.d(TAG, "requestForDownload called without binder to download service");
 
         } else if (!mDownloaderBinder.isDownloading(getAccount(), file)) {
+            final User user = getUser().orElseThrow(RuntimeException::new);
             Intent i = new Intent(this, FileDownloader.class);
-            i.putExtra(FileDownloader.EXTRA_ACCOUNT, getAccount());
+            i.putExtra(FileDownloader.EXTRA_USER, user);
             i.putExtra(FileDownloader.EXTRA_FILE, file);
             startService(i);
         }

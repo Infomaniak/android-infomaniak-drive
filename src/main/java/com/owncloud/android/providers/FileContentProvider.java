@@ -92,7 +92,6 @@ public class FileContentProvider extends ContentProvider {
     private static final String TEXT = " TEXT, ";
     private static final String ALTER_TABLE = "ALTER TABLE ";
     private static final String ADD_COLUMN = " ADD COLUMN ";
-    private static final String REMOVE_COLUMN = " REMOVE COLUMN ";
     private static final String UPGRADE_VERSION_MSG = "OUT of the ADD in onUpgrade; oldVersion == %d, newVersion == %d";
     private static final int SINGLE_PATH_SEGMENT = 1;
     public static final int ARBITRARY_DATA_TABLE_INTRODUCTION_VERSION = 20;
@@ -701,6 +700,7 @@ public class FileContentProvider extends ContentProvider {
                        + ProviderTableMeta.FILE_NAME + TEXT
                        + ProviderTableMeta.FILE_ENCRYPTED_NAME + TEXT
                        + ProviderTableMeta.FILE_PATH + TEXT
+                       + ProviderTableMeta.FILE_PATH_DECRYPTED + TEXT
                        + ProviderTableMeta.FILE_PARENT + INTEGER
                        + ProviderTableMeta.FILE_CREATION + INTEGER
                        + ProviderTableMeta.FILE_MODIFIED + INTEGER
@@ -801,7 +801,8 @@ public class FileContentProvider extends ContentProvider {
                        + ProviderTableMeta.CAPABILITIES_RICHDOCUMENT_OPTIONAL_MIMETYPE_LIST + TEXT
                        + ProviderTableMeta.CAPABILITIES_SHARING_PUBLIC_ASK_FOR_OPTIONAL_PASSWORD + INTEGER
                        + ProviderTableMeta.CAPABILITIES_RICHDOCUMENT_PRODUCT_NAME + TEXT
-                       + ProviderTableMeta.CAPABILITIES_DIRECT_EDITING_ETAG + " TEXT );");
+                       + ProviderTableMeta.CAPABILITIES_DIRECT_EDITING_ETAG + TEXT
+                       + ProviderTableMeta.CAPABILITIES_ETAG + " TEXT );");
     }
 
     private void createUploadsTable(SQLiteDatabase db) {
@@ -2101,9 +2102,11 @@ public class FileContentProvider extends ContentProvider {
                 Log_OC.i(SQL, "Entering in the #53 add rich workspace to file table");
                 db.beginTransaction();
                 try {
-                    db.execSQL(ALTER_TABLE + ProviderTableMeta.FILE_TABLE_NAME +
-                                   ADD_COLUMN + ProviderTableMeta.FILE_RICH_WORKSPACE + " TEXT ");
-
+                    if (!checkIfColumnExists(db, ProviderTableMeta.FILE_TABLE_NAME,
+                                             ProviderTableMeta.FILE_RICH_WORKSPACE)) {
+                        db.execSQL(ALTER_TABLE + ProviderTableMeta.FILE_TABLE_NAME +
+                                       ADD_COLUMN + ProviderTableMeta.FILE_RICH_WORKSPACE + " TEXT ");
+                    }
                     upgraded = true;
                     db.setTransactionSuccessful();
                 } finally {
@@ -2190,6 +2193,43 @@ public class FileContentProvider extends ContentProvider {
                     db.execSQL("UPDATE " + ProviderTableMeta.SYNCED_FOLDERS_TABLE_NAME + " SET " +
                                    ProviderTableMeta.SYNCED_FOLDER_NAME_COLLISION_POLICY + " = " +
                                    FileUploader.NameCollisionPolicy.ASK_USER.serialize());
+                    upgraded = true;
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+            }
+
+            if (!upgraded) {
+                Log_OC.i(SQL, String.format(Locale.ENGLISH, UPGRADE_VERSION_MSG, oldVersion, newVersion));
+            }
+
+            if (oldVersion < 56 && newVersion >= 56) {
+                Log_OC.i(SQL, "Entering in the #56 add decrypted remote path");
+                db.beginTransaction();
+                try {
+                    // Add synced.name_collision_policy
+                    db.execSQL(ALTER_TABLE + ProviderTableMeta.FILE_TABLE_NAME +
+                                   ADD_COLUMN + ProviderTableMeta.FILE_PATH_DECRYPTED + " TEXT "); // strin
+
+                    upgraded = true;
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+            }
+
+            if (!upgraded) {
+                Log_OC.i(SQL, String.format(Locale.ENGLISH, UPGRADE_VERSION_MSG, oldVersion, newVersion));
+            }
+
+            if (oldVersion < 57 && newVersion >= 57) {
+                Log_OC.i(SQL, "Entering in the #57 add etag for capabilities");
+                db.beginTransaction();
+                try {
+                    db.execSQL(ALTER_TABLE + ProviderTableMeta.CAPABILITIES_TABLE_NAME +
+                                   ADD_COLUMN + ProviderTableMeta.CAPABILITIES_ETAG + " TEXT ");
+
                     upgraded = true;
                     db.setTransactionSuccessful();
                 } finally {

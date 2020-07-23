@@ -32,6 +32,7 @@ import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.nextcloud.client.account.CurrentAccountProvider;
 import com.nextcloud.client.account.User;
@@ -46,6 +47,7 @@ import com.owncloud.android.ui.activity.FileDisplayActivity;
 import com.owncloud.android.ui.adapter.TrashbinListAdapter;
 import com.owncloud.android.ui.dialog.SortingOrderDialogFragment;
 import com.owncloud.android.ui.interfaces.TrashbinActivityInterface;
+import com.owncloud.android.utils.DisplayUtils;
 import com.owncloud.android.utils.FileSortOrder;
 import com.owncloud.android.utils.ThemeUtils;
 
@@ -53,15 +55,15 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+
+import static com.owncloud.android.utils.DisplayUtils.openSortingOrderDialogFragment;
 
 /**
  * Presenting trashbin data, received from presenter
@@ -87,6 +89,9 @@ public class TrashbinActivity extends FileActivity implements
     @BindView(R.id.swipe_containing_list)
     public SwipeRefreshLayout swipeListRefreshLayout;
 
+    @BindView(R.id.sort_button)
+    public MaterialButton sortButton;
+
     @BindString(R.string.trashbin_empty_headline)
     public String noResultsHeadline;
 
@@ -111,8 +116,8 @@ public class TrashbinActivity extends FileActivity implements
         setContentView(R.layout.trashbin_activity);
         unbinder = ButterKnife.bind(this);
         setupToolbar();
+        updateActionBarTitleAndHomeButtonByString(getString(R.string.trashbin_activity_title));
         setupDrawer(R.id.nav_trashbin);
-        ThemeUtils.setColoredTitle(getSupportActionBar(), R.string.trashbin_activity_title, this);
     }
 
     @Override
@@ -144,7 +149,15 @@ public class TrashbinActivity extends FileActivity implements
         recyclerView.setHasFooter(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        ThemeUtils.colorSwipeRefreshLayout(this, swipeListRefreshLayout);
         swipeListRefreshLayout.setOnRefreshListener(this::loadFolder);
+
+        sortButton.setOnClickListener(l ->
+                                          openSortingOrderDialogFragment(getSupportFragmentManager(),
+                                                                         preferences.getSortOrderByType(
+                                                                             FileSortOrder.Type.trashBinView,
+                                                                             FileSortOrder.sort_new_to_old))
+                                     );
 
         loadFolder();
     }
@@ -175,17 +188,7 @@ public class TrashbinActivity extends FileActivity implements
                     openDrawer();
                 }
                 break;
-            case R.id.action_sort: {
-                FragmentManager fm = getSupportFragmentManager();
-                FragmentTransaction ft = fm.beginTransaction();
-                ft.addToBackStack(null);
 
-                SortingOrderDialogFragment mSortingOrderDialogFragment = SortingOrderDialogFragment.newInstance(
-                    preferences.getSortOrderByType(FileSortOrder.Type.trashBinView, FileSortOrder.sort_new_to_old));
-                mSortingOrderDialogFragment.show(ft, SortingOrderDialogFragment.SORTING_ORDER_FRAGMENT);
-
-                break;
-            }
             case R.id.action_empty_trashbin:
                 trashbinPresenter.emptyTrashbin();
                 break;
@@ -223,11 +226,6 @@ public class TrashbinActivity extends FileActivity implements
             trashbinPresenter.enterFolder(file.getRemotePath());
 
             mDrawerToggle.setDrawerIndicatorEnabled(false);
-
-            Toolbar toolbar = findViewById(R.id.toolbar);
-            if (toolbar != null && toolbar.getNavigationIcon() != null) {
-                ThemeUtils.tintDrawable(toolbar.getNavigationIcon(), ThemeUtils.fontColor(this));
-            }
         }
     }
 
@@ -267,6 +265,7 @@ public class TrashbinActivity extends FileActivity implements
 
     @Override
     public void onSortingOrderChosen(FileSortOrder sortOrder) {
+        sortButton.setText(DisplayUtils.getSortOrderStringId(sortOrder));
         trashbinListAdapter.setSortOrder(sortOrder);
     }
 
@@ -306,7 +305,9 @@ public class TrashbinActivity extends FileActivity implements
 
             if (emptyContentMessage != null) {
                 emptyContentHeadline.setText(R.string.common_error);
-                emptyContentIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_list_empty_error));
+                emptyContentIcon.setImageDrawable(ResourcesCompat.getDrawable(getResources(),
+                                                                              R.drawable.ic_list_empty_error,
+                                                                              null));
                 emptyContentMessage.setText(message);
 
                 emptyContentMessage.setVisibility(View.VISIBLE);

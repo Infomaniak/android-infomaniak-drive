@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   Nextcloud Android client application
 
   Copyright (C) 2016 Andy Scherzinger
@@ -20,13 +19,16 @@
   License along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <com.google.android.material.appbar.AppBarLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                            xmlns:app="http://schemas.android.com/apk/res-auto"
-                                            android:id="@+id/appbar"
-                                            android:layout_width="match_parent"
-                                            android:layout_height="wrap_content"
-                                            android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/appbar"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/bg_default"
+    tools:viewBindingIgnore="true">
 
     <RelativeLayout
+        android:id="@+id/default_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -50,24 +52,91 @@
         </FrameLayout>
 
         <androidx.appcompat.widget.Toolbar
-            android:id="@id/toolbar"
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:popupTheme="@style/Theme.AppCompat.DayNight.NoActionBar" />
+            android:background="@color/appbar"
+            android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
+            app:popupTheme="@style/Theme.AppCompat.DayNight.NoActionBar"
+            tools:visibility="gone">
 
-        <ProgressBar
-            android:id="@+id/progressBar"
-            style="@style/Widget.ownCloud.TopProgressBar"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/standard_quarter_margin"
-            android:layout_below="@+id/toolbar"
-            android:layout_margin="@dimen/zero"
-            android:indeterminate="false"
-            android:indeterminateOnly="false"
-            android:padding="@dimen/zero"
-            android:visibility="visible" />
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/toolbar_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:visibility="gone"
+                app:backgroundTint="@color/fontAppbar"
+                app:popupTheme="@style/Theme.AppCompat.DayNight.NoActionBar" />
+        </androidx.appcompat.widget.Toolbar>
+
     </RelativeLayout>
 
-    <include layout="@layout/info_box"/>
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/home_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="4dp"
+        android:visibility="gone"
+        app:background="@color/appbar"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="2dp"
+        app:strokeWidth="0dp"
+        tools:visibility="visible">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/menu_button"
+                style="@style/Widget.AppTheme.Button.IconButton"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:layout_marginStart="8dp"
+                android:contentDescription="@string/action_switch_grid_view"
+                app:cornerRadius="@dimen/button_corner_radius"
+                app:icon="@drawable/ic_menu"
+                app:iconTint="@color/fontAppbar"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/search_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="18dp"
+                android:layout_marginEnd="18dp"
+                android:ellipsize="end"
+                android:gravity="start"
+                android:lines="1"
+                android:textColor="@color/fontSecondaryAppbar"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toRightOf="@id/menu_button"
+                app:layout_constraintRight_toLeftOf="@id/switch_account_button"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Search in Nextcloud"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/switch_account_button"
+                style="@style/Widget.AppTheme.Button.IconButton"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginEnd="6dp"
+                app:cornerRadius="@dimen/button_corner_radius"
+                app:iconSize="30dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <include layout="@layout/info_box" />
 
 </com.google.android.material.appbar.AppBarLayout>
