@@ -62,7 +62,7 @@ ext {
     daggerVersion = "2.27"
     markwonVersion =  "4.4.0"
     prismVersion = "2.0.0"
-    androidLibraryVersion = "master-SNAPSHOT"
+    androidLibraryVersion = "30679cb471df318ff7e6f50f11f83f29b43b6627"
 
     travisBuild = System.getenv("TRAVIS") == "true"
 
