@@ -286,7 +286,7 @@ public class SynchronizeFolderOperation extends SyncOperation {
                                                         storageManager.getFolderContent(mLocalFolder, false));
 
         // loop to synchronize every child
-        List<OCFile> updatedFiles = new ArrayList<>(folderAndFiles.size() - 1);
+        ArrayList<OCFile> updatedFiles = new ArrayList<>(folderAndFiles.size() - 1);
         OCFile remoteFile;
         OCFile localFile;
         OCFile updatedFile;

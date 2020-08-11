@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+  <resources>
     <string name="about_android">%1$s Android App</string>
     <string name="about_title">Über</string>
     <string name="about_version">Version %1$s</string>
@@ -559,7 +559,6 @@
     <string name="screenshot_05_autoUpload_heading">Automatisches Hochladen</string>
     <string name="screenshot_05_autoUpload_subline">ihrer Fotos &amp; Videos</string>
     <string name="screenshot_06_davdroid_heading">Kalender &amp; Kontakte</string>
-    <string name="screenshot_06_davdroid_subline">Synchronisiere mit DAVx5</string>
     <string name="select_all">Alle auswählen</string>
     <string name="select_template">Vorlage auswählen</string>
     <string name="send">Senden</string>

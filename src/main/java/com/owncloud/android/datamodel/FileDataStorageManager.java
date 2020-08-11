@@ -1014,10 +1014,11 @@ public class FileDataStorageManager {
 
     public boolean saveShare(OCShare share) {
         boolean overridden = false;
-
+        Uri contentUriShare = ProviderTableMeta.CONTENT_URI_SHARE;
         ContentValues contentValues = createContentValueForShare(share);
 
         if (shareExistsForRemoteId(share.getRemoteId())) {// for renamed files; no more delete and create
+            overridden = true;
             String where = ProviderTableMeta.OCSHARES_ID_REMOTE_SHARED + " = ?";
             String[] selectionArgs = {String.valueOf(share.getRemoteId())};
 
@@ -1029,6 +1030,8 @@ public class FileDataStorageManager {
                 share.setId(new_id);
             }
         }
+
+        return overridden;
     }
 
     /**

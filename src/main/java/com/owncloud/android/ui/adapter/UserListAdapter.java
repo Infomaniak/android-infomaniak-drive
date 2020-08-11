@@ -222,7 +222,8 @@ public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         public void bind(User user, boolean userListItemEnabled, DisplayUtils.AvatarGenerationListener avatarGenerationListener) {
             setData(user);
             setUser(user);
-            setUsername(user);
+            binding.userName.setText(Utils.getUserEmail(user.getAccountName()));
+            //setUsername(user);
             setAvatar(user, avatarGenerationListener);
             setCurrentlyActiveState(user);
 

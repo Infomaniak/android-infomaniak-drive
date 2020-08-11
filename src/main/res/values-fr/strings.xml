@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+  <resources>
     <string name="about_android">Application Android %1$s</string>
     <string name="about_title">À propos de</string>
     <string name="about_version">version %1$s</string>
@@ -561,7 +561,6 @@ Attention la suppression est irréversible.</string>
     <string name="screenshot_05_autoUpload_heading">Téléversement automatique</string>
     <string name="screenshot_05_autoUpload_subline">pour vos photos &amp; vidéos</string>
     <string name="screenshot_06_davdroid_heading">Agenda &amp; Contacts</string>
-    <string name="screenshot_06_davdroid_subline">Synchroniser avec DAVx5</string>
     <string name="select_all">Tout sélectionner</string>
     <string name="select_template">Sélectionnez un modèle</string>
     <string name="send">Envoyer</string>
