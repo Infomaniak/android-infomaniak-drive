@@ -27,6 +27,7 @@ import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -38,6 +39,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.nextcloud.client.account.User;
+import com.nextcloud.java.util.Optional;
 import com.owncloud.android.R;
 import com.owncloud.android.datamodel.OCFile;
 import com.owncloud.android.datamodel.ThumbnailsCacheManager;
@@ -90,7 +93,7 @@ public abstract class EditorWebView extends ExternalSiteWebView {
                 if (getWebview().getVisibility() != View.VISIBLE) {
                     Snackbar snackbar = DisplayUtils.createSnackbar(findViewById(android.R.id.content),
                                                                     R.string.timeout_richDocuments, Snackbar.LENGTH_INDEFINITE)
-                        .setAction(R.string.fallback_weblogin_back, v -> closeView());
+                        .setAction(R.string.common_back, v -> closeView());
 
                     ThemeUtils.colorSnackbar(getApplicationContext(), snackbar);
                     setLoadingSnackbar(snackbar);
@@ -132,11 +135,16 @@ public abstract class EditorWebView extends ExternalSiteWebView {
             fileName = getFile().getFileName();
         }
 
-        initLoadingScreen();
+        Optional<User> user = getUser();
+        if (!user.isPresent()) {
+            finish();
+            return;
+        }
+        initLoadingScreen(user.get());
     }
 
-    protected void initLoadingScreen() {
-        setThumbnailView();
+    protected void initLoadingScreen(final User user) {
+        setThumbnailView(user);
         fileNameTextView.setText(fileName);
     }
 
@@ -155,7 +163,7 @@ public abstract class EditorWebView extends ExternalSiteWebView {
         super.onDestroy();
     }
 
-    protected void setThumbnailView() {
+    protected void setThumbnailView(final User user) {
         // Todo minimize: only icon by mimetype
         OCFile file = getFile();
         if (file.isFolder()) {
@@ -184,8 +192,11 @@ public abstract class EditorWebView extends ExternalSiteWebView {
                     thumbnailView.setBackgroundColor(getResources().getColor(R.color.bg_default));
                 }
             } else {
-                thumbnailView.setImageDrawable(MimeTypeUtil.getFileTypeIcon(file.getMimeType(), file.getFileName(),
-                                                                            getAccount(), this));
+                Drawable icon = MimeTypeUtil.getFileTypeIcon(file.getMimeType(),
+                                                             file.getFileName(),
+                                                             user,
+                                                             getApplicationContext());
+                thumbnailView.setImageDrawable(icon);
             }
         }
     }

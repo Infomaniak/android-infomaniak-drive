@@ -39,7 +39,7 @@ import static org.junit.Assert.assertTrue;
 
 @LargeTest
 @RunWith(JUnit4.class)
-public class ScreenshotsIT extends AbstractIT {
+public class ScreenshotsIT extends AbstractOnServerIT {
     @ClassRule
     public static final LocaleTestRule localeTestRule = new LocaleTestRule();
 
@@ -73,7 +73,7 @@ public class ScreenshotsIT extends AbstractIT {
 
         // folder does not exist yet
         if (getStorageManager().getFileByPath(path) == null) {
-            SyncOperation syncOp = new CreateFolderOperation(path, account, targetContext);
+            SyncOperation syncOp = new CreateFolderOperation(path, user, targetContext);
             RemoteOperationResult result = syncOp.execute(client, getStorageManager());
 
             assertTrue(result.isSuccess());

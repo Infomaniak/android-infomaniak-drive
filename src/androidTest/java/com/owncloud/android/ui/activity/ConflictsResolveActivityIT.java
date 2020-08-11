@@ -31,16 +31,13 @@ import com.owncloud.android.R;
 import com.owncloud.android.datamodel.FileDataStorageManager;
 import com.owncloud.android.datamodel.OCFile;
 import com.owncloud.android.db.OCUpload;
-import com.owncloud.android.lib.resources.files.UploadFileRemoteOperation;
-import com.owncloud.android.operations.RefreshFolderOperation;
 import com.owncloud.android.ui.dialog.ConflictsResolveDialog;
 import com.owncloud.android.utils.FileStorageUtils;
+import com.owncloud.android.utils.ScreenshotTest;
 
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
-
-import java.io.File;
-import java.io.IOException;
 
 import androidx.fragment.app.DialogFragment;
 import androidx.test.espresso.intent.rule.IntentsTestRule;
@@ -59,6 +56,7 @@ public class ConflictsResolveActivityIT extends AbstractIT {
     private boolean returnCode;
 
     @Test
+    @ScreenshotTest
     public void screenshotTextFiles() {
         OCFile newFile = new OCFile("/newFile.txt");
         newFile.setFileLength(56000);
@@ -93,58 +91,59 @@ public class ConflictsResolveActivityIT extends AbstractIT {
         Screenshot.snap(dialog.getDialog().getWindow().getDecorView()).record();
     }
 
-    @Test
-    public void screenshotImages() throws IOException {
-        FileDataStorageManager storageManager = new FileDataStorageManager(account,
-                                                                           targetContext.getContentResolver());
-
-        OCFile newFile = new OCFile("/newFile.txt");
-        newFile.setFileLength(56000);
-        newFile.setModificationTimestamp(1522019340);
-        newFile.setStoragePath(FileStorageUtils.getSavePath(account.name) + "/nonEmpty.txt");
-
-        File image = getFile("image.jpg");
-
-        assertTrue(new UploadFileRemoteOperation(image.getAbsolutePath(),
-                                                 "/image.jpg",
-                                                 "image/jpg",
-                                                 "10000000").execute(client).isSuccess());
-
-        assertTrue(new RefreshFolderOperation(storageManager.getFileByPath("/"),
-                                              System.currentTimeMillis(),
-                                              false,
-                                              true,
-                                              storageManager,
-                                              account,
-                                              targetContext
-        ).execute(client).isSuccess());
-
-        OCFile existingFile = storageManager.getFileByPath("/image.jpg");
-
-        Intent intent = new Intent(targetContext, ConflictsResolveActivity.class);
-        intent.putExtra(ConflictsResolveActivity.EXTRA_FILE, newFile);
-        intent.putExtra(ConflictsResolveActivity.EXTRA_EXISTING_FILE, existingFile);
-
-        ConflictsResolveActivity sut = activityRule.launchActivity(intent);
-
-        ConflictsResolveDialog.OnConflictDecisionMadeListener listener = decision -> {
-
-        };
-
-        ConflictsResolveDialog dialog = ConflictsResolveDialog.newInstance(existingFile,
-                                                                           newFile,
-                                                                           UserAccountManagerImpl
-                                                                               .fromContext(targetContext)
-                                                                               .getUser()
-                                                                          );
-        dialog.showDialog(sut);
-        dialog.listener = listener;
-
-        getInstrumentation().waitForIdleSync();
-        shortSleep();
-
-        Screenshot.snap(dialog.getDialog().getWindow().getDecorView()).record();
-    }
+//    @Test
+    // @ScreenshotTest // todo run without real server
+//    public void screenshotImages() throws IOException {
+//        FileDataStorageManager storageManager = new FileDataStorageManager(account,
+//                                                                           targetContext.getContentResolver());
+//
+//        OCFile newFile = new OCFile("/newFile.txt");
+//        newFile.setFileLength(56000);
+//        newFile.setModificationTimestamp(1522019340);
+//        newFile.setStoragePath(FileStorageUtils.getSavePath(account.name) + "/nonEmpty.txt");
+//
+//        File image = getFile("image.jpg");
+//
+//        assertTrue(new UploadFileRemoteOperation(image.getAbsolutePath(),
+//                                                 "/image.jpg",
+//                                                 "image/jpg",
+//                                                 "10000000").execute(client).isSuccess());
+//
+//        assertTrue(new RefreshFolderOperation(storageManager.getFileByPath("/"),
+//                                              System.currentTimeMillis(),
+//                                              false,
+//                                              true,
+//                                              storageManager,
+//                                              account,
+//                                              targetContext
+//        ).execute(client).isSuccess());
+//
+//        OCFile existingFile = storageManager.getFileByPath("/image.jpg");
+//
+//        Intent intent = new Intent(targetContext, ConflictsResolveActivity.class);
+//        intent.putExtra(ConflictsResolveActivity.EXTRA_FILE, newFile);
+//        intent.putExtra(ConflictsResolveActivity.EXTRA_EXISTING_FILE, existingFile);
+//
+//        ConflictsResolveActivity sut = activityRule.launchActivity(intent);
+//
+//        ConflictsResolveDialog.OnConflictDecisionMadeListener listener = decision -> {
+//
+//        };
+//
+//        ConflictsResolveDialog dialog = ConflictsResolveDialog.newInstance(existingFile,
+//                                                                           newFile,
+//                                                                           UserAccountManagerImpl
+//                                                                               .fromContext(targetContext)
+//                                                                               .getUser()
+//                                                                          );
+//        dialog.showDialog(sut);
+//        dialog.listener = listener;
+//
+//        getInstrumentation().waitForIdleSync();
+//        shortSleep();
+//
+//        Screenshot.snap(dialog.getDialog().getWindow().getDecorView()).record();
+//    }
 
     @Test
     public void cancel() {
@@ -187,6 +186,7 @@ public class ConflictsResolveActivityIT extends AbstractIT {
     }
 
     @Test
+    @ScreenshotTest
     public void keepExisting() {
         returnCode = false;
 
@@ -231,6 +231,7 @@ public class ConflictsResolveActivityIT extends AbstractIT {
     }
 
     @Test
+    @ScreenshotTest
     public void keepNew() {
         returnCode = false;
 
@@ -241,6 +242,7 @@ public class ConflictsResolveActivityIT extends AbstractIT {
         OCFile existingFile = new OCFile("/newFile.txt");
         existingFile.setFileLength(1024000);
         existingFile.setModificationTimestamp(1582019340);
+        existingFile.setRemoteId("123abc");
 
         OCFile newFile = new OCFile("/newFile.txt");
         newFile.setFileLength(56000);
@@ -275,6 +277,7 @@ public class ConflictsResolveActivityIT extends AbstractIT {
     }
 
     @Test
+    @ScreenshotTest
     public void keepBoth() {
         returnCode = false;
 
@@ -317,5 +320,10 @@ public class ConflictsResolveActivityIT extends AbstractIT {
         onView(withText("OK")).perform(click());
 
         assertTrue(returnCode);
+    }
+
+    @After
+    public void after() {
+        getStorageManager().deleteAllFiles();
     }
 }

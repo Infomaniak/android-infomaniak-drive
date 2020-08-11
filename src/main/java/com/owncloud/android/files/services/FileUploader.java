@@ -47,11 +47,13 @@ import android.os.Parcelable;
 import android.os.Process;
 import android.util.Pair;
 
+import com.nextcloud.client.account.User;
 import com.nextcloud.client.account.UserAccountManager;
 import com.nextcloud.client.device.BatteryStatus;
 import com.nextcloud.client.device.PowerManagementService;
 import com.nextcloud.client.network.Connectivity;
 import com.nextcloud.client.network.ConnectivityService;
+import com.nextcloud.java.util.Optional;
 import com.owncloud.android.MainApp;
 import com.owncloud.android.R;
 import com.owncloud.android.authentication.AuthenticatorActivity;
@@ -291,10 +293,15 @@ public class FileUploader extends Service
             return Service.START_NOT_STICKY;
         }
 
-        Account account = intent.getParcelableExtra(KEY_ACCOUNT);
-        if (!accountManager.exists(account)) {
+        final Account account = intent.getParcelableExtra(KEY_ACCOUNT);
+        if (account == null) {
             return Service.START_NOT_STICKY;
         }
+        Optional<User> optionalUser = accountManager.getUser(account.name);
+        if (!optionalUser.isPresent()) {
+            return Service.START_NOT_STICKY;
+        }
+        final User user = optionalUser.get();
 
         boolean retry = intent.getBooleanExtra(KEY_RETRY, false);
         List<String> requestedUploads = new ArrayList<>();
@@ -308,7 +315,7 @@ public class FileUploader extends Service
                 return Service.START_NOT_STICKY;
             }
 
-            Integer error = gatherAndStartNewUploads(intent, account, requestedUploads, onWifiOnly, whileChargingOnly);
+            Integer error = gatherAndStartNewUploads(intent, user, requestedUploads, onWifiOnly, whileChargingOnly);
             if (error != null) {
                 return error;
             }
@@ -317,7 +324,7 @@ public class FileUploader extends Service
                 Log_OC.e(TAG, "Not enough information provided in intent: no KEY_RETRY_UPLOAD_KEY");
                 return START_NOT_STICKY;
             }
-            retryUploads(intent, account, requestedUploads);
+            retryUploads(intent, user, requestedUploads);
         }
 
         if (requestedUploads.size() > 0) {
@@ -338,7 +345,7 @@ public class FileUploader extends Service
     @Nullable
     private Integer gatherAndStartNewUploads(
         Intent intent,
-        Account account,
+        User user,
         List<String> requestedUploads,
         boolean onWifiOnly,
         boolean whileChargingOnly
@@ -401,7 +408,7 @@ public class FileUploader extends Service
         try {
             for (OCFile file : files) {
                 startNewUpload(
-                    account,
+                    user,
                     requestedUploads,
                     onWifiOnly,
                     whileChargingOnly,
@@ -429,7 +436,7 @@ public class FileUploader extends Service
      * Start a new {@link UploadFileOperation}.
      */
     private void startNewUpload(
-        Account account,
+        User user,
         List<String> requestedUploads,
         boolean onWifiOnly,
         boolean whileChargingOnly,
@@ -439,7 +446,7 @@ public class FileUploader extends Service
         int createdBy,
         OCFile file
     ) {
-        OCUpload ocUpload = new OCUpload(file, account);
+        OCUpload ocUpload = new OCUpload(file, user.toPlatformAccount());
         ocUpload.setFileSize(file.getFileLength());
         ocUpload.setNameCollisionPolicy(nameCollisionPolicy);
         ocUpload.setCreateRemoteFolder(isCreateRemoteFolder);
@@ -453,7 +460,7 @@ public class FileUploader extends Service
             mUploadsStorageManager,
             connectivityService,
             powerManagementService,
-            account,
+            user,
             file,
             ocUpload,
             nameCollisionPolicy,
@@ -472,7 +479,7 @@ public class FileUploader extends Service
         newUpload.addRenameUploadListener(this);
 
         Pair<String, String> putResult = mPendingUploads.putIfAbsent(
-            account.name,
+            user.getAccountName(),
             file.getRemotePath(),
             newUpload
         );
@@ -489,7 +496,7 @@ public class FileUploader extends Service
     /**
      * Retries a list of uploads.
      */
-    private void retryUploads(Intent intent, Account account, List<String> requestedUploads) {
+    private void retryUploads(Intent intent, User user, List<String> requestedUploads) {
         boolean onWifiOnly;
         boolean whileChargingOnly;
         OCUpload upload = intent.getParcelableExtra(KEY_RETRY_UPLOAD);
@@ -501,7 +508,7 @@ public class FileUploader extends Service
             mUploadsStorageManager,
             connectivityService,
             powerManagementService,
-            account,
+            user,
             null,
             upload,
             upload.getNameCollisionPolicy(),
@@ -517,7 +524,7 @@ public class FileUploader extends Service
         newUpload.addRenameUploadListener(this);
 
         Pair<String, String> putResult = mPendingUploads.putIfAbsent(
-            account.name,
+            user.getAccountName(),
             upload.getRemotePath(),
             newUpload
         );
@@ -1184,15 +1191,15 @@ public class FileUploader extends Service
          * Warning: If remote file exists and target was renamed the original file is being returned here. That is, it
          * seems as if the original file is being updated when actually a new file is being uploaded.
          *
-         * @param account Owncloud account where the remote file will be stored.
+         * @param user    user where the remote file will be stored.
          * @param file    A file that could be in the queue of pending uploads
          */
-        public boolean isUploading(Account account, OCFile file) {
-            if (account == null || file == null) {
+        public boolean isUploading(User user, OCFile file) {
+            if (user == null || file == null) {
                 return false;
             }
 
-            return mPendingUploads.contains(account.name, file.getRemotePath());
+            return mPendingUploads.contains(user.getAccountName(), file.getRemotePath());
         }
 
         public boolean isUploadingNow(OCUpload upload) {
@@ -1207,19 +1214,19 @@ public class FileUploader extends Service
          * Adds a listener interested in the progress of the upload for a concrete file.
          *
          * @param listener Object to notify about progress of transfer.
-         * @param account  ownCloud account holding the file of interest.
+         * @param user  user owning the file of interest.
          * @param file     {@link OCFile} of interest for listener.
          */
         public void addDatatransferProgressListener(
             OnDatatransferProgressListener listener,
-            Account account,
+            User user,
             OCFile file
         ) {
-            if (account == null || file == null || listener == null) {
+            if (user == null || file == null || listener == null) {
                 return;
             }
 
-            String targetKey = buildRemoteName(account.name, file.getRemotePath());
+            String targetKey = buildRemoteName(user.getAccountName(), file.getRemotePath());
             mBoundListeners.put(targetKey, listener);
         }
 
@@ -1245,19 +1252,19 @@ public class FileUploader extends Service
          * Removes a listener interested in the progress of the upload for a concrete file.
          *
          * @param listener Object to notify about progress of transfer.
-         * @param account  ownCloud account holding the file of interest.
-         * @param file     {@link OCFile} of interest for listener.
+         * @param user user owning the file of interest.
+         * @param file {@link OCFile} of interest for listener.
          */
         public void removeDatatransferProgressListener(
             OnDatatransferProgressListener listener,
-            Account account,
+            User user,
             OCFile file
         ) {
-            if (account == null || file == null || listener == null) {
+            if (user == null || file == null || listener == null) {
                 return;
             }
 
-            String targetKey = buildRemoteName(account.name, file.getRemotePath());
+            String targetKey = buildRemoteName(user.getAccountName(), file.getRemotePath());
             if (mBoundListeners.get(targetKey) == listener) {
                 mBoundListeners.remove(targetKey);
             }

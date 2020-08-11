@@ -59,17 +59,12 @@
     <string name="prefs_value_theme_system">Follow system</string>
     <string name="prefs_theme_title">Theme</string>
 
-
     <string name="recommend_subject">Try %1$s on your device!</string>
     <string name="recommend_text">I want to invite you to use %1$s on your device.\nDownload here: %2$s</string>
     <string name="recommend_urls">%1$s or %2$s</string>
 
-    <string name="auth_check_server">Check server</string>
     <string name="auth_host_url">Server address https://…</string>
-    <string name="auth_username">Username</string>
-    <string name="auth_password">Password</string>
     <string name="sync_string_files">Files</string>
-    <string name="setup_btn_connect">Connect</string>
     <string name="uploader_btn_upload_text">Upload</string>
     <string name="uploader_btn_alternative_text">Choose</string>
     <string name="uploader_top_message">Choose upload folder</string>
@@ -255,14 +250,10 @@
     <string name="auth_unauthorized">Wrong username or password</string>
     <string name="auth_oauth_error">Unsuccessful authorization</string>
     <string name="auth_oauth_error_access_denied">Access denied by authorization server</string>
-    <string name="auth_wtf_reenter_URL">Unexpected state, please enter the server address again.</string>
-    <string name="auth_expired_basic_auth_toast">Please enter the current password</string>
     <string name="auth_unsupported_multiaccount">%1$s does not support multiple accounts</string>
     <string name="auth_fail_get_user_name">Your server is not returning a correct user ID, please contact an admin.</string>
-    <string name="auth_can_not_auth_against_server">Cannot authenticate to this server</string>
     <string name="auth_account_does_not_exist">The account is not added on this device yet</string>
     <string name="auth_access_failed">Access failed: %1$s</string>
-    <string name="auth_illegal_login_used">Illegal login data URL used</string>
 
     <string name="favorite">Add to favorites</string>
     <string name="unset_favorite">Remove from favourites</string>
@@ -283,6 +274,7 @@
     <string name="filename_forbidden_characters">Forbidden characters: / \\ &lt; &gt; : " | ? *</string>
     <string name="filename_forbidden_charaters_from_server">Filename contains at least one invalid character</string>
     <string name="filename_empty">Filename cannot be empty</string>
+    <string name="label_empty">Label cannot be empty</string>
     <string name="wait_a_moment">Wait a moment…</string>
     <string name="wait_checking_credentials">Checking stored credentials</string>
     <string name="filedisplay_no_file_selected">No file selected</string>
@@ -408,8 +400,6 @@
     <string name="log_send_no_mail_app">No app for sending logs found. Please install an e-mail client.</string>
     <string name="log_send_mail_subject">%1$s Android app logs</string>
 
-    <string name="saml_authentication_required_text">Password required</string>
-    <string name="saml_authentication_wrong_pass">Wrong password</string>
     <string name="actionbar_move">Move</string>
     <string name="actionbar_copy">Copy</string>
     <string name="file_list_empty_moving">Nothing in here. You can add a folder.</string>
@@ -435,7 +425,6 @@
     <string name="subject_user_shared_with_you">%1$s shared \"%2$s\" with you</string>
     <string name="subject_shared_with_you">\"%1$s\" has been shared with you</string>
 
-    <string name="auth_refresh_button">Refresh connection</string>
     <string name="auth_host_address">Server address</string>
     <string name="common_error_out_memory">Not enough memory</string>
 
@@ -471,13 +460,6 @@
 
     <string name="share_dialog_title">Sharing</string>
     <string name="share_file">Share %1$s</string>
-    <string name="share_with_user_section_title">Share with users and groups</string>
-    <string name="share_no_users">No data shared with users yet</string>
-    <string name="share_add_user_or_group">Add user or group</string>
-    <string name="share_via_link_edit_permission_label">Allow editing</string>
-    <string name="share_via_link_password_label">Protect with password</string>
-    <string name="share_via_link_password_title">Secured</string>
-    <string name="share_via_link_expiration_date_label">Set expiration date</string>
     <string name="share_via_link_menu_password_label">Password protect (%1$s)</string>
     <string name="share_expiration_date_label">Expires %1$s</string>
     <string name="share_no_expiration_date_label">Set expiration date</string>
@@ -487,14 +469,11 @@
     <string name="share_no_password_title">Set password</string>
     <string name="edit_permission_label">edit</string>
     <string name="share_via_link_hide_file_listing_permission_label">Hide file listing</string>
-    <string name="share_get_public_link_button">Get link</string>
     <string name="share_with_title">Share with…</string>
-    <string name="share_with_edit_title">Share with %1$s</string>
     <string name="share_via_link_unset_password">Unset</string>
 
     <string name="share_search">Name, federated cloud ID or email address…</string>
 
-    <string name="search_users_and_groups_hint">Search users and groups</string>
     <string name="share_group_clarification">%1$s (group)</string>
     <string name="share_remote_clarification">%1$s (remote)</string>
     <string name="share_email_clarification">%1$s (email)</string>
@@ -503,7 +482,6 @@
 
     <string name="share_privilege_unshare">Unshare</string>
     <string name="share_privilege_can_share">can share</string>
-    <string name="share_privilege_can_edit">can edit</string>
     <string name="share_privilege_can_edit_create">can create</string>
     <string name="share_privilege_can_edit_change">can change</string>
     <string name="share_privilege_can_edit_delete">can delete</string>
@@ -526,8 +504,6 @@
 
     <string name="uploads_view_upload_status_waiting_for_charging">Awaiting charge</string>
     <string name="actionbar_search">Search</string>
-    <string name="files_drop_not_supported">This is a Nextcloud feature, please upgrade.</string>
-    <string name="learn_more">Learn more</string>
     <string name="drawer_synced_folders">Auto upload</string>
     <string name="drawer_community">Community</string>
     <string name="community_testing_headline">Help by testing</string>
@@ -557,6 +533,7 @@
     <string name="copy_to">Copy to…</string>
     <string name="choose_remote_folder">Choose remote folder…</string>
     <string name="choose_local_folder">Choose local folder…</string>
+    <string name="local_folder_friendly_path">%1$s/%2$s</string>
     <string name="synced_folders_loading_folders">Loading folders…</string>
     <string name="synced_folders_no_results">No media folders found</string>
     <plurals name="synced_folders_show_hidden_folders">
@@ -607,7 +584,7 @@
 
     <!-- Activities -->
     <string name="activities_no_results_headline">No activity yet</string>
-    <string name="activities_no_results_message">No events like additions, changes and shares yet</string>
+    <string name="activities_no_results_message">No events like additions, changes and shares yet.</string>
     <string name="prefs_category_about">About</string>
 
     <string name="actionbar_contacts">Back up contacts</string>
@@ -643,8 +620,6 @@
     <string name="test_server_button">Test server connection</string>
     <string name="info_separator" translatable="false">&#160;&#x2022;</string>
     <string name="resharing_is_not_allowed">Resharing is not allowed</string>
-    <string name="fallback_weblogin_back">Back</string>
-    <string name="fallback_weblogin_text">Revert to old login method</string>
 
     <string name="foreground_service_upload">Uploading files…</string>
     <string name="foreground_service_download">Downloading files…</string>
@@ -659,7 +634,6 @@
     <string name="sync_in_progress">Fetching most recent version of the file.</string>
     <string name="date_unknown">Unknown</string>
 
-    <string name="resized_image_not_possible">No resized image available.</string>
     <string name="resized_image_not_possible_download">No resized image available. Download full image?</string>
 
     <string name="store_short_desc">The self-hosted productivity platform that keeps you in control</string>
@@ -695,7 +669,6 @@
     <string name="prefs_category_dev">Dev</string>
     <string name="dev_version_no_information_available">No info available.</string>
     <string name="dev_version_no_new_version_available">No new version available.</string>
-    <string name="folder_icon">Folder icon</string>
     <string name="dev_version_new_version_available">New version available</string>
     <string name="version_dev_download">Download</string>
 
@@ -899,6 +872,13 @@
     <string name="etm_background_job_started">Started</string>
     <string name="etm_background_job_progress">Progress</string>
     <string name="etm_migrations">Migrations (app upgrade)</string>
+    <string name="etm_downloader">Downloader</string>
+    <string name="etm_download_path">Remote path</string>
+    <string name="etm_download_enqueue_test_download">Enqueue test download</string>
+    <string name="etm_download_uuid" translatable="false">@string/etm_background_job_uuid</string>
+    <string name="etm_download_user" translatable="false">@string/etm_background_job_user</string>
+    <string name="etm_download_state" translatable="false">@string/etm_background_job_state</string>
+    <string name="etm_download_progress" translatable="false">@string/etm_background_job_progress</string>
 
     <string name="logs_status_loading">Loading…</string>
     <string name="logs_status_filtered">Logs: %1$d kB, query matched %2$d / %3$d in %4$d ms</string>
@@ -942,4 +922,12 @@
     <string name="thumbnail_for_existing_file_description">Thumbnail for existing file</string>
     <string name="invalid_url">Invalid URL</string>
     <string name="conflict_dialog_error">Error creating conflict dialog!</string>
+    <string name="qr_could_not_be_read">QR Code could not be read!</string>
+    <string name="note_icon_hint">Note icon</string>
+    <string name="add_another_public_share_link">Add another link</string>
+    <string name="unshare">Unshare</string>
+    <string name="allow_editing">Allow editing</string>
+    <string name="add_new_public_share">Add new public share link</string>
+    <string name="edit_label">Change name</string>
+    <string name="public_share_name">New name</string>
 </resources>

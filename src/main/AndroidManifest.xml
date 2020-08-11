@@ -121,14 +121,13 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="http"
-                    android:host="*"
-                    android:pathPattern="/.*index.php/f/.*"
-                    />
-                <data android:scheme="https"
-                      android:host="*"
-                      android:pathPattern="/.*index.php/f/.*"
-                    />
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+                <data android:host="*" />
+                <data android:pathPattern="/f/..*" />
+                <data android:pathPattern="/..*/f/..*" />
+                <data android:pathPattern="/..*/..*/f/..*" />
+                <data android:pathPattern="/..*/..*/..*/f/..*" />
             </intent-filter>
             <meta-data android:name="android.app.searchable"
                 android:resource="@xml/users_and_groups_searchable"/>
@@ -251,7 +250,7 @@
             android:authorities="@string/users_and_groups_search_authority"
             android:enabled="true"
             android:exported="false"
-            android:label="@string/search_users_and_groups_hint" />
+            android:label="@string/share_search" />
 
         <provider
             android:name=".providers.DocumentsStorageProvider"
@@ -326,6 +325,7 @@
 
         <service android:name=".services.OperationsService" />
         <service android:name=".files.services.FileDownloader" />
+        <service android:name="com.nextcloud.client.files.downloader.DownloaderService" />
         <service android:name=".files.services.FileUploader" />
         <service android:name="com.nextcloud.client.media.PlayerService"/>
 

@@ -226,8 +226,7 @@ public class SyncedFoldersActivity extends FileActivity implements SyncedFolderA
         AlertDialog alertDialog = new AlertDialog.Builder(this)
             .setView(findViewById(R.id.root_layout))
             .setPositiveButton(R.string.common_ok, (dialog, which) -> dialog.dismiss())
-            .setTitle(ThemeUtils.getColoredTitle(getResources().getString(R.string.autoupload_disable_power_save_check),
-                                                 ThemeUtils.primaryAccentColor(this)))
+            .setTitle(R.string.autoupload_disable_power_save_check)
             .setMessage(getString(R.string.power_save_check_dialog_message))
             .show();
 
@@ -243,8 +242,7 @@ public class SyncedFoldersActivity extends FileActivity implements SyncedFolderA
         adapter = new SyncedFolderAdapter(this, clock, gridWidth, this, lightVersion);
         syncedFolderProvider = new SyncedFolderProvider(getContentResolver(), preferences, clock);
         emptyContentIcon.setImageResource(R.drawable.nav_synced_folders);
-        emptyContentActionButton.setBackgroundColor(ThemeUtils.primaryColor(this));
-        emptyContentActionButton.setTextColor(ThemeUtils.fontColor(this));
+        ThemeUtils.colorPrimaryButton(emptyContentActionButton, this);
 
         final GridLayoutManager lm = new GridLayoutManager(this, gridWidth);
         adapter.setLayoutManager(lm);

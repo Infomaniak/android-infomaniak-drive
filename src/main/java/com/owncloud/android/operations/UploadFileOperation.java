@@ -30,6 +30,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
 
+import com.nextcloud.client.account.User;
 import com.nextcloud.client.device.BatteryStatus;
 import com.nextcloud.client.device.PowerManagementService;
 import com.nextcloud.client.network.Connectivity;
@@ -139,7 +140,7 @@ public class UploadFileOperation extends SyncOperation {
 
     private RequestEntity mEntity;
 
-    private final Account mAccount;
+    private final User user;
     private final OCUpload mUpload;
     private final UploadsStorageManager uploadsStorageManager;
     private final ConnectivityService connectivityService;
@@ -176,7 +177,7 @@ public class UploadFileOperation extends SyncOperation {
     public UploadFileOperation(UploadsStorageManager uploadsStorageManager,
                                ConnectivityService connectivityService,
                                PowerManagementService powerManagementService,
-                               Account account,
+                               User user,
                                OCFile file,
                                OCUpload upload,
                                FileUploader.NameCollisionPolicy nameCollisionPolicy,
@@ -185,9 +186,6 @@ public class UploadFileOperation extends SyncOperation {
                                boolean onWifiOnly,
                                boolean whileChargingOnly
     ) {
-        if (account == null) {
-            throw new IllegalArgumentException("Illegal NULL account in UploadFileOperation " + "creation");
-        }
         if (upload == null) {
             throw new IllegalArgumentException("Illegal NULL file in UploadFileOperation creation");
         }
@@ -200,7 +198,7 @@ public class UploadFileOperation extends SyncOperation {
         this.uploadsStorageManager = uploadsStorageManager;
         this.connectivityService = connectivityService;
         this.powerManagementService = powerManagementService;
-        mAccount = account;
+        this.user = user;
         mUpload = upload;
         if (file == null) {
             mFile = obtainNewOCFileToUpload(
@@ -237,7 +235,7 @@ public class UploadFileOperation extends SyncOperation {
     public boolean isIgnoringPowerSaveMode() { return mIgnoringPowerSaveMode; }
 
     public Account getAccount() {
-        return mAccount;
+        return user.toPlatformAccount();
     }
 
     public String getFileName() {
@@ -477,7 +475,8 @@ public class UploadFileOperation extends SyncOperation {
                 return collisionResult;
             }
 
-            String expectedPath = FileStorageUtils.getDefaultSavePathFor(mAccount.name, mFile);
+            mFile.setDecryptedRemotePath(parentFile.getDecryptedRemotePath() + originalFile.getName());
+            String expectedPath = FileStorageUtils.getDefaultSavePathFor(user.getAccountName(), mFile);
             expectedFile = new File(expectedPath);
 
             result = copyFile(originalFile, expectedPath);
@@ -520,7 +519,7 @@ public class UploadFileOperation extends SyncOperation {
             } catch (FileNotFoundException e) {
                 // this basically means that the file is on SD card
                 // try to copy file to temporary dir if it doesn't exist
-                String temporalPath = FileStorageUtils.getInternalTemporalPath(mAccount.name, mContext) +
+                String temporalPath = FileStorageUtils.getInternalTemporalPath(user.getAccountName(), mContext) +
                     mFile.getRemotePath();
                 mFile.setStoragePath(temporalPath);
                 temporalFile = new File(temporalPath);
@@ -606,7 +605,7 @@ public class UploadFileOperation extends SyncOperation {
                 metadata.getFiles().put(encryptedFileName, decryptedFile);
 
                 EncryptedFolderMetadata encryptedFolderMetadata = EncryptionUtils.encryptFolderMetadata(metadata,
-                        privateKey);
+                                                                                                        privateKey);
                 String serializedFolderMetadata = EncryptionUtils.serializeJSON(encryptedFolderMetadata);
 
                 // upload metadata
@@ -615,6 +614,13 @@ public class UploadFileOperation extends SyncOperation {
                                                token,
                                                client,
                                                metadataExists);
+
+                // unlock
+                result = EncryptionUtils.unlockFolder(parentFile, client, token);
+
+                if (result.isSuccess()) {
+                    token = null;
+                }
             }
         } catch (FileNotFoundException e) {
             Log_OC.d(TAG, mFile.getStoragePath() + " not exists anymore");
@@ -652,13 +658,14 @@ public class UploadFileOperation extends SyncOperation {
         }
 
         // unlock must be done always
-        // TODO check if in good state
-        RemoteOperationResult unlockFolderResult = EncryptionUtils.unlockFolder(parentFile,
-                                                                                client,
-                                                                                token);
+        if (token != null) {
+            RemoteOperationResult unlockFolderResult = EncryptionUtils.unlockFolder(parentFile,
+                                                                                    client,
+                                                                                    token);
 
-        if (!unlockFolderResult.isSuccess()) {
-            return unlockFolderResult;
+            if (!unlockFolderResult.isSuccess()) {
+                return unlockFolderResult;
+            }
         }
 
         // delete temporal file
@@ -729,7 +736,7 @@ public class UploadFileOperation extends SyncOperation {
                 return collisionResult;
             }
 
-            String expectedPath = FileStorageUtils.getDefaultSavePathFor(mAccount.name, mFile);
+            String expectedPath = FileStorageUtils.getDefaultSavePathFor(user.getAccountName(), mFile);
             expectedFile = new File(expectedPath);
 
             result = copyFile(originalFile, expectedPath);
@@ -748,7 +755,7 @@ public class UploadFileOperation extends SyncOperation {
             } catch (FileNotFoundException e) {
                 // this basically means that the file is on SD card
                 // try to copy file to temporary dir if it doesn't exist
-                String temporalPath = FileStorageUtils.getInternalTemporalPath(mAccount.name, mContext) +
+                String temporalPath = FileStorageUtils.getInternalTemporalPath(user.getAccountName(), mContext) +
                     mFile.getRemotePath();
                 mFile.setStoragePath(temporalPath);
                 temporalFile = new File(temporalPath);
@@ -788,10 +795,14 @@ public class UploadFileOperation extends SyncOperation {
                                                                         mFile.getRemotePath(),
                                                                         mFile.getMimeType(),
                                                                         mFile.getEtagInConflict(),
-                                                                        timeStamp, onWifiConnection);
+                                                                        timeStamp,
+                                                                        onWifiConnection);
             } else {
                 mUploadOperation = new UploadFileRemoteOperation(mFile.getStoragePath(),
-                                                                 mFile.getRemotePath(), mFile.getMimeType(), mFile.getEtagInConflict(), timeStamp);
+                                                                 mFile.getRemotePath(),
+                                                                 mFile.getMimeType(),
+                                                                 mFile.getEtagInConflict(),
+                                                                 timeStamp);
             }
 
             for (OnDatatransferProgressListener mDataTransferListener : mDataTransferListeners) {
@@ -876,7 +887,7 @@ public class UploadFileOperation extends SyncOperation {
     private RemoteOperationResult copyFile(File originalFile, String expectedPath) throws OperationCancelledException,
             IOException {
         if (mLocalBehaviour == FileUploader.LOCAL_BEHAVIOUR_COPY && !mOriginalStoragePath.equals(expectedPath)) {
-            String temporalPath = FileStorageUtils.getInternalTemporalPath(mAccount.name, mContext) +
+            String temporalPath = FileStorageUtils.getInternalTemporalPath(user.getAccountName(), mContext) +
                 mFile.getRemotePath();
             mFile.setStoragePath(temporalPath);
             File temporalFile = new File(temporalPath);
@@ -926,7 +937,9 @@ public class UploadFileOperation extends SyncOperation {
         return null;
     }
 
-    private void handleSuccessfulUpload(File temporalFile, File expectedFile, File originalFile,
+    private void handleSuccessfulUpload(File temporalFile,
+                                        File expectedFile,
+                                        File originalFile,
                                         OwnCloudClient client) {
         switch (mLocalBehaviour) {
             case FileUploader.LOCAL_BEHAVIOUR_FORGET:
@@ -949,6 +962,12 @@ public class UploadFileOperation extends SyncOperation {
                     } catch (IOException e) {
                         Log_OC.e(TAG, e.getMessage());
                     }
+                } else if (originalFile != null) {
+                    try {
+                        copy(originalFile, expectedFile);
+                    } catch (IOException e) {
+                        Log_OC.e(TAG, e.getMessage());
+                    }
                 }
                 mFile.setStoragePath(expectedFile.getAbsolutePath());
                 saveUploadedFile(client);
@@ -958,7 +977,7 @@ public class UploadFileOperation extends SyncOperation {
                 break;
 
             case FileUploader.LOCAL_BEHAVIOUR_MOVE:
-                String expectedPath = FileStorageUtils.getDefaultSavePathFor(mAccount.name, mFile);
+                String expectedPath = FileStorageUtils.getDefaultSavePathFor(user.getAccountName(), mFile);
                 File newFile = new File(expectedPath);
 
                 try {
@@ -991,7 +1010,7 @@ public class UploadFileOperation extends SyncOperation {
         RemoteOperation operation = new ExistenceCheckRemoteOperation(pathToGrant, false);
         RemoteOperationResult result = operation.execute(client);
         if (!result.isSuccess() && result.getCode() == ResultCode.FILE_NOT_FOUND && mRemoteFolderToBeCreated) {
-            SyncOperation syncOp = new CreateFolderOperation(pathToGrant, getAccount(), getContext());
+            SyncOperation syncOp = new CreateFolderOperation(pathToGrant, user, getContext());
             result = syncOp.execute(client, getStorageManager());
         }
         if (result.isSuccess()) {
@@ -1310,7 +1329,7 @@ public class UploadFileOperation extends SyncOperation {
 
         // generate new Thumbnail
         final ThumbnailsCacheManager.ThumbnailGenerationTask task =
-                new ThumbnailsCacheManager.ThumbnailGenerationTask(getStorageManager(), mAccount);
+                new ThumbnailsCacheManager.ThumbnailGenerationTask(getStorageManager(), user.toPlatformAccount());
         task.execute(new ThumbnailsCacheManager.ThumbnailGenerationTaskObject(file, file.getRemoteId()));
     }
 

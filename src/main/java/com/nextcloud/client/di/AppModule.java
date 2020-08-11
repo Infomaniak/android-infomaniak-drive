@@ -26,6 +26,7 @@ import android.app.NotificationManager;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.media.AudioManager;
 import android.os.Handler;
@@ -48,6 +49,8 @@ import com.nextcloud.client.migrations.MigrationsDb;
 import com.nextcloud.client.migrations.MigrationsManager;
 import com.nextcloud.client.migrations.MigrationsManagerImpl;
 import com.nextcloud.client.network.ClientFactory;
+import com.nextcloud.client.notifications.AppNotificationManager;
+import com.nextcloud.client.notifications.AppNotificationManagerImpl;
 import com.owncloud.android.datamodel.ArbitraryDataProvider;
 import com.owncloud.android.datamodel.UploadsStorageManager;
 import com.owncloud.android.ui.activities.data.activities.ActivitiesRepository;
@@ -62,6 +65,7 @@ import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -78,6 +82,11 @@ class AppModule {
     @Provides
     Context context(Application application) {
         return application;
+    }
+
+    @Provides
+    PackageManager packageManager(Application application) {
+        return application.getPackageManager();
     }
 
     @Provides
@@ -158,9 +167,17 @@ class AppModule {
 
     @Provides
     @Singleton
-    AsyncRunner asyncRunner() {
+    AsyncRunner uiAsyncRunner() {
         Handler uiHandler = new Handler();
-        return new ThreadPoolAsyncRunner(uiHandler, 4);
+        return new ThreadPoolAsyncRunner(uiHandler, 4, "ui");
+    }
+
+    @Provides
+    @Singleton
+    @Named("io")
+    AsyncRunner ioAsyncRunner() {
+        Handler uiHandler = new Handler();
+        return new ThreadPoolAsyncRunner(uiHandler, 8, "io");
     }
 
     @Provides
@@ -193,5 +210,11 @@ class AppModule {
                                         AsyncRunner asyncRunner,
                                         Migrations migrations) {
         return new MigrationsManagerImpl(appInfo, migrationsDb, asyncRunner, migrations.getSteps());
+    }
+
+    @Provides
+    @Singleton
+    AppNotificationManager notificationsManager(Context context, NotificationManager platformNotificationsManager) {
+        return new AppNotificationManagerImpl(context, context.getResources(), platformNotificationsManager);
     }
 }

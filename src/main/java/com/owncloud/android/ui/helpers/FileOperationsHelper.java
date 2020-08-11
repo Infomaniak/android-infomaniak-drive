@@ -69,6 +69,7 @@ import com.owncloud.android.services.OperationsService;
 import com.owncloud.android.ui.activity.ConflictsResolveActivity;
 import com.owncloud.android.ui.activity.ExternalSiteWebView;
 import com.owncloud.android.ui.activity.FileActivity;
+import com.owncloud.android.ui.activity.FileDisplayActivity;
 import com.owncloud.android.ui.activity.RichDocumentsEditorWebView;
 import com.owncloud.android.ui.activity.ShareActivity;
 import com.owncloud.android.ui.activity.TextEditorWebView;
@@ -117,6 +118,7 @@ public class FileOperationsHelper {
     private static final String FILE_EXTENSION_URL = "url";
     private static final String FILE_EXTENSION_DESKTOP = "desktop";
     private static final String FILE_EXTENSION_WEBLOC = "webloc";
+    public static final int SINGLE_LINK_SIZE = 1;
 
     private FileActivity fileActivity;
     private CurrentAccountProvider currentAccount;
@@ -458,7 +460,7 @@ public class FileOperationsHelper {
      * @param file     The file to share.
      * @param password Optional password to protect the public share.
      */
-    public void shareFileViaLink(OCFile file, String password) {
+    public void shareFileViaPublicShare(OCFile file, String password) {
         if (file != null) {
             fileActivity.showLoadingDialog(fileActivity.getString(R.string.wait_a_moment));
             Intent service = new Intent(fileActivity, OperationsService.class);
@@ -476,19 +478,19 @@ public class FileOperationsHelper {
         }
     }
 
-    public void getFileWithLink(OCFile file) {
-        if (file != null) {
-            fileActivity.showLoadingDialog(fileActivity.getApplicationContext().
-                    getString(R.string.wait_a_moment));
+    public void getFileWithLink(@NonNull OCFile file) {
+        List<OCShare> shares = fileActivity.getStorageManager().getSharesByPathAndType(file.getRemotePath(),
+                                                                                       ShareType.PUBLIC_LINK,
+                                                                                       "");
 
-            Intent service = new Intent(fileActivity, OperationsService.class);
-            service.setAction(OperationsService.ACTION_CREATE_SHARE_VIA_LINK);
-            service.putExtra(OperationsService.EXTRA_ACCOUNT, fileActivity.getAccount());
-            service.putExtra(OperationsService.EXTRA_REMOTE_PATH, file.getRemotePath());
-            mWaitingForOpId = fileActivity.getOperationsServiceBinder().queueNewOperation(service);
-
+        if (shares.size() == SINGLE_LINK_SIZE) {
+            FileActivity.copyAndShareFileLink(fileActivity, file, shares.get(0).getShareLink());
         } else {
-            Log_OC.e(TAG, "Trying to share a NULL OCFile");
+            if (fileActivity instanceof FileDisplayActivity) {
+                ((FileDisplayActivity) fileActivity).showDetails(file, 1);
+            } else {
+                showShareFile(file);
+            }
         }
     }
 
@@ -541,33 +543,18 @@ public class FileOperationsHelper {
     }
 
     /**
-     * Helper method to unshare a file publicly shared via link.
-     * Starts a request to do it in {@link OperationsService}
+     * Helper method to unshare a file publicly shared via link. Starts a request to do it in {@link OperationsService}
      *
      * @param file The file to unshare.
      */
-    public void unshareFileViaLink(OCFile file) {
+    public void unshareShare(OCFile file, OCShare share) {
 
         // Unshare the file: Create the intent
         Intent unshareService = new Intent(fileActivity, OperationsService.class);
         unshareService.setAction(OperationsService.ACTION_UNSHARE);
         unshareService.putExtra(OperationsService.EXTRA_ACCOUNT, fileActivity.getAccount());
         unshareService.putExtra(OperationsService.EXTRA_REMOTE_PATH, file.getRemotePath());
-        unshareService.putExtra(OperationsService.EXTRA_SHARE_TYPE, ShareType.PUBLIC_LINK);
-        unshareService.putExtra(OperationsService.EXTRA_SHARE_WITH, "");
-
-        queueShareIntent(unshareService);
-    }
-
-    public void unshareFileWithUserOrGroup(OCFile file, ShareType shareType, String userOrGroup) {
-
-        // Unshare the file: Create the intent
-        Intent unshareService = new Intent(fileActivity, OperationsService.class);
-        unshareService.setAction(OperationsService.ACTION_UNSHARE);
-        unshareService.putExtra(OperationsService.EXTRA_ACCOUNT, fileActivity.getAccount());
-        unshareService.putExtra(OperationsService.EXTRA_REMOTE_PATH, file.getRemotePath());
-        unshareService.putExtra(OperationsService.EXTRA_SHARE_TYPE, shareType);
-        unshareService.putExtra(OperationsService.EXTRA_SHARE_WITH, userOrGroup);
+        unshareService.putExtra(OperationsService.EXTRA_SHARE_ID, share.getId());
 
         queueShareIntent(unshareService);
     }
@@ -593,20 +580,33 @@ public class FileOperationsHelper {
 
 
     /**
-     * Updates a public share on a file to set its password.
-     * Starts a request to do it in {@link OperationsService}
+     * Updates a public share on a file to set its password. Starts a request to do it in {@link OperationsService}
      *
-     * @param file     File which public share will be protected with a password.
-     * @param password Password to set for the public link; null or empty string to clear
-     *                 the current password
+     * @param password Password to set for the public link; null or empty string to clear the current password
      */
-    public void setPasswordToShareViaLink(OCFile file, String password) {
+    public void setPasswordToPublicShare(OCShare share, String password) {
         // Set password updating share
         Intent updateShareIntent = new Intent(fileActivity, OperationsService.class);
-        updateShareIntent.setAction(OperationsService.ACTION_UPDATE_SHARE);
+        updateShareIntent.setAction(OperationsService.ACTION_UPDATE_PUBLIC_SHARE);
         updateShareIntent.putExtra(OperationsService.EXTRA_ACCOUNT, fileActivity.getAccount());
-        updateShareIntent.putExtra(OperationsService.EXTRA_REMOTE_PATH, file.getRemotePath());
+        updateShareIntent.putExtra(OperationsService.EXTRA_SHARE_ID, share.getId());
         updateShareIntent.putExtra(OperationsService.EXTRA_SHARE_PASSWORD, (password == null) ? "" : password);
+
+        queueShareIntent(updateShareIntent);
+    }
+
+    /**
+     * Updates a public share on a file to set its label. Starts a request to do it in {@link OperationsService}
+     *
+     * @param label new label
+     */
+    public void setLabelToPublicShare(OCShare share, String label) {
+        // Set password updating share
+        Intent updateShareIntent = new Intent(fileActivity, OperationsService.class);
+        updateShareIntent.setAction(OperationsService.ACTION_UPDATE_PUBLIC_SHARE);
+        updateShareIntent.putExtra(OperationsService.EXTRA_ACCOUNT, fileActivity.getAccount());
+        updateShareIntent.putExtra(OperationsService.EXTRA_SHARE_ID, share.getId());
+        updateShareIntent.putExtra(OperationsService.EXTRA_SHARE_PUBLIC_LABEL, (label == null) ? "" : label);
 
         queueShareIntent(updateShareIntent);
     }
@@ -621,30 +621,31 @@ public class FileOperationsHelper {
      */
     public void setPasswordToShare(OCShare share, String password) {
         Intent updateShareIntent = new Intent(fileActivity, OperationsService.class);
-        updateShareIntent.setAction(OperationsService.ACTION_UPDATE_SHARE);
+        if (TextUtils.isEmpty(share.getShareLink())) {
+            updateShareIntent.setAction(OperationsService.ACTION_UPDATE_USER_SHARE);
+        } else {
+            updateShareIntent.setAction(OperationsService.ACTION_UPDATE_PUBLIC_SHARE);
+        }
         updateShareIntent.putExtra(OperationsService.EXTRA_ACCOUNT, fileActivity.getAccount());
         updateShareIntent.putExtra(OperationsService.EXTRA_SHARE_ID, share.getId());
-        updateShareIntent.putExtra(
-                OperationsService.EXTRA_SHARE_PASSWORD,
-                (password == null) ? "" : password
-        );
+        updateShareIntent.putExtra(OperationsService.EXTRA_SHARE_PASSWORD, (password == null) ? "" : password);
         queueShareIntent(updateShareIntent);
     }
 
 
     /**
-     * Updates a public share on a file to set its expiration date.
-     * Starts a request to do it in {@link OperationsService}
+     * Updates a public share on a file to set its expiration date. Starts a request to do it in {@link
+     * OperationsService}
      *
-     * @param file                   File which public share will be constrained with an expiration date.
-     * @param expirationTimeInMillis Expiration date to set. A negative value clears the current expiration
-     *                               date, leaving the link unrestricted. Zero makes no change.
+     * @param share                  {@link OCShare} instance which permissions will be updated.
+     * @param expirationTimeInMillis Expiration date to set. A negative value clears the current expiration date,
+     *                               leaving the link unrestricted. Zero makes no change.
      */
-    public void setExpirationDateToShareViaLink(OCFile file, long expirationTimeInMillis) {
+    public void setExpirationDateToPublicShare(OCShare share, long expirationTimeInMillis) {
         Intent updateShareIntent = new Intent(fileActivity, OperationsService.class);
-        updateShareIntent.setAction(OperationsService.ACTION_UPDATE_SHARE);
+        updateShareIntent.setAction(OperationsService.ACTION_UPDATE_PUBLIC_SHARE);
         updateShareIntent.putExtra(OperationsService.EXTRA_ACCOUNT, fileActivity.getAccount());
-        updateShareIntent.putExtra(OperationsService.EXTRA_REMOTE_PATH, file.getRemotePath());
+        updateShareIntent.putExtra(OperationsService.EXTRA_SHARE_ID, share.getId());
         updateShareIntent.putExtra(OperationsService.EXTRA_SHARE_EXPIRATION_DATE_IN_MILLIS, expirationTimeInMillis);
         queueShareIntent(updateShareIntent);
     }
@@ -659,7 +660,7 @@ public class FileOperationsHelper {
      */
     public void setExpirationDateToShare(OCShare share, long expirationTimeInMillis) {
         Intent updateShareIntent = new Intent(fileActivity, OperationsService.class);
-        updateShareIntent.setAction(OperationsService.ACTION_UPDATE_SHARE);
+        updateShareIntent.setAction(OperationsService.ACTION_UPDATE_USER_SHARE);
         updateShareIntent.putExtra(OperationsService.EXTRA_ACCOUNT, fileActivity.getAccount());
         updateShareIntent.putExtra(OperationsService.EXTRA_SHARE_ID, share.getId());
         updateShareIntent.putExtra(OperationsService.EXTRA_SHARE_EXPIRATION_DATE_IN_MILLIS, expirationTimeInMillis);
@@ -676,7 +677,7 @@ public class FileOperationsHelper {
      */
     public void setPermissionsToShare(OCShare share, int permissions) {
         Intent updateShareIntent = new Intent(fileActivity, OperationsService.class);
-        updateShareIntent.setAction(OperationsService.ACTION_UPDATE_SHARE);
+        updateShareIntent.setAction(OperationsService.ACTION_UPDATE_USER_SHARE);
         updateShareIntent.putExtra(OperationsService.EXTRA_ACCOUNT, fileActivity.getAccount());
         updateShareIntent.putExtra(OperationsService.EXTRA_SHARE_ID, share.getId());
         updateShareIntent.putExtra(OperationsService.EXTRA_SHARE_PERMISSIONS, permissions);
@@ -684,17 +685,17 @@ public class FileOperationsHelper {
     }
 
     /**
-     * Updates a public share on a folder to set its editing permission.
-     * Starts a request to do it in {@link OperationsService}
+     * Updates a public share on a folder to set its editing permission. Starts a request to do it in {@link
+     * OperationsService}
      *
-     * @param folder           Folder which editing permission of his public share will be modified.
+     * @param share            {@link OCShare} instance which permissions will be updated.
      * @param uploadPermission New state of the permission for editing the folder shared via link.
      */
-    public void setUploadPermissionsToShare(OCFile folder, boolean uploadPermission) {
+    public void setUploadPermissionsToPublicShare(OCShare share, boolean uploadPermission) {
         Intent updateShareIntent = new Intent(fileActivity, OperationsService.class);
-        updateShareIntent.setAction(OperationsService.ACTION_UPDATE_SHARE);
+        updateShareIntent.setAction(OperationsService.ACTION_UPDATE_PUBLIC_SHARE);
         updateShareIntent.putExtra(OperationsService.EXTRA_ACCOUNT, fileActivity.getAccount());
-        updateShareIntent.putExtra(OperationsService.EXTRA_REMOTE_PATH, folder.getRemotePath());
+        updateShareIntent.putExtra(OperationsService.EXTRA_SHARE_ID, share.getId());
         updateShareIntent.putExtra(OperationsService.EXTRA_SHARE_PUBLIC_UPLOAD, uploadPermission);
         queueShareIntent(updateShareIntent);
     }
@@ -706,9 +707,9 @@ public class FileOperationsHelper {
      * @param share           {@link OCShare} instance which permissions will be updated.
      * @param hideFileListing New state of the permission for editing the folder shared via link.
      */
-    public void setHideFileListingPermissionsToShare(OCShare share, boolean hideFileListing) {
+    public void setHideFileListingPermissionsToPublicShare(OCShare share, boolean hideFileListing) {
         Intent updateShareIntent = new Intent(fileActivity, OperationsService.class);
-        updateShareIntent.setAction(OperationsService.ACTION_UPDATE_SHARE);
+        updateShareIntent.setAction(OperationsService.ACTION_UPDATE_PUBLIC_SHARE);
         updateShareIntent.putExtra(OperationsService.EXTRA_ACCOUNT, fileActivity.getAccount());
         updateShareIntent.putExtra(OperationsService.EXTRA_SHARE_ID, share.getId());
 
@@ -716,17 +717,17 @@ public class FileOperationsHelper {
             updateShareIntent.putExtra(OperationsService.EXTRA_SHARE_PERMISSIONS, OCShare.CREATE_PERMISSION_FLAG);
         } else {
             updateShareIntent.putExtra(OperationsService.EXTRA_SHARE_PERMISSIONS,
-                    OCShare.FEDERATED_PERMISSIONS_FOR_FOLDER_AFTER_OC9);
+                                       OCShare.FEDERATED_PERMISSIONS_FOR_FOLDER_AFTER_OC9);
         }
 
         queueShareIntent(updateShareIntent);
     }
 
-    public void setHideFileDownloadPermissionsToShare(OCFile file, boolean hideFileDownload) {
+    public void setHideFileDownloadPermissionsToPublicShare(OCShare share, boolean hideFileDownload) {
         Intent updateShareIntent = new Intent(fileActivity, OperationsService.class);
-        updateShareIntent.setAction(OperationsService.ACTION_UPDATE_SHARE);
+        updateShareIntent.setAction(OperationsService.ACTION_UPDATE_PUBLIC_SHARE);
         updateShareIntent.putExtra(OperationsService.EXTRA_ACCOUNT, fileActivity.getAccount());
-        updateShareIntent.putExtra(OperationsService.EXTRA_REMOTE_PATH, file.getRemotePath());
+        updateShareIntent.putExtra(OperationsService.EXTRA_SHARE_ID, share.getId());
         updateShareIntent.putExtra(OperationsService.EXTRA_SHARE_HIDE_FILE_DOWNLOAD, hideFileDownload);
 
         queueShareIntent(updateShareIntent);
@@ -863,7 +864,9 @@ public class FileOperationsHelper {
 
     public void toggleEncryption(OCFile file, boolean shouldBeEncrypted) {
         if (file.isEncrypted() != shouldBeEncrypted) {
-            EventBus.getDefault().post(new EncryptionEvent(file.getLocalId(), file.getRemoteId(), file.getRemotePath(),
+            EventBus.getDefault().post(new EncryptionEvent(file.getLocalId(),
+                                                           file.getRemoteId(),
+                                                           file.getRemotePath(),
                                                            shouldBeEncrypted));
         }
     }
@@ -924,23 +927,23 @@ public class FileOperationsHelper {
      * @param file OCFile
      */
     public void cancelTransference(OCFile file) {
-        Account account = fileActivity.getAccount();
+        User currentUser = fileActivity.getUser().orElseThrow(IllegalStateException::new);
         if (file.isFolder()) {
             OperationsService.OperationsServiceBinder opsBinder =
                     fileActivity.getOperationsServiceBinder();
             if (opsBinder != null) {
-                opsBinder.cancel(account, file);
+                opsBinder.cancel(currentUser.toPlatformAccount(), file);
             }
         }
 
         // for both files and folders
         FileDownloaderBinder downloaderBinder = fileActivity.getFileDownloaderBinder();
-        if (downloaderBinder != null && downloaderBinder.isDownloading(account, file)) {
-            downloaderBinder.cancel(account, file);
+        if (downloaderBinder != null && downloaderBinder.isDownloading(currentUser, file)) {
+            downloaderBinder.cancel(currentUser.toPlatformAccount(), file);
         }
         FileUploaderBinder uploaderBinder = fileActivity.getFileUploaderBinder();
-        if (uploaderBinder != null && uploaderBinder.isUploading(account, file)) {
-            uploaderBinder.cancel(account, file);
+        if (uploaderBinder != null && uploaderBinder.isUploading(currentUser, file)) {
+            uploaderBinder.cancel(currentUser.toPlatformAccount(), file);
         }
     }
 

@@ -43,8 +43,6 @@ import com.owncloud.android.ui.activity.FileDisplayActivity;
 import com.owncloud.android.utils.DisplayUtils;
 import com.owncloud.android.utils.ThemeUtils;
 
-import org.jetbrains.annotations.NotNull;
-
 import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
@@ -105,7 +103,7 @@ public class PreviewTextStringFragment extends PreviewTextFragment {
             throw new RuntimeException("View may not be null");
         }
 
-        FloatingActionButton fabMain = view.findViewById(R.id.text_preview_fab);
+        FloatingActionButton fabMain = requireActivity().findViewById(R.id.fab_main);
 
         if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             fabMain.setVisibility(View.GONE);
@@ -113,8 +111,7 @@ public class PreviewTextStringFragment extends PreviewTextFragment {
             fabMain.setVisibility(View.VISIBLE);
             fabMain.setEnabled(true);
             fabMain.setOnClickListener(v -> edit());
-            ThemeUtils.tintFloatingActionButton(fabMain, requireContext());
-            ThemeUtils.drawableFloatingActionButton(fabMain, R.drawable.ic_edit, requireContext());
+            ThemeUtils.colorFloatingActionButton(fabMain, R.drawable.ic_edit, requireContext());
         }
 
         return view;
@@ -124,7 +121,7 @@ public class PreviewTextStringFragment extends PreviewTextFragment {
      * {@inheritDoc}
      */
     @Override
-    public void onCreateOptionsMenu(@NotNull Menu menu, @NotNull MenuInflater inflater) {
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
 
         MenuItem menuItem = menu.findItem(R.id.action_search);
@@ -147,8 +144,8 @@ public class PreviewTextStringFragment extends PreviewTextFragment {
             mTextPreview.setVisibility(View.VISIBLE);
         }
 
-        if (mMultiView != null) {
-            mMultiView.setVisibility(View.GONE);
+        if (mMultiListContainer != null) {
+            mMultiListContainer.setVisibility(View.GONE);
         }
     }
 

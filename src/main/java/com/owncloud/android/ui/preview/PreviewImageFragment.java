@@ -49,13 +49,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.caverock.androidsvg.SVG;
 import com.caverock.androidsvg.SVGParseException;
 import com.github.chrisbanes.photoview.PhotoView;
 import com.google.android.material.snackbar.Snackbar;
+import com.nextcloud.client.account.User;
 import com.nextcloud.client.account.UserAccountManager;
 import com.nextcloud.client.device.DeviceInfo;
 import com.nextcloud.client.di.Injectable;
@@ -73,8 +73,6 @@ import com.owncloud.android.utils.BitmapUtils;
 import com.owncloud.android.utils.DisplayUtils;
 import com.owncloud.android.utils.MimeType;
 import com.owncloud.android.utils.MimeTypeUtil;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -115,7 +113,6 @@ public class PreviewImageFragment extends FileFragment implements Injectable {
     private static final String MIME_TYPE_SVG = "image/svg+xml";
 
     private PhotoView mImageView;
-    private RelativeLayout mMultiView;
 
     private LinearLayout mMultiListContainer;
     private TextView mMultiListMessage;
@@ -205,8 +202,6 @@ public class PreviewImageFragment extends FileFragment implements Injectable {
         view.setOnClickListener(v -> togglePreviewImageFullScreen());
 
         mImageView.setOnClickListener(v -> togglePreviewImageFullScreen());
-
-        mMultiView = view.findViewById(R.id.multi_view);
 
         setupMultiView(view);
         setMultiListLoadingMessage();
@@ -298,7 +293,7 @@ public class PreviewImageFragment extends FileFragment implements Injectable {
                         task.execute(getFile());
                     }
                 }
-                mMultiView.setVisibility(View.GONE);
+                mMultiListContainer.setVisibility(View.GONE);
                 mImageView.setBackgroundColor(getResources().getColor(R.color.background_color_inverse));
                 mImageView.setVisibility(View.VISIBLE);
 
@@ -346,7 +341,7 @@ public class PreviewImageFragment extends FileFragment implements Injectable {
      * {@inheritDoc}
      */
     @Override
-    public void onCreateOptionsMenu(@NotNull Menu menu, @NotNull MenuInflater inflater) {
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.item_file, menu);
 
@@ -367,27 +362,26 @@ public class PreviewImageFragment extends FileFragment implements Injectable {
      * {@inheritDoc}
      */
     @Override
-    public void onPrepareOptionsMenu(@NotNull Menu menu) {
+    public void onPrepareOptionsMenu(@NonNull Menu menu) {
         super.onPrepareOptionsMenu(menu);
 
         if (containerActivity.getStorageManager() != null && getFile() != null) {
             // Update the file
             setFile(containerActivity.getStorageManager().getFileById(getFile().getFileId()));
 
-            Account currentAccount = containerActivity.getStorageManager().getAccount();
+            User currentUser = accountManager.getUser();
             FileMenuFilter mf = new FileMenuFilter(
                 getFile(),
-                currentAccount,
                 containerActivity,
                 getActivity(),
                 false,
                 deviceInfo,
-                accountManager.getUser()
+                currentUser
             );
 
             mf.filter(menu,
                       true,
-                      accountManager.isMediaStreamingSupported(currentAccount));
+                      currentUser.getServer().getVersion().isMediaStreamingSupported());
         }
 
         // additional restriction for this fragment
@@ -651,7 +645,7 @@ public class PreviewImageFragment extends FileFragment implements Injectable {
                 }
             }
 
-            mMultiView.setVisibility(View.GONE);
+            mMultiListContainer.setVisibility(View.GONE);
             if (getResources() != null) {
                 mImageView.setBackgroundColor(getResources().getColor(R.color.background_color_inverse));
             }
@@ -661,13 +655,13 @@ public class PreviewImageFragment extends FileFragment implements Injectable {
     }
 
     private LayerDrawable generateCheckerboardLayeredDrawable(LoadImage result, Bitmap bitmap) {
-        Resources r = getResources();
+        Resources resources = getResources();
         Drawable[] layers = new Drawable[2];
-        layers[0] = r.getDrawable(R.color.bg_default);
+        layers[0] = ResourcesCompat.getDrawable(resources, R.color.bg_default, null);
         Drawable bitmapDrawable;
 
         if (MIME_TYPE_PNG.equalsIgnoreCase(result.ocFile.getMimeType())) {
-            bitmapDrawable = new BitmapDrawable(getResources(), bitmap);
+            bitmapDrawable = new BitmapDrawable(resources, bitmap);
         } else if (MIME_TYPE_SVG.equalsIgnoreCase(result.ocFile.getMimeType())) {
             bitmapDrawable = result.drawable;
         } else if (MIME_TYPE_GIF.equalsIgnoreCase(result.ocFile.getMimeType())) {
@@ -677,7 +671,7 @@ public class PreviewImageFragment extends FileFragment implements Injectable {
                 bitmapDrawable = result.drawable;
             }
         } else {
-            bitmapDrawable = new BitmapDrawable(getResources(), bitmap);
+            bitmapDrawable = new BitmapDrawable(resources, bitmap);
         }
 
         layers[1] = bitmapDrawable;
@@ -712,7 +706,7 @@ public class PreviewImageFragment extends FileFragment implements Injectable {
     }
 
     private void setMultiListLoadingMessage() {
-        if (mMultiView != null) {
+        if (mMultiListContainer != null) {
             mMultiListHeadline.setText(R.string.file_list_loading);
             mMultiListMessage.setText("");
 
@@ -727,7 +721,7 @@ public class PreviewImageFragment extends FileFragment implements Injectable {
             mMultiListMessage.setText(message);
             mMultiListIcon.setImageResource(icon);
 
-            mMultiView.setBackgroundColor(getResources().getColor(R.color.background_color_inverse));
+            mMultiListContainer.setBackgroundColor(getResources().getColor(R.color.background_color_inverse));
             mMultiListHeadline.setTextColor(getResources().getColor(R.color.standard_grey));
             mMultiListMessage.setTextColor(getResources().getColor(R.color.standard_grey));
 
@@ -740,7 +734,7 @@ public class PreviewImageFragment extends FileFragment implements Injectable {
     public void setErrorPreviewMessage() {
         try {
             if (getActivity() != null) {
-                Snackbar.make(mMultiView,
+                Snackbar.make(mMultiListContainer,
                               R.string.resized_image_not_possible_download,
                               Snackbar.LENGTH_INDEFINITE)
                     .setAction(R.string.common_yes, v -> {
@@ -748,14 +742,12 @@ public class PreviewImageFragment extends FileFragment implements Injectable {
                                    if (activity != null) {
                                        activity.requestForDownload(getFile());
                                    } else {
-                                       Snackbar.make(mMultiView,
+                                       Snackbar.make(mMultiListContainer,
                                                      getResources().getString(R.string.could_not_download_image),
                                                      Snackbar.LENGTH_INDEFINITE).show();
                                    }
                                }
                     ).show();
-            } else {
-                Snackbar.make(mMultiView, R.string.resized_image_not_possible, Snackbar.LENGTH_INDEFINITE).show();
             }
         } catch (IllegalArgumentException e) {
             Log_OC.d(TAG, e.getMessage());
@@ -764,7 +756,7 @@ public class PreviewImageFragment extends FileFragment implements Injectable {
 
     public void setNoConnectionErrorMessage() {
         try {
-            Snackbar.make(mMultiView, R.string.auth_no_net_conn_title, Snackbar.LENGTH_LONG).show();
+            Snackbar.make(mMultiListContainer, R.string.auth_no_net_conn_title, Snackbar.LENGTH_LONG).show();
         } catch (IllegalArgumentException e) {
             Log_OC.d(TAG, e.getMessage());
         }

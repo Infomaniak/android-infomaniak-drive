@@ -49,6 +49,7 @@ import java.util.Arrays;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class PassCodeActivity extends AppCompatActivity implements Injectable {
@@ -94,10 +95,10 @@ public class PassCodeActivity extends AppCompatActivity implements Injectable {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.passcodelock);
 
-        int elementColor = ThemeUtils.elementColor(this);
+        int elementColor = ThemeUtils.primaryColor(this);
 
         mBCancel = findViewById(R.id.cancel);
-        mBCancel.setBackgroundColor(ThemeUtils.primaryColor(this));
+        ThemeUtils.colorPrimaryButton(mBCancel, this);
 
         mPassCodeHdr = findViewById(R.id.header);
         mPassCodeHdrExplanation = findViewById(R.id.explanation);
@@ -388,7 +389,7 @@ public class PassCodeActivity extends AppCompatActivity implements Injectable {
 
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean(PassCodeActivity.KEY_CONFIRMING_PASSCODE, mConfirmingPassCode);
         outState.putStringArray(PassCodeActivity.KEY_PASSCODE_DIGITS, mPassCodeDigits);

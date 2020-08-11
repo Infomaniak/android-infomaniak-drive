@@ -24,7 +24,7 @@ package com.owncloud.android.datamodel;
 
 import android.content.ContentValues;
 
-import com.owncloud.android.AbstractIT;
+import com.owncloud.android.AbstractOnServerIT;
 import com.owncloud.android.db.ProviderMeta;
 import com.owncloud.android.lib.common.operations.RemoteOperationResult;
 import com.owncloud.android.lib.resources.files.CreateFolderRemoteOperation;
@@ -50,12 +50,18 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-abstract public class FileDataStorageManagerTest extends AbstractIT {
+abstract public class FileDataStorageManagerTest extends AbstractOnServerIT {
 
     protected FileDataStorageManager sut;
 
     @Before
-    abstract public void before();
+    public void before() {
+        // make sure everything is removed
+        sut.deleteAllFiles();
+        sut.deleteVirtuals(VirtualFolderType.PHOTOS);
+
+        assertEquals(0, sut.getAllFiles().size());
+    }
 
     @After
     public void after() {
@@ -83,13 +89,13 @@ abstract public class FileDataStorageManagerTest extends AbstractIT {
 
         assertTrue(new CreateFolderRemoteOperation("/1/2/", true).execute(client).isSuccess());
 
-        assertTrue(new UploadFileRemoteOperation(FileStorageUtils.getSavePath(account.name) + "/chunkedFile.txt",
+        assertTrue(new UploadFileRemoteOperation(getDummyFile("/chunkedFile.txt").getAbsolutePath(),
                                                  "/1/1/chunkedFile.txt",
                                                  "text/plain",
                                                  String.valueOf(System.currentTimeMillis() / 1000))
                        .execute(client).isSuccess());
 
-        assertTrue(new UploadFileRemoteOperation(FileStorageUtils.getSavePath(account.name) + "/chunkedFile.txt",
+        assertTrue(new UploadFileRemoteOperation(getDummyFile("/chunkedFile.txt").getAbsolutePath(),
                                                  "/1/1/chunkedFile2.txt",
                                                  "text/plain",
                                                  String.valueOf(System.currentTimeMillis() / 1000))

@@ -180,7 +180,7 @@ public class SendShareDialog extends BottomSheetDialogFragment {
             requestPasswordForShareViaLink();
         } else {
             // create without password if not enforced by server or we don't know if enforced;
-            ((FileActivity) getActivity()).getFileOperationsHelper().shareFileViaLink(file, null);
+            ((FileActivity) getActivity()).getFileOperationsHelper().shareFileViaPublicShare(file, null);
         }
 
         this.dismiss();
@@ -194,7 +194,7 @@ public class SendShareDialog extends BottomSheetDialogFragment {
     }
 
     private void themeShareButtonImage(ImageView shareImageView) {
-        shareImageView.getBackground().setColorFilter(ThemeUtils.elementColor(getContext()), PorterDuff.Mode.SRC_IN);
+        shareImageView.getBackground().setColorFilter(ThemeUtils.primaryColor(getContext()), PorterDuff.Mode.SRC_IN);
         shareImageView.getDrawable().mutate().setColorFilter(ThemeUtils.fontColor(getContext()),
                 PorterDuff.Mode.SRC_IN);
     }

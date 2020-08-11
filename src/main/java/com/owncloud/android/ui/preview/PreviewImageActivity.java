@@ -32,14 +32,13 @@ import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.nextcloud.client.account.User;
 import com.nextcloud.client.di.Injectable;
 import com.nextcloud.client.preferences.AppPreferences;
+import com.nextcloud.java.util.Optional;
 import com.owncloud.android.MainApp;
 import com.owncloud.android.R;
 import com.owncloud.android.datamodel.FileDataStorageManager;
@@ -53,14 +52,11 @@ import com.owncloud.android.lib.common.operations.OnRemoteOperationListener;
 import com.owncloud.android.lib.common.operations.RemoteOperation;
 import com.owncloud.android.lib.common.operations.RemoteOperationResult;
 import com.owncloud.android.lib.common.utils.Log_OC;
-import com.owncloud.android.lib.resources.shares.OCShare;
-import com.owncloud.android.operations.CreateShareViaLinkOperation;
 import com.owncloud.android.operations.RemoveFileOperation;
 import com.owncloud.android.operations.SynchronizeFileOperation;
 import com.owncloud.android.ui.activity.FileActivity;
 import com.owncloud.android.ui.activity.FileDisplayActivity;
 import com.owncloud.android.ui.fragment.FileFragment;
-import com.owncloud.android.utils.ErrorMessageAdapter;
 import com.owncloud.android.utils.MimeTypeUtil;
 import com.owncloud.android.utils.ThemeUtils;
 
@@ -84,11 +80,16 @@ public class PreviewImageActivity extends FileActivity implements
         Injectable {
 
     public static final String TAG = PreviewImageActivity.class.getSimpleName();
-
     private static final String KEY_WAITING_FOR_BINDER = "WAITING_FOR_BINDER";
     private static final String KEY_SYSTEM_VISIBLE = "TRUE";
-
     public static final String EXTRA_VIRTUAL_TYPE = "EXTRA_VIRTUAL_TYPE";
+
+    public static Intent previewFileIntent(Context context, User user, OCFile file) {
+        final Intent intent = new Intent(context, PreviewImageActivity.class);
+        intent.putExtra(FileActivity.EXTRA_FILE, file);
+        intent.putExtra(FileActivity.EXTRA_ACCOUNT, user.toPlatformAccount());
+        return intent;
+    }
 
     private ViewPager mViewPager;
     private PreviewImagePagerAdapter mPreviewImagePagerAdapter;
@@ -132,13 +133,15 @@ public class PreviewImageActivity extends FileActivity implements
 
     }
 
-    private void initViewPager() {
+    private void initViewPager(User user) {
         // virtual folder
         if (getIntent().getSerializableExtra(EXTRA_VIRTUAL_TYPE) != null) {
             VirtualFolderType type = (VirtualFolderType) getIntent().getSerializableExtra(EXTRA_VIRTUAL_TYPE);
 
             mPreviewImagePagerAdapter = new PreviewImagePagerAdapter(getSupportFragmentManager(),
-                    type, getAccount(), getStorageManager());
+                                                                     type,
+                                                                     user,
+                                                                     getStorageManager());
         } else {
             // get parent from path
             OCFile parentFolder = getStorageManager().getFileById(getFile().getParentId());
@@ -151,7 +154,7 @@ public class PreviewImageActivity extends FileActivity implements
             mPreviewImagePagerAdapter = new PreviewImagePagerAdapter(
                 getSupportFragmentManager(),
                 parentFolder,
-                getAccount(),
+                user,
                 getStorageManager(),
                 MainApp.isOnlyOnDevice(),
                 preferences
@@ -177,7 +180,8 @@ public class PreviewImageActivity extends FileActivity implements
     @Override
     public void onStart() {
         super.onStart();
-        if (getAccount() != null) {
+        Optional<User> optionalUser = getUser();
+        if (optionalUser.isPresent()) {
             OCFile file = getFile();
             /// Validate handled file (first image to preview)
             if (file == null) {
@@ -197,7 +201,7 @@ public class PreviewImageActivity extends FileActivity implements
                 setFile(file);  // reset after getting it fresh from storageManager
                 getSupportActionBar().setTitle(getFile().getFileName());
                 //if (!stateWasRecovered) {
-                initViewPager();
+                initViewPager(optionalUser.get());
                 //}
 
             } else {
@@ -222,43 +226,6 @@ public class PreviewImageActivity extends FileActivity implements
             finish();
         } else if (operation instanceof SynchronizeFileOperation) {
             onSynchronizeFileOperationFinish(result);
-        } else if (operation instanceof CreateShareViaLinkOperation) {
-            CreateShareViaLinkOperation op = (CreateShareViaLinkOperation) operation;
-
-            if (result.isSuccess()) {
-                updateFileFromDB();
-
-                // if share to user and share via link multiple ocshares are returned,
-                // therefore filtering for public_link
-                String link = "";
-                OCFile file = null;
-                for (Object object : result.getData()) {
-                    OCShare shareLink = (OCShare) object;
-                    if (FileDisplayActivity.TAG_PUBLIC_LINK.equalsIgnoreCase(shareLink.getShareType().name())) {
-                        link = shareLink.getShareLink();
-                        file = getStorageManager().getFileByPath(shareLink.getPath());
-                        break;
-                    }
-                }
-
-                copyAndShareFileLink(this, file, link);
-            } else {
-                // Detect Failure (403) --> maybe needs password
-                String password = op.getPassword();
-                if (result.getCode() == RemoteOperationResult.ResultCode.SHARE_FORBIDDEN &&
-                    TextUtils.isEmpty(password) &&
-                    getCapabilities().getFilesSharingPublicEnabled().isUnknown()) {
-                    // Was tried without password, but not sure that it's optional.
-
-                    Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content),
-                                                      ErrorMessageAdapter.getErrorCauseMessage(result,
-                                                                                               operation,
-                                                                                               getResources()),
-                                                      Snackbar.LENGTH_LONG);
-                    ThemeUtils.colorSnackbar(this, snackbar);
-                    snackbar.show();
-                }
-            }
         }
     }
 
@@ -396,7 +363,7 @@ public class PreviewImageActivity extends FileActivity implements
         if (mDownloaderBinder == null) {
             Log_OC.d(TAG, "requestForDownload called without binder to download service");
 
-        } else if (!mDownloaderBinder.isDownloading(getAccount(), file)) {
+        } else if (!mDownloaderBinder.isDownloading(getUserAccountManager().getUser(), file)) {
             final User user = getUser().orElseThrow(RuntimeException::new);
             Intent i = new Intent(this, FileDownloader.class);
             i.putExtra(FileDownloader.EXTRA_USER, user);

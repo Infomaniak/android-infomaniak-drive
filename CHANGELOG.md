@@ -1,3 +1,51 @@
+## 3.13.0 RC4 (August, 07, 2020)
+
+- new UI overhaul @Shagequi @JorisBodin
+- E2EE beta support
+- dark mode enhancement @AndyScherzinger
+- warn on outdated NC16 server
+- requires Android 4.3 or newer
+
+For a full list, please see https://github.com/nextcloud/android/milestone/48
+
+## 3.13.0 RC3 (August, 04, 2020)
+
+- new UI overhaul @Shagequi @JorisBodin
+- E2EE beta support
+- dark mode enhancement @AndyScherzinger
+- warn on outdated NC16 server
+- requires Android 4.3 or newer
+
+For a full list, please see https://github.com/nextcloud/android/milestone/48
+
+## 3.13.0 RC2 (July, 31, 2020)
+
+- new UI overhaul @Shagequi @JorisBodin
+- E2EE beta support
+- dark mode enhancement @AndyScherzinger
+- warn on outdated NC16 server
+- requires Android 4.3 or newer
+
+For a full list, please see https://github.com/nextcloud/android/milestone/48
+
+## 3.13.0 RC1 (July, 23, 2020)
+
+- new UI overhaul @Shagequi @JorisBodin
+- E2EE beta support
+- dark mode enhancement @AndyScherzinger
+- warn on outdated NC16 server
+- requires Android 4.3 or newer
+
+For a full list, please see https://github.com/nextcloud/android/milestone/48
+
+## 3.12.1 (July, 07, 2020)
+
+- UI does not hang when changing auto upload
+- fix crash on contacts backup settings
+- bugfixes
+
+For a full list, please see https://github.com/nextcloud/android/milestone/49
+
 ## 3.12.0 (June, 10, 2020)
 
 - add circle support for searching/displaying

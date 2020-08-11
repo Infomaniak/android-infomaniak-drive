@@ -28,9 +28,7 @@ import com.facebook.testing.screenshot.Screenshot;
 import com.owncloud.android.AbstractIT;
 import com.owncloud.android.datamodel.OCFile;
 import com.owncloud.android.ui.activity.FileDisplayActivity;
-import com.owncloud.android.utils.FileStorageUtils;
 import com.owncloud.android.utils.MimeTypeUtil;
-import com.owncloud.android.utils.ScreenshotTest;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -51,13 +49,13 @@ public class PreviewTextFileFragmentTest extends AbstractIT {
         Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
     @Test
-    @ScreenshotTest
-    public void displaySimpleTextFile() {
+    // @ScreenshotTest // todo run without real server
+    public void displaySimpleTextFile() throws IOException {
         FileDisplayActivity sut = activityRule.launchActivity(null);
 
         shortSleep();
 
-        File file = new File(FileStorageUtils.getSavePath(account.name) + "/nonEmpty.txt");
+        File file = getDummyFile("nonEmpty.txt");
         OCFile test = new OCFile("/text.md");
         test.setMimeType(MimeTypeUtil.MIMETYPE_TEXT_MARKDOWN);
         test.setStoragePath(file.getAbsolutePath());
@@ -69,7 +67,7 @@ public class PreviewTextFileFragmentTest extends AbstractIT {
     }
 
     @Test
-    @ScreenshotTest
+    // @ScreenshotTest // todo run without real server
     public void displayJavaSnippetFile() throws IOException {
         FileDisplayActivity sut = activityRule.launchActivity(null);
 

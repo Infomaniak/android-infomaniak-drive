@@ -24,18 +24,24 @@ package com.nextcloud.client;
 
 import android.accounts.AccountManager;
 
-import com.owncloud.android.AbstractIT;
+import com.owncloud.android.AbstractOnServerIT;
 import com.owncloud.android.datamodel.ArbitraryDataProvider;
 import com.owncloud.android.datamodel.OCFile;
 import com.owncloud.android.db.OCUpload;
+import com.owncloud.android.files.services.FileUploader;
 import com.owncloud.android.lib.common.accounts.AccountUtils;
 import com.owncloud.android.lib.common.operations.RemoteOperationResult;
 import com.owncloud.android.lib.common.utils.Log_OC;
 import com.owncloud.android.lib.resources.e2ee.ToggleEncryptionRemoteOperation;
+import com.owncloud.android.lib.resources.files.ReadFileRemoteOperation;
+import com.owncloud.android.lib.resources.status.OCCapability;
+import com.owncloud.android.lib.resources.status.OwnCloudVersion;
 import com.owncloud.android.lib.resources.users.GetPrivateKeyOperation;
 import com.owncloud.android.lib.resources.users.GetPublicKeyOperation;
 import com.owncloud.android.lib.resources.users.SendCSROperation;
 import com.owncloud.android.lib.resources.users.StorePrivateKeyOperation;
+import com.owncloud.android.operations.DownloadFileOperation;
+import com.owncloud.android.operations.GetCapabilitiesOperation;
 import com.owncloud.android.operations.RemoveFileOperation;
 import com.owncloud.android.utils.CsrHelper;
 import com.owncloud.android.utils.EncryptionUtils;
@@ -52,19 +58,24 @@ import java.io.IOException;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import static com.owncloud.android.lib.resources.status.OwnCloudVersion.nextcloud_19;
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
-public class EndToEndRandomIT extends AbstractIT {
+public class EndToEndRandomIT extends AbstractOnServerIT {
     public enum Action {
         CREATE_FOLDER,
         GO_INTO_FOLDER,
         GO_UP,
-        UPLOAD_FILE
+        UPLOAD_FILE,
+        DOWNLOAD_FILE,
+        DELETE_FILE,
     }
 
     private static ArbitraryDataProvider arbitraryDataProvider;
@@ -79,7 +90,13 @@ public class EndToEndRandomIT extends AbstractIT {
     }
 
     @Before
-    public void before() {
+    public void before() throws IOException {
+        OCCapability capability = getStorageManager().getCapability(account.name);
+
+        if (capability.getVersion().equals(new OwnCloudVersion("0.0.0"))) {
+            // fetch new one
+            assertTrue(new GetCapabilitiesOperation().execute(client, getStorageManager()).isSuccess());
+        }
         // tests only for NC19+
         assumeTrue(getStorageManager()
                        .getCapability(account.name)
@@ -87,6 +104,8 @@ public class EndToEndRandomIT extends AbstractIT {
                        .isNewerOrEqual(nextcloud_19)
                   );
 
+        // make sure that every file is available, even after tests that remove source file
+        createDummyFiles();
     }
 
     @Test
@@ -111,6 +130,14 @@ public class EndToEndRandomIT extends AbstractIT {
 
                 case UPLOAD_FILE:
                     uploadFile(i);
+                    break;
+
+                case DOWNLOAD_FILE:
+                    downloadFile(i);
+                    break;
+
+                case DELETE_FILE:
+                    deleteFile(i);
                     break;
 
                 default:
@@ -198,6 +225,14 @@ public class EndToEndRandomIT extends AbstractIT {
         deleteFile(1);
     }
 
+    @Test
+    public void downloadFile() throws Exception {
+        init();
+
+        uploadFile(1);
+        downloadFile(1);
+    }
+
     private void init() throws Exception {
         // create folder
         createFolder(rootEncFolder);
@@ -260,17 +295,149 @@ public class EndToEndRandomIT extends AbstractIT {
 
     private void uploadFile(int i) throws IOException {
         String fileName = RandomString.make(5) + ".txt";
-        createFile(fileName, new Random().nextInt(50000));
-        String path = currentFolder.getRemotePath() + fileName;
+
+        File file;
+        if (new Random().nextBoolean()) {
+            file = createFile(fileName, new Random().nextInt(50000));
+        } else {
+            file = createFile(fileName, 500000 + new Random().nextInt(50000));
+        }
+
+        String remotePath = currentFolder.getRemotePath() + fileName;
 
         Log_OC.d(this,
                  "[" + i + "/" + actionCount + "] " +
                      "Upload file to: " + currentFolder.getDecryptedRemotePath() + fileName);
 
-        OCUpload ocUpload = new OCUpload(FileStorageUtils.getSavePath(account.name) + File.separator + fileName,
-                                         path,
+        OCUpload ocUpload = new OCUpload(file.getAbsolutePath(),
+                                         remotePath,
                                          account.name);
         uploadOCUpload(ocUpload);
+        shortSleep();
+
+        OCFile parentFolder = getStorageManager()
+            .getFileByEncryptedRemotePath(new File(ocUpload.getRemotePath()).getParent() + "/");
+        String uploadedFileName = new File(ocUpload.getRemotePath()).getName();
+
+        String decryptedPath = parentFolder.getDecryptedRemotePath() + uploadedFileName;
+
+        OCFile uploadedFile = getStorageManager().getFileByDecryptedRemotePath(decryptedPath);
+        verifyStoragePath(uploadedFile);
+
+        // verify storage path
+        refreshFolder(currentFolder.getRemotePath());
+        uploadedFile = getStorageManager().getFileByDecryptedRemotePath(decryptedPath);
+        verifyStoragePath(uploadedFile);
+
+        // verify that encrypted file is on server
+        assertTrue(new ReadFileRemoteOperation(currentFolder.getRemotePath() + uploadedFile.getEncryptedFileName())
+                       .execute(client)
+                       .isSuccess());
+
+        // verify that unencrypted file is not on server
+        assertFalse(new ReadFileRemoteOperation(currentFolder.getDecryptedRemotePath() + fileName)
+                        .execute(client)
+                        .isSuccess());
+    }
+
+    private void downloadFile(int i) {
+        ArrayList<OCFile> files = new ArrayList<>();
+        for (OCFile file : getStorageManager().getFolderContent(currentFolder, false)) {
+            if (!file.isFolder()) {
+                files.add(file);
+            }
+        }
+
+        if (files.isEmpty()) {
+            Log_OC.d(this, "[" + i + "/" + actionCount + "] No files in: " + currentFolder.getDecryptedRemotePath());
+            return;
+        }
+
+        OCFile fileToDownload = files.get(new Random().nextInt(files.size()));
+        assertNotNull(fileToDownload.getRemoteId());
+
+        Log_OC.d(this,
+                 "[" + i + "/" + actionCount + "] " + "Download file: " +
+                     currentFolder.getDecryptedRemotePath() + fileToDownload.getDecryptedFileName());
+
+        assertTrue(new DownloadFileOperation(account, fileToDownload, targetContext)
+                       .execute(client)
+                       .isSuccess());
+
+        assertTrue(new File(fileToDownload.getStoragePath()).exists());
+        verifyStoragePath(fileToDownload);
+    }
+
+    @Test
+    public void testUploadWithCopy() throws Exception {
+        init();
+
+        OCUpload ocUpload = new OCUpload(FileStorageUtils.getTemporalPath(account.name) + "/nonEmpty.txt",
+                                         currentFolder.getRemotePath() + "nonEmpty.txt",
+                                         account.name);
+
+        uploadOCUpload(ocUpload, FileUploader.LOCAL_BEHAVIOUR_COPY);
+
+        File originalFile = new File(FileStorageUtils.getTemporalPath(account.name) + "/nonEmpty.txt");
+        OCFile uploadedFile = fileDataStorageManager.getFileByDecryptedRemotePath(currentFolder.getRemotePath() +
+                                                                                      "nonEmpty.txt");
+
+        assertTrue(originalFile.exists());
+        assertTrue(new File(uploadedFile.getStoragePath()).exists());
+    }
+
+    @Test
+    public void testUploadWithMove() throws Exception {
+        init();
+
+        OCUpload ocUpload = new OCUpload(FileStorageUtils.getTemporalPath(account.name) + "/nonEmpty.txt",
+                                         currentFolder.getRemotePath() + "nonEmpty.txt",
+                                         account.name);
+
+        uploadOCUpload(ocUpload, FileUploader.LOCAL_BEHAVIOUR_MOVE);
+
+        File originalFile = new File(FileStorageUtils.getTemporalPath(account.name) + "/nonEmpty.txt");
+        OCFile uploadedFile = fileDataStorageManager.getFileByDecryptedRemotePath(currentFolder.getRemotePath() +
+                                                                                      "nonEmpty.txt");
+
+        assertFalse(originalFile.exists());
+        assertTrue(new File(uploadedFile.getStoragePath()).exists());
+    }
+
+    @Test
+    public void testUploadWithForget() throws Exception {
+        init();
+
+        OCUpload ocUpload = new OCUpload(FileStorageUtils.getTemporalPath(account.name) + "/nonEmpty.txt",
+                                         currentFolder.getRemotePath() + "nonEmpty.txt",
+                                         account.name);
+
+        uploadOCUpload(ocUpload, FileUploader.LOCAL_BEHAVIOUR_FORGET);
+
+        File originalFile = new File(FileStorageUtils.getTemporalPath(account.name) + "/nonEmpty.txt");
+        OCFile uploadedFile = fileDataStorageManager.getFileByDecryptedRemotePath(currentFolder.getRemotePath() +
+                                                                                      "nonEmpty.txt");
+
+        assertTrue(originalFile.exists());
+        assertFalse(new File(uploadedFile.getStoragePath()).exists());
+    }
+
+    @Test
+    public void testUploadWithDelete() throws Exception {
+        init();
+
+        OCUpload ocUpload = new OCUpload(FileStorageUtils.getTemporalPath(account.name) + "/nonEmpty.txt",
+                                         currentFolder.getRemotePath() + "nonEmpty.txt",
+                                         account.name);
+
+        uploadOCUpload(ocUpload, FileUploader.LOCAL_BEHAVIOUR_DELETE);
+
+        File originalFile = new File(FileStorageUtils.getTemporalPath(account.name) + "/nonEmpty.txt");
+        OCFile uploadedFile = fileDataStorageManager.getFileByDecryptedRemotePath(currentFolder.getRemotePath() +
+                                                                                      "nonEmpty.txt");
+
+        assertFalse(originalFile.exists());
+        assertFalse(new File(uploadedFile.getStoragePath()).exists());
     }
 
     private void deleteFile(int i) {
@@ -281,7 +448,13 @@ public class EndToEndRandomIT extends AbstractIT {
             }
         }
 
+        if (files.isEmpty()) {
+            Log_OC.d(this, "[" + i + "/" + actionCount + "] No files in: " + currentFolder.getDecryptedRemotePath());
+            return;
+        }
+
         OCFile fileToDelete = files.get(new Random().nextInt(files.size()));
+        assertNotNull(fileToDelete.getRemoteId());
 
         Log_OC.d(this,
                  "[" + i + "/" + actionCount + "] " +
@@ -394,5 +567,66 @@ public class EndToEndRandomIT extends AbstractIT {
 
     private String generateMnemonicString() {
         return "1 2 3 4 5 6";
+    }
+
+    public void after() {
+        // remove all encrypted files
+        OCFile root = fileDataStorageManager.getFileByDecryptedRemotePath("/");
+        removeFolder(root);
+
+//        List<OCFile> files = fileDataStorageManager.getFolderContent(root, false);
+//
+//        for (OCFile child : files) {
+//            removeFolder(child);
+//        }
+
+        assertEquals(0, fileDataStorageManager.getFolderContent(root, false).size());
+
+        super.after();
+    }
+
+    private void removeFolder(OCFile folder) {
+        Log_OC.d(this, "Start removing content of folder: " + folder.getDecryptedRemotePath());
+
+        List<OCFile> children = fileDataStorageManager.getFolderContent(folder, false);
+
+        // remove children
+        for (OCFile child : children) {
+            if (child.isFolder()) {
+                removeFolder(child);
+
+                // remove folder
+                Log_OC.d(this, "Remove folder: " + child.getDecryptedRemotePath());
+                if (!folder.isEncrypted() && child.isEncrypted()) {
+                    assertTrue(new ToggleEncryptionRemoteOperation(child.getLocalId(),
+                                                                   child.getRemotePath(),
+                                                                   false)
+                                   .execute(client)
+                                   .isSuccess());
+
+                    OCFile f = getStorageManager().getFileByEncryptedRemotePath(child.getRemotePath());
+                    f.setEncrypted(false);
+                    getStorageManager().saveFile(f);
+
+                    child.setEncrypted(false);
+                }
+            } else {
+                Log_OC.d(this, "Remove file: " + child.getDecryptedRemotePath());
+            }
+
+            assertTrue(new RemoveFileOperation(child, false, account, false, targetContext)
+                           .execute(client, getStorageManager())
+                           .isSuccess()
+                      );
+        }
+
+        Log_OC.d(this, "Finished removing content of folder: " + folder.getDecryptedRemotePath());
+    }
+
+    private void verifyStoragePath(OCFile file) {
+        assertEquals(FileStorageUtils.getSavePath(account.name) +
+                         currentFolder.getDecryptedRemotePath() +
+                         file.getDecryptedFileName(),
+                     file.getStoragePath());
     }
 }

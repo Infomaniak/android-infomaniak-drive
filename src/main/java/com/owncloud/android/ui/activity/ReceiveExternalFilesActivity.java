@@ -34,7 +34,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.ColorStateList;
 import android.content.res.Resources.NotFoundException;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -715,6 +714,9 @@ public class ReceiveExternalFilesActivity extends FileActivity
 
         ListView mListView = findViewById(android.R.id.list);
 
+        findViewById(R.id.sort_list_button_group).setVisibility(View.VISIBLE);
+        findViewById(R.id.switch_grid_view_button).setVisibility(View.GONE);
+
         String current_dir = mParents.peek();
         boolean notRoot = mParents.size() > 1;
 
@@ -753,28 +755,25 @@ public class ReceiveExternalFilesActivity extends FileActivity
                 }
 
                 UploaderAdapter sa = new UploaderAdapter(this,
-                        data,
-                        R.layout.uploader_list_item_layout,
-                        new String[]{"dirname"},
-                        new int[]{R.id.filename},
-                        getStorageManager(), getAccount());
+                                                         data,
+                                                         R.layout.uploader_list_item_layout,
+                                                         new String[]{"dirname"},
+                                                         new int[]{R.id.filename},
+                                                         getStorageManager(),
+                                                         getUser().get());
 
                 mListView.setAdapter(sa);
             }
             MaterialButton btnChooseFolder = findViewById(R.id.uploader_choose_folder);
-            btnChooseFolder.setBackgroundTintMode(PorterDuff.Mode.SRC_ATOP);
-            btnChooseFolder.setBackgroundTintList(ColorStateList.valueOf(ThemeUtils.primaryColor(this, true)));
+            ThemeUtils.colorPrimaryButton(btnChooseFolder, this);
             btnChooseFolder.setOnClickListener(this);
-            btnChooseFolder.setTextColor(ThemeUtils.fontColor(this));
 
             if (mFile.canWrite()) {
                 btnChooseFolder.setEnabled(true);
-                btnChooseFolder.setBackgroundTintList(ColorStateList.valueOf(ThemeUtils.primaryColor(getAccount(),
-                                                                                                     true,
-                                                                                                     this)));
+                ThemeUtils.colorPrimaryButton(btnChooseFolder, this);
             } else {
                 btnChooseFolder.setEnabled(false);
-                btnChooseFolder.setBackgroundTintList(ColorStateList.valueOf(Color.GRAY));
+                btnChooseFolder.setBackgroundColor(Color.GRAY);
             }
 
             ThemeUtils.colorStatusBar(this);

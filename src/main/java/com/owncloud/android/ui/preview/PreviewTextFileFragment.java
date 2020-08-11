@@ -33,6 +33,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.nextcloud.client.account.User;
 import com.nextcloud.client.account.UserAccountManager;
 import com.owncloud.android.R;
 import com.owncloud.android.datamodel.OCFile;
@@ -44,7 +45,6 @@ import com.owncloud.android.ui.dialog.RemoveFilesDialogFragment;
 import com.owncloud.android.utils.DisplayUtils;
 import com.owncloud.android.utils.MimeTypeUtil;
 
-import org.jetbrains.annotations.NotNull;
 import org.mozilla.universalchardet.ReaderFactory;
 
 import java.io.BufferedWriter;
@@ -227,8 +227,8 @@ public class PreviewTextFileFragment extends PreviewTextFragment {
                 textView.setVisibility(View.VISIBLE);
             }
 
-            if (mMultiView != null) {
-                mMultiView.setVisibility(View.GONE);
+            if (mMultiListContainer != null) {
+                mMultiListContainer.setVisibility(View.GONE);
             }
         }
     }
@@ -237,7 +237,7 @@ public class PreviewTextFileFragment extends PreviewTextFragment {
      * {@inheritDoc}
      */
     @Override
-    public void onCreateOptionsMenu(@NotNull Menu menu, @NotNull MenuInflater inflater) {
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.item_file, menu);
 
@@ -257,23 +257,22 @@ public class PreviewTextFileFragment extends PreviewTextFragment {
      * {@inheritDoc}
      */
     @Override
-    public void onPrepareOptionsMenu(@NotNull Menu menu) {
+    public void onPrepareOptionsMenu(@NonNull Menu menu) {
         super.onPrepareOptionsMenu(menu);
 
         if (containerActivity.getStorageManager() != null) {
-            Account currentAccount = containerActivity.getStorageManager().getAccount();
+            User user = accountManager.getUser();
             FileMenuFilter mf = new FileMenuFilter(
                 getFile(),
-                currentAccount,
                 containerActivity,
                 getActivity(),
                 false,
                 deviceInfo,
-                accountManager.getUser()
+                user
             );
             mf.filter(menu,
                       true,
-                      accountManager.isMediaStreamingSupported(currentAccount));
+                      user.getServer().getVersion().isMediaStreamingSupported());
         }
 
         // additional restriction for this fragment

@@ -18,10 +18,10 @@
   License along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_weight="1">
 
     <LinearLayout
         android:id="@+id/shareContainer"
@@ -34,12 +34,12 @@
         <androidx.appcompat.widget.SearchView
             android:visibility="gone"
             android:id="@+id/searchView"
+            style="@style/ownCloud.SearchView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/standard_eighth_margin"
+            android:layout_marginStart="@dimen/standard_quarter_margin"
             android:layout_marginEnd="@dimen/standard_margin"
-            android:hint="@string/share_search"
-            style="@style/ownCloud.SearchView"/>
+            android:hint="@string/share_search" />
 
         <!-- IK : Visibility changed to gone until user sharing implementation in kDrive API -->
         <LinearLayout
@@ -55,101 +55,62 @@
 
             <ImageView
                 android:id="@+id/shared_with_you_avatar"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="@dimen/user_icon_size"
+                android:layout_height="@dimen/user_icon_size"
                 android:contentDescription="@string/avatar"
                 android:src="@drawable/ic_user" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:paddingLeft="@dimen/standard_padding"
+                android:paddingTop="@dimen/standard_half_padding"
+                android:paddingRight="@dimen/standard_padding">
 
                 <TextView
                     android:id="@+id/shared_with_you_username"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingLeft="@dimen/standard_padding"
-                    android:paddingTop="@dimen/standard_half_padding"
-                    android:paddingRight="@dimen/standard_padding"
                     android:text="@string/shared_with_you_by"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
 
-                <TextView
-                    android:id="@+id/shared_with_you_note"
+                <LinearLayout
+                    android:id="@+id/shared_with_you_note_container"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingLeft="@dimen/standard_padding"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
                     android:paddingTop="@dimen/standard_half_padding"
-                    android:paddingRight="@dimen/standard_padding"
-                    android:textSize="16sp"/>
+                    tools:ignore="UseCompoundDrawables">
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/file_text"
+                        android:contentDescription="@string/note_icon_hint" />
+
+                    <TextView
+                        android:id="@+id/shared_with_you_note"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="@dimen/standard_half_padding"
+                        android:paddingEnd="@dimen/standard_half_padding"
+                        android:textSize="16sp"
+                        android:layout_weight="1" />
+                </LinearLayout>
 
             </LinearLayout>
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/share_by_link_container"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/publicShareList"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/standard_half_margin"
-            android:orientation="horizontal"
-            android:paddingLeft="@dimen/standard_padding"
-            android:paddingTop="@dimen/standard_padding"
-            android:paddingRight="@dimen/standard_padding">
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:divider="@drawable/divider"
+            android:dividerHeight="1dp" />
 
-            <com.google.android.flexbox.FlexboxLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="horizontal"
-                app:alignContent="stretch"
-                app:alignItems="stretch"
-                app:flexWrap="wrap">
-
-                <androidx.appcompat.widget.AppCompatCheckBox
-                    android:id="@+id/share_by_link"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:text="@string/share_via_link_section_title" />
-
-                <ImageView
-                    android:id="@+id/share_link_copy_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="32dp"
-                    android:layout_gravity="start|center"
-                    android:layout_weight="1"
-                    android:contentDescription="@string/copy_link"
-                    android:paddingStart="@dimen/standard_half_margin"
-                    android:paddingTop="@dimen/standard_quarter_margin"
-                    android:paddingEnd="@dimen/standard_eighth_margin"
-                    android:paddingBottom="@dimen/standard_quarter_margin"
-                    android:scaleType="fitStart"
-                    android:src="@drawable/ic_content_copy" />
-
-                <androidx.appcompat.widget.AppCompatCheckBox
-                    android:id="@+id/share_by_link_allow_editing"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:ellipsize="middle"
-                    android:text="@string/edit_permission_label"
-                    android:textSize="16sp" />
-            </com.google.android.flexbox.FlexboxLayout>
-
-            <ImageView
-                android:id="@+id/overflow_menu_share_link"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end|center"
-                android:layout_marginStart="@dimen/standard_half_margin"
-                android:layout_weight="0"
-                android:contentDescription="@string/overflow_menu"
-                android:paddingStart="@dimen/standard_half_padding"
-                android:paddingEnd="@dimen/zero"
-                android:src="@drawable/ic_dots_vertical"/>
-        </LinearLayout>
-
+        <include layout="@layout/file_details_share_public_link_add_new_item" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/shareUsersList"
@@ -159,62 +120,46 @@
             android:divider="@drawable/divider"
             android:dividerHeight="1dp" />
 
-        <TextView
-            android:id="@+id/shareNoUsers"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/standard_padding"
-            android:paddingTop="@dimen/standard_half_padding"
-            android:paddingRight="@dimen/standard_padding"
-            android:text="@string/share_no_users"
-            android:textSize="16sp" />
-
         <LinearLayout
             android:id="@+id/copy_internal_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/standard_margin"
+            android:orientation="horizontal"
             android:paddingStart="@dimen/zero"
+            android:paddingTop="@dimen/standard_half_padding"
             android:paddingEnd="@dimen/standard_padding"
-            android:orientation="horizontal">
+            android:paddingBottom="@dimen/standard_padding">
 
             <ImageView
                 android:id="@+id/copy_internal_link_icon"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="center_horizontal"
-                android:contentDescription="@string/share"
-                android:src="@drawable/ic_external"
-                android:paddingTop="@dimen/copy_internal_link_padding"
-                android:paddingRight="@dimen/copy_internal_link_padding"
-                android:paddingEnd="@dimen/copy_internal_link_padding"
-                android:paddingBottom="@dimen/copy_internal_link_padding"
-                android:paddingLeft="@dimen/copy_internal_link_padding"
-                android:paddingStart="@dimen/copy_internal_link_padding"
-                android:layout_marginBottom="@dimen/standard_half_margin"
-                android:layout_marginEnd="@dimen/standard_margin"
-                android:layout_marginLeft="@dimen/standard_margin"
-                android:layout_marginRight="@dimen/standard_margin"
+                android:layout_width="@dimen/share_icon_size"
+                android:layout_height="@dimen/share_icon_size"
+                android:layout_gravity="top"
                 android:layout_marginStart="@dimen/standard_margin"
-                android:layout_marginTop="@dimen/standard_half_margin"
-                android:background="@drawable/round_bgnd" />
+                android:layout_marginEnd="@dimen/standard_margin"
+                android:background="@drawable/round_bgnd"
+                android:contentDescription="@string/share"
+                android:padding="@dimen/standard_half_padding"
+                android:src="@drawable/ic_external" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/standard_half_margin"
                 android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/shareInternalLink"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/text_color"
-                    android:text="@string/share_internal_link" />
+                    android:text="@string/share_internal_link"
+                    android:textColor="@color/text_color" />
 
                 <TextView
                     android:id="@+id/shareInternalLinkText"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    tools:text="@string/share_internal_link_to_folder_text" />
             </LinearLayout>
 
         </LinearLayout>

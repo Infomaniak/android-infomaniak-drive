@@ -234,7 +234,10 @@ public class ActivityListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                     for (PreviewObject previewObject : activity.getPreviews()) {
                         if (!isDetailView || MimeTypeUtil.isImageOrVideo(previewObject.getMimeType()) ||
                             MimeTypeUtil.isVideo(previewObject.getMimeType())) {
-                            ImageView imageView = createThumbnailNew(previewObject);
+                            ImageView imageView = createThumbnailNew(previewObject,
+                                                                     activity
+                                                                         .getRichSubjectElement()
+                                                                         .getRichObjectList());
                             activityViewHolder.list.addView(imageView);
                         }
                     }
@@ -256,14 +259,32 @@ public class ActivityListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
     }
 
-    private ImageView createThumbnailNew(PreviewObject previewObject) {
+    private ImageView createThumbnailNew(PreviewObject previewObject, List<RichObject> richObjectList) {
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(px, px);
         params.setMargins(10, 10, 10, 10);
         ImageView imageView = new ImageView(context);
         imageView.setLayoutParams(params);
 
+        for (RichObject object : richObjectList) {
+            int objectId = -1;
+            try {
+                objectId = Integer.parseInt(object.getId());
+            } catch (NumberFormatException e) {
+                // object.getId() can also be a string if RichObjects refers to an user
+            }
+            if (objectId == previewObject.getFileId()) {
+                imageView.setOnClickListener(v -> activityListInterface.onActivityClicked(object));
+                break;
+            }
+        }
+
         if (MimeTypeUtil.isImageOrVideo(previewObject.getMimeType())) {
-            int placeholder = R.drawable.file;
+            int placeholder;
+            if (MimeTypeUtil.isImage(previewObject.getMimeType())) {
+                placeholder = R.drawable.file_image;
+            } else {
+                placeholder = R.drawable.file_movie;
+            }
             Glide.with(context).using(new CustomGlideStreamLoader(currentAccountProvider, clientFactory))
                 .load(previewObject.getSource())
                 .placeholder(placeholder)
@@ -271,8 +292,7 @@ public class ActivityListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 .into(imageView);
         } else {
             if (MimeTypeUtil.isFolder(previewObject.getMimeType())) {
-                imageView.setImageDrawable(
-                    MimeTypeUtil.getDefaultFolderIcon(context));
+                imageView.setImageDrawable(MimeTypeUtil.getDefaultFolderIcon(context));
             } else {
                 imageView.setImageDrawable(MimeTypeUtil.getFileTypeIcon(previewObject.getMimeType(), "", context));
             }

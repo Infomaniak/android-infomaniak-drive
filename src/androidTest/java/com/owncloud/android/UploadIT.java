@@ -26,6 +26,7 @@ import com.nextcloud.client.device.BatteryStatus;
 import com.nextcloud.client.device.PowerManagementService;
 import com.nextcloud.client.network.Connectivity;
 import com.nextcloud.client.network.ConnectivityService;
+import com.owncloud.android.datamodel.OCFile;
 import com.owncloud.android.datamodel.UploadsStorageManager;
 import com.owncloud.android.db.OCUpload;
 import com.owncloud.android.files.services.FileUploader;
@@ -35,13 +36,16 @@ import com.owncloud.android.operations.RemoveFileOperation;
 import com.owncloud.android.operations.UploadFileOperation;
 import com.owncloud.android.utils.FileStorageUtils;
 
-import org.jetbrains.annotations.NotNull;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
-import androidx.test.ext.junit.runners.AndroidJUnit4;
+import java.io.File;
+import java.io.IOException;
 
+import androidx.annotation.NonNull;
+
+import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
 
@@ -49,8 +53,7 @@ import static junit.framework.TestCase.assertTrue;
  * Tests related to file uploads
  */
 
-@RunWith(AndroidJUnit4.class)
-public class UploadIT extends AbstractIT {
+public class UploadIT extends AbstractOnServerIT {
     private static final String FOLDER = "/testUpload/";
 
     private UploadsStorageManager uploadsStorageManager =
@@ -80,12 +83,18 @@ public class UploadIT extends AbstractIT {
             return false;
         }
 
-        @NotNull
+        @NonNull
         @Override
         public BatteryStatus getBattery() {
             return new BatteryStatus(false, 0);
         }
     };
+
+    @Before
+    public void before() throws IOException {
+        // make sure that every file is available, even after tests that remove source file
+        createDummyFiles();
+    }
 
     @After
     public void after() {
@@ -111,7 +120,7 @@ public class UploadIT extends AbstractIT {
 
     @Test
     public void testEmptyUpload() {
-        OCUpload ocUpload = new OCUpload(FileStorageUtils.getSavePath(account.name) + "/empty.txt",
+        OCUpload ocUpload = new OCUpload(FileStorageUtils.getTemporalPath(account.name) + "/empty.txt",
                                          FOLDER + "empty.txt",
                                          account.name);
 
@@ -120,7 +129,7 @@ public class UploadIT extends AbstractIT {
 
     @Test
     public void testNonEmptyUpload() {
-        OCUpload ocUpload = new OCUpload(FileStorageUtils.getSavePath(account.name) + "/nonEmpty.txt",
+        OCUpload ocUpload = new OCUpload(FileStorageUtils.getTemporalPath(account.name) + "/nonEmpty.txt",
                                          FOLDER + "nonEmpty.txt",
                                          account.name);
 
@@ -128,46 +137,87 @@ public class UploadIT extends AbstractIT {
     }
 
     @Test
+    public void testUploadWithCopy() {
+        OCUpload ocUpload = new OCUpload(FileStorageUtils.getTemporalPath(account.name) + "/nonEmpty.txt",
+                                         FOLDER + "nonEmpty.txt",
+                                         account.name);
+
+        uploadOCUpload(ocUpload, FileUploader.LOCAL_BEHAVIOUR_COPY);
+
+        File originalFile = new File(FileStorageUtils.getTemporalPath(account.name) + "/nonEmpty.txt");
+        OCFile uploadedFile = fileDataStorageManager.getFileByDecryptedRemotePath(FOLDER + "nonEmpty.txt");
+
+        assertTrue(originalFile.exists());
+        assertTrue(new File(uploadedFile.getStoragePath()).exists());
+        verifyStoragePath(uploadedFile);
+    }
+
+    @Test
+    public void testUploadWithMove() {
+        OCUpload ocUpload = new OCUpload(FileStorageUtils.getTemporalPath(account.name) + "/nonEmpty.txt",
+                                         FOLDER + "nonEmpty.txt",
+                                         account.name);
+
+        uploadOCUpload(ocUpload, FileUploader.LOCAL_BEHAVIOUR_MOVE);
+
+        File originalFile = new File(FileStorageUtils.getTemporalPath(account.name) + "/nonEmpty.txt");
+        OCFile uploadedFile = fileDataStorageManager.getFileByDecryptedRemotePath(FOLDER + "nonEmpty.txt");
+
+        assertFalse(originalFile.exists());
+        assertTrue(new File(uploadedFile.getStoragePath()).exists());
+        verifyStoragePath(uploadedFile);
+    }
+
+    @Test
+    public void testUploadWithForget() {
+        OCUpload ocUpload = new OCUpload(FileStorageUtils.getTemporalPath(account.name) + "/nonEmpty.txt",
+                                         FOLDER + "nonEmpty.txt",
+                                         account.name);
+
+        uploadOCUpload(ocUpload, FileUploader.LOCAL_BEHAVIOUR_FORGET);
+
+        File originalFile = new File(FileStorageUtils.getTemporalPath(account.name) + "/nonEmpty.txt");
+        OCFile uploadedFile = fileDataStorageManager.getFileByDecryptedRemotePath(FOLDER + "nonEmpty.txt");
+
+        assertTrue(originalFile.exists());
+        assertFalse(new File(uploadedFile.getStoragePath()).exists());
+        assertTrue(uploadedFile.getStoragePath().isEmpty());
+    }
+
+    @Test
+    public void testUploadWithDelete() {
+        OCUpload ocUpload = new OCUpload(FileStorageUtils.getTemporalPath(account.name) + "/nonEmpty.txt",
+                                         FOLDER + "nonEmpty.txt",
+                                         account.name);
+
+        uploadOCUpload(ocUpload, FileUploader.LOCAL_BEHAVIOUR_DELETE);
+
+        File originalFile = new File(FileStorageUtils.getTemporalPath(account.name) + "/nonEmpty.txt");
+        OCFile uploadedFile = fileDataStorageManager.getFileByDecryptedRemotePath(FOLDER + "nonEmpty.txt");
+
+        assertFalse(originalFile.exists());
+        assertFalse(new File(uploadedFile.getStoragePath()).exists());
+        assertTrue(uploadedFile.getStoragePath().isEmpty());
+    }
+
+    @Test
     public void testChunkedUpload() {
-        OCUpload ocUpload = new OCUpload(FileStorageUtils.getSavePath(account.name) + "/chunkedFile.txt",
+        OCUpload ocUpload = new OCUpload(FileStorageUtils.getTemporalPath(account.name) + "/chunkedFile.txt",
                                          FOLDER + "chunkedFile.txt", account.name);
 
         uploadOCUpload(ocUpload);
     }
 
-    public RemoteOperationResult testUpload(OCUpload ocUpload) {
-        UploadFileOperation newUpload = new UploadFileOperation(
-            uploadsStorageManager,
-            connectivityServiceMock,
-            powerManagementServiceMock,
-            account,
-            null,
-            ocUpload,
-            FileUploader.NameCollisionPolicy.DEFAULT,
-            FileUploader.LOCAL_BEHAVIOUR_COPY,
-            targetContext,
-            false,
-            false
-        );
-        newUpload.addRenameUploadListener(() -> {
-            // dummy
-        });
-
-        newUpload.setRemoteFolderToBeCreated();
-
-        return newUpload.execute(client, getStorageManager());
-    }
-
     @Test
     public void testUploadInNonExistingFolder() {
-        OCUpload ocUpload = new OCUpload(FileStorageUtils.getSavePath(account.name) + "/empty.txt",
+        OCUpload ocUpload = new OCUpload(FileStorageUtils.getTemporalPath(account.name) + "/empty.txt",
                                          FOLDER + "2/3/4/1.txt", account.name);
 
         uploadOCUpload(ocUpload);
     }
     @Test
     public void testUploadOnChargingOnlyButNotCharging() {
-        OCUpload ocUpload = new OCUpload(FileStorageUtils.getSavePath(account.name) + "/empty.txt",
+        OCUpload ocUpload = new OCUpload(FileStorageUtils.getTemporalPath(account.name) + "/empty.txt",
                                          FOLDER + "notCharging.txt", account.name);
         ocUpload.setWhileChargingOnly(true);
 
@@ -175,7 +225,7 @@ public class UploadIT extends AbstractIT {
             uploadsStorageManager,
             connectivityServiceMock,
             powerManagementServiceMock,
-            account,
+            user,
             null,
             ocUpload,
             FileUploader.NameCollisionPolicy.DEFAULT,
@@ -206,14 +256,14 @@ public class UploadIT extends AbstractIT {
                 return false;
             }
 
-            @NotNull
+            @NonNull
             @Override
             public BatteryStatus getBattery() {
                 return new BatteryStatus(true, 100);
             }
         };
 
-        OCUpload ocUpload = new OCUpload(FileStorageUtils.getSavePath(account.name) + "/empty.txt",
+        OCUpload ocUpload = new OCUpload(FileStorageUtils.getTemporalPath(account.name) + "/empty.txt",
                                          FOLDER + "charging.txt", account.name);
         ocUpload.setWhileChargingOnly(true);
 
@@ -221,7 +271,7 @@ public class UploadIT extends AbstractIT {
             uploadsStorageManager,
             connectivityServiceMock,
             powerManagementServiceMock,
-            account,
+            user,
             null,
             ocUpload,
             FileUploader.NameCollisionPolicy.DEFAULT,
@@ -252,7 +302,7 @@ public class UploadIT extends AbstractIT {
                 return new Connectivity(true, false, false, true);
             }
         };
-        OCUpload ocUpload = new OCUpload(FileStorageUtils.getSavePath(account.name) + "/empty.txt",
+        OCUpload ocUpload = new OCUpload(FileStorageUtils.getTemporalPath(account.name) + "/empty.txt",
                                          FOLDER + "noWifi.txt", account.name);
         ocUpload.setUseWifiOnly(true);
 
@@ -260,7 +310,7 @@ public class UploadIT extends AbstractIT {
             uploadsStorageManager,
             connectivityServiceMock,
             powerManagementServiceMock,
-            account,
+            user,
             null,
             ocUpload,
             FileUploader.NameCollisionPolicy.DEFAULT,
@@ -280,7 +330,7 @@ public class UploadIT extends AbstractIT {
 
     @Test
     public void testUploadOnWifiOnlyAndWifi() {
-        OCUpload ocUpload = new OCUpload(FileStorageUtils.getSavePath(account.name) + "/empty.txt",
+        OCUpload ocUpload = new OCUpload(FileStorageUtils.getTemporalPath(account.name) + "/empty.txt",
                                          FOLDER + "wifi.txt", account.name);
         ocUpload.setWhileChargingOnly(true);
 
@@ -288,7 +338,7 @@ public class UploadIT extends AbstractIT {
             uploadsStorageManager,
             connectivityServiceMock,
             powerManagementServiceMock,
-            account,
+            user,
             null,
             ocUpload,
             FileUploader.NameCollisionPolicy.DEFAULT,
@@ -312,5 +362,10 @@ public class UploadIT extends AbstractIT {
                                 false,
                                 targetContext)
             .execute(client, getStorageManager());
+    }
+
+    private void verifyStoragePath(OCFile file) {
+        assertEquals(FileStorageUtils.getSavePath(account.name) + FOLDER + file.getDecryptedFileName(),
+                     file.getStoragePath());
     }
 }

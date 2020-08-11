@@ -21,7 +21,6 @@
 
 package com.owncloud.android.files;
 
-import android.accounts.Account;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.os.Build;
@@ -65,7 +64,6 @@ public class FileMenuFilter {
     private int numberOfAllFiles;
     private Collection<OCFile> files;
     private ComponentsGetter componentsGetter;
-    private Account account;
     private Context context;
     private boolean overflowMenu;
     private DeviceInfo deviceInfo;
@@ -76,14 +74,14 @@ public class FileMenuFilter {
      *
      * @param numberOfAllFiles  Number of all displayed files
      * @param files             Collection of {@link OCFile} file targets of the action to filter in the {@link Menu}.
-     * @param account           ownCloud {@link Account} holding targetFile.
      * @param componentsGetter  Accessor to app components, needed to access synchronization services
      * @param context           Android {@link Context}, needed to access build setup resources.
      * @param overflowMenu      true if the overflow menu items are being filtered
+     * @param deviceInfo        Device information provider
+     * @param user              currently active user
      */
     public FileMenuFilter(int numberOfAllFiles,
                           Collection<OCFile> files,
-                          Account account,
                           ComponentsGetter componentsGetter,
                           Context context,
                           boolean overflowMenu,
@@ -92,7 +90,6 @@ public class FileMenuFilter {
     ) {
         this.numberOfAllFiles = numberOfAllFiles;
         this.files = files;
-        this.account = account;
         this.componentsGetter = componentsGetter;
         this.context = context;
         this.overflowMenu = overflowMenu;
@@ -104,20 +101,19 @@ public class FileMenuFilter {
      * Constructor
      *
      * @param file              {@link OCFile} target of the action to filter in the {@link Menu}.
-     * @param account           ownCloud {@link Account} holding targetFile.
      * @param componentsGetter  Accessor to app components, needed to access synchronization services
      * @param context           Android {@link Context}, needed to access build setup resources.
      * @param overflowMenu      true if the overflow menu items are being filtered
+     * @param user              currently active user
      */
     public FileMenuFilter(OCFile file,
-                          Account account,
                           ComponentsGetter componentsGetter,
                           Context context,
                           boolean overflowMenu,
                           DeviceInfo deviceInfo,
                           User user
     ) {
-        this(1, Collections.singletonList(file), account, componentsGetter, context, overflowMenu, deviceInfo, user);
+        this(1, Collections.singletonList(file), componentsGetter, context, overflowMenu, deviceInfo, user);
     }
 
     /**
@@ -195,7 +191,7 @@ public class FileMenuFilter {
                         boolean inSingleFileFragment,
                         boolean isMediaSupported) {
         boolean synchronizing = anyFileSynchronizing();
-        OCCapability capability = componentsGetter.getStorageManager().getCapability(account.name);
+        OCCapability capability = componentsGetter.getStorageManager().getCapability(user.getAccountName());
         boolean endToEndEncryptionEnabled = capability.getEndToEndEncryption().isTrue();
 
         filterEdit(toShow, toHide, capability);
@@ -231,7 +227,7 @@ public class FileMenuFilter {
         }
     }
 
-    private void filterDetails(List<Integer> toShow, List<Integer> toHide) {
+    private void filterDetails(Collection<Integer> toShow, Collection<Integer> toHide) {
         if (isSingleSelection()) {
             toShow.add(R.id.action_see_details);
         } else {
@@ -358,7 +354,7 @@ public class FileMenuFilter {
         }
     }
 
-    private void filterOpenWith(List<Integer> toShow, List<Integer> toHide, boolean synchronizing) {
+    private void filterOpenWith(Collection<Integer> toShow, Collection<Integer> toHide, boolean synchronizing) {
         if (!isSingleFile() || !anyFileDown() || synchronizing) {
             toHide.add(R.id.action_open_file_with);
         } else {
@@ -412,7 +408,7 @@ public class FileMenuFilter {
         }
     }
 
-    private void filterRename(List<Integer> toShow, List<Integer> toHide, boolean synchronizing) {
+    private void filterRename(Collection<Integer> toShow, Collection<Integer> toHide, boolean synchronizing) {
         if (!isSingleSelection() || synchronizing || containsEncryptedFile() || containsEncryptedFolder()) {
             toHide.add(R.id.action_rename_file);
         } else {
@@ -438,7 +434,7 @@ public class FileMenuFilter {
 
     private boolean anyFileSynchronizing() {
         boolean synchronizing = false;
-        if (componentsGetter != null && !files.isEmpty() && account != null) {
+        if (componentsGetter != null && !files.isEmpty() && user != null) {
             OperationsServiceBinder opsBinder = componentsGetter.getOperationsServiceBinder();
             FileUploaderBinder uploaderBinder = componentsGetter.getFileUploaderBinder();
             FileDownloaderBinder downloaderBinder = componentsGetter.getFileDownloaderBinder();
@@ -453,7 +449,7 @@ public class FileMenuFilter {
         boolean synchronizing = false;
         if (opsBinder != null) {
             for (Iterator<OCFile> iterator = files.iterator(); !synchronizing && iterator.hasNext(); ) {
-                synchronizing = opsBinder.isSynchronizing(account, iterator.next());
+                synchronizing = opsBinder.isSynchronizing(user, iterator.next());
             }
         }
         return synchronizing;
@@ -463,7 +459,7 @@ public class FileMenuFilter {
         boolean downloading = false;
         if (downloaderBinder != null) {
             for (Iterator<OCFile> iterator = files.iterator(); !downloading && iterator.hasNext(); ) {
-                downloading = downloaderBinder.isDownloading(account, iterator.next());
+                downloading = downloaderBinder.isDownloading(user, iterator.next());
             }
         }
         return downloading;
@@ -473,7 +469,7 @@ public class FileMenuFilter {
         boolean uploading = false;
         if (uploaderBinder != null) {
             for (Iterator<OCFile> iterator = files.iterator(); !uploading && iterator.hasNext(); ) {
-                uploading = uploaderBinder.isUploading(account, iterator.next());
+                uploading = uploaderBinder.isUploading(user, iterator.next());
             }
         }
         return uploading;

@@ -24,10 +24,10 @@
  */
 package com.owncloud.android.ui.fragment;
 
-import android.accounts.Account;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -44,6 +44,9 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.PopupMenu;
 
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.behavior.HideBottomViewOnScrollBehavior;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.nextcloud.android.lib.richWorkspace.RichWorkspaceDirectEditingRemoteOperation;
 import com.nextcloud.client.account.User;
@@ -120,7 +123,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.ActionBar;
-import androidx.core.content.ContextCompat;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -192,6 +195,7 @@ public class OCFileListFragment extends ExtendedListFragment implements
     protected SearchEvent searchEvent;
     protected AsyncTask<Void, Void, Boolean> remoteOperationAsyncTask;
     protected String mLimitToMimeType;
+    private FloatingActionButton mFabMain;
 
     @Inject DeviceInfo deviceInfo;
 
@@ -242,7 +246,7 @@ public class OCFileListFragment extends ExtendedListFragment implements
      * {@inheritDoc}
      */
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         Log_OC.i(TAG, "onAttach");
         try {
@@ -283,6 +287,12 @@ public class OCFileListFragment extends ExtendedListFragment implements
         boolean allowContextualActions = args != null && args.getBoolean(ARG_ALLOW_CONTEXTUAL_ACTIONS, false);
         if (allowContextualActions) {
             setChoiceModeAsMultipleModal(savedInstanceState);
+        }
+
+        mFabMain = requireActivity().findViewById(R.id.fab_main);
+
+        if (mFabMain != null) { // is not available in FolderPickerActivity
+            ThemeUtils.colorFloatingActionButton(mFabMain, R.drawable.ic_plus, requireContext());
         }
 
         Log_OC.i(TAG, "onCreateView() end");
@@ -409,14 +419,18 @@ public class OCFileListFragment extends ExtendedListFragment implements
     /**
      * register listener on FAB.
      */
-    private void registerFabListener() {
+    public void registerFabListener() {
         FileActivity activity = (FileActivity) getActivity();
-        getFabMain().setOnClickListener(v -> new OCFileListBottomSheetDialog(activity,
+
+        if (mFabMain != null) { // is not available in FolderPickerActivity
+            ThemeUtils.colorFloatingActionButton(mFabMain, R.drawable.ic_plus, requireContext());
+            mFabMain.setOnClickListener(v -> new OCFileListBottomSheetDialog(activity,
                                                                              this,
                                                                              deviceInfo,
                                                                              accountManager.getUser(),
                                                                              getCurrentFile())
-            .show());
+                .show());
+        }
     }
 
     @Override
@@ -498,17 +512,17 @@ public class OCFileListFragment extends ExtendedListFragment implements
     public void onOverflowIconClicked(OCFile file, View view) {
         PopupMenu popup = new PopupMenu(getActivity(), view);
         popup.inflate(R.menu.item_file);
-        Account currentAccount = ((FileActivity) getActivity()).getAccount();
+        User currentUser = ((FileActivity) getActivity()).getUser().orElseThrow(IllegalStateException::new);
         FileMenuFilter mf = new FileMenuFilter(mAdapter.getFiles().size(),
                                                Collections.singleton(file),
-                                               currentAccount,
                                                mContainerActivity, getActivity(),
                                                true,
                                                deviceInfo,
                                                accountManager.getUser());
+        final boolean isMediaStreamingSupported = currentUser.getServer().getVersion().isMediaStreamingSupported();
         mf.filter(popup.getMenu(),
                   true,
-                  accountManager.isMediaStreamingSupported(currentAccount));
+                  isMediaStreamingSupported);
         popup.setOnMenuItemClickListener(item -> {
             Set<OCFile> checkedFiles = new HashSet<>();
             checkedFiles.add(file);
@@ -540,7 +554,7 @@ public class OCFileListFragment extends ExtendedListFragment implements
 
     @Override
     public void onHeaderClicked() {
-        if (!getAdapter().isMultiSelect()) {
+        if (!getAdapter().isMultiSelect() && mContainerActivity instanceof FileDisplayActivity) {
             ((FileDisplayActivity) mContainerActivity).startRichWorkspacePreview(getCurrentFile());
         }
     }
@@ -659,11 +673,10 @@ public class OCFileListFragment extends ExtendedListFragment implements
             Set<OCFile> checkedFiles = mAdapter.getCheckedItems();
             String title = getResources().getQuantityString(R.plurals.items_selected_count, checkedCount, checkedCount);
             mode.setTitle(title);
-            Account currentAccount = ((FileActivity) getActivity()).getAccount();
+            User currentUser = accountManager.getUser();
             FileMenuFilter mf = new FileMenuFilter(
                 mAdapter.getFiles().size(),
                 checkedFiles,
-                currentAccount,
                 mContainerActivity,
                 getActivity(),
                 false,
@@ -671,9 +684,10 @@ public class OCFileListFragment extends ExtendedListFragment implements
                 accountManager.getUser()
             );
 
+            final boolean isMediaStreamingSupported = currentUser.getServer().getVersion().isMediaStreamingSupported();
             mf.filter(menu,
                       false,
-                      accountManager.isMediaStreamingSupported(currentAccount));
+                      isMediaStreamingSupported);
 
             // Determine if we need to finish the action mode because there are no items selected
             if (checkedCount == 0 && !mIsActionModeNew) {
@@ -891,37 +905,43 @@ public class OCFileListFragment extends ExtendedListFragment implements
                 int position = mAdapter.getItemPosition(file);
 
                 if (file.isFolder()) {
+                    resetHeaderScrollingState();
+
                     if (file.isEncrypted()) {
                         // check if API >= 19
                         if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.KITKAT) {
                             Snackbar.make(getRecyclerView(), R.string.end_to_end_encryption_not_supported,
-                                Snackbar.LENGTH_LONG).show();
+                                          Snackbar.LENGTH_LONG).show();
                             return;
                         }
 
-                        Account account = ((FileActivity) mContainerActivity).getAccount();
+                        User user = ((FileActivity) mContainerActivity).getUser().orElseThrow(RuntimeException::new);
 
                         // check if e2e app is enabled
-                        OCCapability ocCapability = mContainerActivity.getStorageManager().getCapability(account.name);
+                        OCCapability ocCapability = mContainerActivity.getStorageManager()
+                            .getCapability(user.getAccountName());
 
                         if (ocCapability.getEndToEndEncryption().isFalse() ||
-                                ocCapability.getEndToEndEncryption().isUnknown()) {
+                            ocCapability.getEndToEndEncryption().isUnknown()) {
                             Snackbar.make(getRecyclerView(), R.string.end_to_end_encryption_not_enabled,
-                                    Snackbar.LENGTH_LONG).show();
+                                          Snackbar.LENGTH_LONG).show();
                             return;
-                        }// check if keys are stored
+                        }
+                        // check if keys are stored
                         ArbitraryDataProvider arbitraryDataProvider = new ArbitraryDataProvider(
-                                getContext().getContentResolver());
+                            getContext().getContentResolver());
 
 
-                        String publicKey = arbitraryDataProvider.getValue(account, EncryptionUtils.PUBLIC_KEY);
-                        String privateKey = arbitraryDataProvider.getValue(account, EncryptionUtils.PRIVATE_KEY);
+                        String publicKey = arbitraryDataProvider.getValue(user.toPlatformAccount(),
+                                                                          EncryptionUtils.PUBLIC_KEY);
+                        String privateKey = arbitraryDataProvider.getValue(user.toPlatformAccount(),
+                                                                           EncryptionUtils.PRIVATE_KEY);
 
                         if (publicKey.isEmpty() || privateKey.isEmpty()) {
-                            Log_OC.d(TAG, "no public key for " + account.name);
+                            Log_OC.d(TAG, "no public key for " + user.getAccountName());
 
-                            SetupEncryptionDialogFragment dialog = SetupEncryptionDialogFragment.newInstance(account,
-                                    position);
+                            SetupEncryptionDialogFragment dialog = SetupEncryptionDialogFragment.newInstance(user,
+                                                                                                             position);
                             dialog.setTargetFragment(this, SetupEncryptionDialogFragment.SETUP_ENCRYPTION_REQUEST_CODE);
                             dialog.show(getFragmentManager(), SetupEncryptionDialogFragment.SETUP_ENCRYPTION_DIALOG_TAG);
                         } else {
@@ -984,10 +1004,14 @@ public class OCFileListFragment extends ExtendedListFragment implements
                     } else if (file.isDown() && MimeTypeUtil.isVCard(file)) {
                         ((FileDisplayActivity) mContainerActivity).startContactListFragment(file);
                     } else if (PreviewTextFileFragment.canBePreviewed(file)) {
+                        setFabVisible(false);
+                        resetHeaderScrollingState();
                         ((FileDisplayActivity) mContainerActivity).startTextPreview(file, false);
                     } else if (file.isDown()) {
                         if (PreviewMediaFragment.canBePreviewed(file)) {
                             // media preview
+                            setFabVisible(false);
+                            resetHeaderScrollingState();
                             ((FileDisplayActivity) mContainerActivity).startMediaPreview(file, 0, true, true, false);
                         } else {
                             mContainerActivity.getFileOperationsHelper().openFile(file);
@@ -1001,6 +1025,8 @@ public class OCFileListFragment extends ExtendedListFragment implements
                         if (PreviewMediaFragment.canBePreviewed(file) && account.getServer().getVersion()
                             .isMediaStreamingSupported() && !file.isEncrypted()) {
                             // stream media preview on >= NC14
+                            setFabVisible(false);
+                            resetHeaderScrollingState();
                             ((FileDisplayActivity) mContainerActivity).startMediaPreview(file, 0, true, true, true);
                         } else if (FileMenuFilter.isEditorAvailable(requireContext().getContentResolver(),
                                                                     accountManager.getUser(),
@@ -1101,7 +1127,12 @@ public class OCFileListFragment extends ExtendedListFragment implements
                     if (mActiveActionMode != null) {
                         mActiveActionMode.finish();
                     }
+
+                    resetHeaderScrollingState();
+
                     mContainerActivity.showDetails(singleFile);
+                    setFabVisible(false);
+                    mContainerActivity.showSortListGroup(false);
                     return true;
                 }
                 case R.id.action_set_as_wallpaper: {
@@ -1291,11 +1322,11 @@ public class OCFileListFragment extends ExtendedListFragment implements
             setFabVisible(false);
         } else {
             setFabVisible(true);
-            registerFabListener();
+            // registerFabListener();
         }
 
         // FAB
-        setFabEnabled(mFile.canWrite());
+        setFabEnabled(mFile != null && mFile.canWrite());
 
         invalidateActionMode();
     }
@@ -1311,24 +1342,14 @@ public class OCFileListFragment extends ExtendedListFragment implements
         mAdapter.setSortOrder(mFile, sortOrder);
     }
 
-    private void setGridSwitchButton() {
-        if (isGridEnabled()) {
-            mSwitchGridViewButton.setContentDescription(getString(R.string.action_switch_list_view));
-            mSwitchGridViewButton.setIcon(ContextCompat.getDrawable(requireContext(), R.drawable.ic_view_list));
-        } else {
-            mSwitchGridViewButton.setContentDescription(getString(R.string.action_switch_grid_view));
-            mSwitchGridViewButton.setIcon(ContextCompat.getDrawable(requireContext(), R.drawable.ic_view_module));
-        }
-    }
-
     /**
      * Determines if user set folder to grid or list view. If folder is not set itself,
      * it finds a parent that is set (at least root is set).
      *
-     * @param folder Folder to check.
+     * @param folder Folder to check or null for root folder
      * @return 'true' is folder should be shown in grid mode, 'false' if list mode is preferred.
      */
-    public boolean isGridViewPreferred(OCFile folder) {
+    public boolean isGridViewPreferred(@Nullable OCFile folder) {
         return FOLDER_LAYOUT_GRID.equals(preferences.getFolderLayout(folder));
     }
 
@@ -1528,7 +1549,7 @@ public class OCFileListFragment extends ExtendedListFragment implements
 
         new Handler(Looper.getMainLooper()).post(switchViewsRunnable);
 
-        final User currentAccount = accountManager.getUser();
+        final User currentUser = accountManager.getUser();
 
         final RemoteOperation remoteOperation;
         if (currentSearchType != SearchType.SHARED_FILTER) {
@@ -1549,7 +1570,7 @@ public class OCFileListFragment extends ExtendedListFragment implements
                 setTitle();
                 if (getContext() != null && !isCancelled()) {
                     RemoteOperationResult remoteOperationResult = remoteOperation.execute(
-                        currentAccount.toPlatformAccount(), getContext());
+                        currentUser.toPlatformAccount(), getContext());
 
                     FileDataStorageManager storageManager = null;
                     if (mContainerActivity != null && mContainerActivity.getStorageManager() != null) {
@@ -1601,19 +1622,46 @@ public class OCFileListFragment extends ExtendedListFragment implements
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onMessageEvent(EncryptionEvent event) {
+        final User user = accountManager.getUser();
+
         try {
-            final User user = accountManager.getUser();
-            final OwnCloudClient client = clientFactory.create(user);
-            final ToggleEncryptionRemoteOperation toggleEncryptionOperation = new ToggleEncryptionRemoteOperation(
-                event.localId, event.remotePath, event.shouldBeEncrypted);
-            final RemoteOperationResult remoteOperationResult = toggleEncryptionOperation.execute(client);
+            OwnCloudClient client = clientFactory.create(user);
+            RemoteOperationResult remoteOperationResult = new ToggleEncryptionRemoteOperation(event.localId,
+                                                                                              event.remotePath,
+                                                                                              event.shouldBeEncrypted)
+                .execute(client);
 
             if (remoteOperationResult.isSuccess()) {
                 mAdapter.setEncryptionAttributeForItemID(event.remoteId, event.shouldBeEncrypted);
+
+                // check if keys are stored
+                ArbitraryDataProvider arbitraryDataProvider =
+                    new ArbitraryDataProvider(requireContext().getContentResolver());
+
+
+                String publicKey = arbitraryDataProvider.getValue(user.toPlatformAccount(),
+                                                                  EncryptionUtils.PUBLIC_KEY);
+                String privateKey = arbitraryDataProvider.getValue(user.toPlatformAccount(),
+                                                                   EncryptionUtils.PRIVATE_KEY);
+
+                if (publicKey.isEmpty() || privateKey.isEmpty()) {
+                    Log_OC.d(TAG, "no public key for " + user.getAccountName());
+
+
+                    FileDataStorageManager storageManager = mContainerActivity.getStorageManager();
+                    int position = mAdapter.getItemPosition(storageManager.getFileByRemoteId(event.remoteId));
+                    SetupEncryptionDialogFragment dialog = SetupEncryptionDialogFragment.newInstance(user, position);
+                    dialog.setTargetFragment(this, SetupEncryptionDialogFragment.SETUP_ENCRYPTION_REQUEST_CODE);
+                    dialog.show(getParentFragmentManager(), SetupEncryptionDialogFragment.SETUP_ENCRYPTION_DIALOG_TAG);
+                }
             } else if (remoteOperationResult.getHttpCode() == HttpStatus.SC_FORBIDDEN) {
-                Snackbar.make(getRecyclerView(), R.string.end_to_end_encryption_folder_not_empty, Snackbar.LENGTH_LONG).show();
+                Snackbar.make(getRecyclerView(),
+                              R.string.end_to_end_encryption_folder_not_empty,
+                              Snackbar.LENGTH_LONG).show();
             } else {
-                Snackbar.make(getRecyclerView(), R.string.common_error_unknown, Snackbar.LENGTH_LONG).show();
+                Snackbar.make(getRecyclerView(),
+                              R.string.common_error_unknown,
+                              Snackbar.LENGTH_LONG).show();
             }
 
         } catch (ClientFactory.CreationException e) {
@@ -1746,5 +1794,91 @@ public class OCFileListFragment extends ExtendedListFragment implements
     @Override
     public boolean isLoading() {
         return false;
+    }
+
+    /**
+     * Sets the 'visibility' state of the FAB contained in the fragment.
+     * <p>
+     * When 'false' is set, FAB visibility is set to View.GONE programmatically.
+     *
+     * @param visible Desired visibility for the FAB.
+     */
+    public void setFabVisible(final boolean visible) {
+        if (mFabMain == null) {
+            // is not available in FolderPickerActivity
+            return;
+        }
+
+        if (getActivity() != null) {
+            getActivity().runOnUiThread(() -> {
+                if (visible) {
+                    mFabMain.show();
+                    ThemeUtils.colorFloatingActionButton(mFabMain, requireContext());
+                } else {
+                    mFabMain.hide();
+                }
+
+                showFabWithBehavior(visible);
+            });
+        }
+    }
+
+    /**
+     * Remove this, if HideBottomViewOnScrollBehavior is fix by Google
+     *
+     * @param visible
+     */
+    private void showFabWithBehavior(boolean visible) {
+        ViewGroup.LayoutParams layoutParams = mFabMain.getLayoutParams();
+        if (layoutParams instanceof CoordinatorLayout.LayoutParams) {
+            CoordinatorLayout.Behavior coordinatorLayoutBehavior =
+                ((CoordinatorLayout.LayoutParams) layoutParams).getBehavior();
+            if (coordinatorLayoutBehavior instanceof HideBottomViewOnScrollBehavior) {
+                @SuppressWarnings("unchecked")
+                HideBottomViewOnScrollBehavior<FloatingActionButton> behavior =
+                    (HideBottomViewOnScrollBehavior<FloatingActionButton>) coordinatorLayoutBehavior;
+                if (visible) {
+                    behavior.slideUp(mFabMain);
+                } else {
+                    behavior.slideDown(mFabMain);
+                }
+            }
+        }
+    }
+
+    /**
+     * Sets the 'visibility' state of the FAB contained in the fragment.
+     * <p>
+     * When 'false' is set, FAB is greyed out
+     *
+     * @param enabled Desired visibility for the FAB.
+     */
+    public void setFabEnabled(final boolean enabled) {
+        if (mFabMain == null) {
+            // is not available in FolderPickerActivity
+            return;
+        }
+
+        if (getActivity() != null) {
+            getActivity().runOnUiThread(() -> {
+                if (enabled) {
+                    mFabMain.setEnabled(true);
+                    ThemeUtils.colorFloatingActionButton(mFabMain, requireContext());
+                } else {
+                    mFabMain.setEnabled(false);
+                    ThemeUtils.colorFloatingActionButton(mFabMain, requireContext(), Color.GRAY);
+                }
+            });
+        }
+    }
+
+    private void resetHeaderScrollingState() {
+        if (requireActivity() instanceof FileDisplayActivity) {
+            AppBarLayout appBarLayout = ((FileDisplayActivity) requireActivity()).findViewById(R.id.appbar);
+
+            if (appBarLayout != null) {
+                appBarLayout.setExpanded(true);
+            }
+        }
     }
 }
