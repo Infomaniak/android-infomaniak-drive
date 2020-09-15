@@ -29,7 +29,7 @@
     <string name="activities_no_results_headline">Nenhuma atividade</string>
     <string name="activities_no_results_message">Ainda nenhum evento como adições, alterações e compartilhamentos.</string>
     <string name="activity_chooser_send_file_title">Enviar</string>
-    <string name="activity_chooser_title">Enviar o link para…</string>
+    <string name="activity_chooser_title">Enviar link para…</string>
     <string name="activity_icon">Atividade</string>
     <string name="add_another_public_share_link">Adicionar um novo link</string>
     <string name="add_new_public_share">Adicionar um novo link público de compartilhamento</string>
@@ -787,7 +787,7 @@
     <string name="uploads_view_upload_status_virus_detected">Vírus encontrado. Envio não foi finalizado!</string>
     <string name="uploads_view_upload_status_waiting_exit_power_save_mode">Esperando sair do modo de economia de energia</string>
     <string name="uploads_view_upload_status_waiting_for_charging">Esperando carregar</string>
-    <string name="uploads_view_upload_status_waiting_for_wifi">Esperando pelo Wi-Fi</string>
+    <string name="uploads_view_upload_status_waiting_for_wifi">Aguardando pelo Wi-Fi não medido</string>
     <string name="user_icon">Usuário</string>
     <string name="user_info_address">Endereço</string>
     <string name="user_info_email">E-mail</string>

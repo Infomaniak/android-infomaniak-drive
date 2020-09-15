@@ -27,12 +27,14 @@
     <string name="actionbar_sort">مرتب‌سازی</string>
     <string name="active_user">کاربر فعال</string>
     <string name="activities_no_results_headline">هنوز فعّالیت ندارد</string>
+    <string name="activities_no_results_message">رویدادی نظیر افزودن، تغییر و هم‌رسانی هنوز وجود ندارد.</string>
     <string name="activity_chooser_send_file_title">ارسال</string>
     <string name="activity_chooser_title">ارسال لینک به ....</string>
     <string name="activity_icon">فعّالیت</string>
     <string name="add_another_public_share_link">پیوند دیگری اضافه کنید</string>
+    <string name="add_new_public_share">افزودن پیوند هم‌رسانی عمومی جدید</string>
     <string name="add_to_cloud">افزودن به %1$s</string>
-    <string name="allow_editing">اجازه‌ی ویرایش</string>
+    <string name="allow_editing">اجازهٔ ویرایش</string>
     <string name="appbar_search_in">جست‌وجو در %s</string>
     <string name="associated_account_not_found">حساب مرتبط یافت نشد!</string>
     <string name="auth_access_failed">دسترسی خطای  %1$s</string>
@@ -729,7 +731,6 @@
     <string name="uploads_view_upload_status_virus_detected">ویروس شناسایی شد. آپلود انجام نمی شود!</string>
     <string name="uploads_view_upload_status_waiting_exit_power_save_mode">در انتظار خروج از حالت ذخیرهٔ نیرو</string>
     <string name="uploads_view_upload_status_waiting_for_charging">منتظر شارژ</string>
-    <string name="uploads_view_upload_status_waiting_for_wifi">در انتظار وای‌فای</string>
     <string name="user_icon">User</string>
     <string name="user_info_address">آدرس</string>
     <string name="user_info_email">پست الکترونیک</string>

@@ -528,7 +528,7 @@
     <string name="preview_sorry">Atsiprašome</string>
     <string name="privacy">Privatumas</string>
     <string name="public_share_name">Naujas pavadinimas</string>
-    <string name="push_notifications_not_implemented">Stumti pranešimus, kurie išjungti dėl ryšių su Google Play servisais</string>
+    <string name="push_notifications_not_implemented">Push pranešimai išjungti dėl priklausomybės nuo nuosavybinių Google Play paslaugų.</string>
     <string name="push_notifications_old_login">Nėra pranešimų dėl pasenusios prisijungimo sesijos. Pasvarstykite galimybę iš naujo pridėti prisijungimo duomenis.</string>
     <string name="push_notifications_temp_error">Stumti pranešimus funkcija šiuo metu negalima</string>
     <string name="qr_could_not_be_read">Nepavyko nuskaityti QR kodo! </string>
@@ -788,7 +788,6 @@
     <string name="uploads_view_upload_status_virus_detected">Aptiktas virusas. Įkėlimas negali būti užbaigtas!</string>
     <string name="uploads_view_upload_status_waiting_exit_power_save_mode">Laukiama išeiti iš energijos taupymo režimo</string>
     <string name="uploads_view_upload_status_waiting_for_charging">Laukiama mokėjimo </string>
-    <string name="uploads_view_upload_status_waiting_for_wifi">Laukiama belaidžio tinklo (Wi-Fi)</string>
     <string name="user_icon">Naudotojas</string>
     <string name="user_info_address">Adresas</string>
     <string name="user_info_email">El. paštas</string>

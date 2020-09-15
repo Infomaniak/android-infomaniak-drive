@@ -686,7 +686,7 @@ public class UploadFileOperation extends SyncOperation {
 
         // check that connectivity conditions are met and delays the upload otherwise
         Connectivity connectivity = connectivityService.getConnectivity();
-        if (mOnWifiOnly && !connectivity.isWifi()) {
+        if (mOnWifiOnly && (!connectivity.isWifi() || connectivity.isMetered())) {
             Log_OC.d(TAG, "Upload delayed until WiFi is available: " + getRemotePath());
             remoteOperationResult = new RemoteOperationResult(ResultCode.DELAYED_FOR_WIFI);
         }
@@ -903,7 +903,9 @@ public class UploadFileOperation extends SyncOperation {
     }
 
     @CheckResult
-    private RemoteOperationResult checkNameCollision(OwnCloudClient client, DecryptedFolderMetadata metadata, boolean encrypted)
+    private RemoteOperationResult checkNameCollision(OwnCloudClient client,
+                                                     DecryptedFolderMetadata metadata,
+                                                     boolean encrypted)
         throws OperationCancelledException {
         Log_OC.d(TAG, "Checking name collision in server");
 
