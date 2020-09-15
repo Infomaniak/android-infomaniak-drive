@@ -1314,7 +1314,9 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity
      * server.
      */
     private void showServerStatus() {
-        if (mServerStatusIcon == NO_ICON && EMPTY_STRING.equals(mServerStatusText)) {
+        if (true) {
+            //kDrive
+        } else if (mServerStatusIcon == NO_ICON && EMPTY_STRING.equals(mServerStatusText)) {
             mServerStatusView.setVisibility(View.INVISIBLE);
         } else {
             mServerStatusView.setText(mServerStatusText);
