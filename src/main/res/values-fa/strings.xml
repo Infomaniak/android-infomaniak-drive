@@ -34,7 +34,10 @@
     <string name="add_another_public_share_link">پیوند دیگری اضافه کنید</string>
     <string name="add_new_public_share">افزودن پیوند هم‌رسانی عمومی جدید</string>
     <string name="add_to_cloud">افزودن به %1$s</string>
+    <string name="allow_creating">اجازه ایجاد</string>
+    <string name="allow_deleting">اجازه حذف</string>
     <string name="allow_editing">اجازهٔ ویرایش</string>
+    <string name="allow_resharing">مجوز اشتراک گذاری مجدد</string>
     <string name="appbar_search_in">جست‌وجو در %s</string>
     <string name="associated_account_not_found">حساب مرتبط یافت نشد!</string>
     <string name="auth_access_failed">دسترسی خطای  %1$s</string>
@@ -348,6 +351,9 @@
     <string name="instant_upload_path">آپلود فوری</string>
     <string name="invalid_url">آدرس اینترنتی اشتباه</string>
     <string name="link">Link</string>
+    <string name="link_share_allow_upload_and_editing">اجازه آپلود و ویرایش</string>
+    <string name="link_share_file_drop">انداختن فایل (فقط آپلود)</string>
+    <string name="link_share_read_only">فقط خواندنی</string>
     <string name="list_layout">Listed layout</string>
     <string name="local_file_list_empty">هیچ فایلی در این پوشه نیست.</string>
     <string name="local_file_not_found_message">پرونده در سیستم پرونده محلی یافت نمی شود</string>
@@ -421,6 +427,7 @@
     <string name="notifications_no_results_headline">بدون اعلان</string>
     <string name="notifications_no_results_message">لطفا بعداً دوباره بررسی کنید</string>
     <string name="offline_mode">بدون اتصال به اینترنت</string>
+    <string name="oneHour">1 ساعت</string>
     <string name="outdated_server">سرور به پایان عمر رسیده است ، لطفاً ارتقا دهید!</string>
     <string name="overflow_menu">منوی بیشتر</string>
     <string name="pass_code_configure_your_pass_code">رمز خود را وارد کنید</string>
@@ -541,6 +548,7 @@
     <string name="share_group_clarification">%1$s (گروه)</string>
     <string name="share_internal_link">پیوند داخلی را به اشتراک بگذارید</string>
     <string name="share_known_remote_clarification">%1$s ( در%2$s )</string>
+    <string name="share_link">لینک را به اشتراک بگذارید</string>
     <string name="share_link_empty_password">شما باید یک رمزعبور را وارد کنید</string>
     <string name="share_link_forbidden_permissions">اشتراک‌گذاری این فایل</string>
     <string name="share_link_optional_password_title">رمزعبور اختیاری را وارد کنید</string>
@@ -555,7 +563,6 @@
     <string name="share_privilege_unshare">لغو اشتراک</string>
     <string name="share_remote_clarification">%1$s (از راه دور)</string>
     <string name="share_room_clarification">%1$s (گفتگو)</string>
-    <string name="share_search">نام ، شناسه ابر یا آدرس ایمیل…</string>
     <string name="share_send_note">توجه داشته باشید به گیرنده</string>
     <string name="share_via_link_hide_download">پنهان کردن بارگیری</string>
     <string name="share_via_link_hide_file_listing_permission_label">لیست پرونده ها را مخفی کنید</string>
@@ -604,6 +611,7 @@
     <string name="ssl_validator_reason_cert_not_trusted">- گواهی سرور نامعتبر است</string>
     <string name="ssl_validator_reason_cert_not_yet_valid">- زمان اعتبار گواهی نامه سرویس دهنده فرانرسیده است</string>
     <string name="ssl_validator_reason_hostname_not_verified">- URL با آدرس هاست موجود در گواهی نامه مطابقت ندارد.</string>
+    <string name="status_message">پیغام وضعیت</string>
     <string name="storage_camera">دوربین</string>
     <string name="storage_choose_location">محل ذخیره را انتخاب کنید</string>
     <string name="storage_description_default">پیش‌گزیده</string>
@@ -646,8 +654,11 @@
     <string name="synced_icon">همگام سازی</string>
     <string name="tags">برچسب‌ها</string>
     <string name="test_server_button">اتصال به سرور را آزمایش کنید</string>
+    <string name="thirtyMinutes">۳۰ دقیقه</string>
+    <string name="thisWeek">این هفته</string>
     <string name="thumbnail">بند انگشتی</string>
     <string name="timeout_richDocuments">بارگیری بسیار طول می کشد ...</string>
+    <string name="today">Today</string>
     <string name="trashbin_activity_title">فایل های حذف شده</string>
     <string name="trashbin_empty_headline">هیچ فایل حذف شده وجود ندارد</string>
     <string name="trashbin_file_not_deleted">فایل%1$s نمی تواند حذف شود!</string>

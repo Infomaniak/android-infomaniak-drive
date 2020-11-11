@@ -34,7 +34,10 @@
     <string name="add_another_public_share_link">Προσθήκη άλλου συνδέσμου</string>
     <string name="add_new_public_share">Προσθήκη νέου δημόσιου κοινόχρηστου συνδέσμου</string>
     <string name="add_to_cloud">Προσθήκη στο %1$s</string>
+    <string name="allow_creating">Επιτρέπεται η δημιουργία</string>
+    <string name="allow_deleting">Επιτρέπετε η διαγραφή</string>
     <string name="allow_editing">Επιτρέπεται η επεξεργασία</string>
+    <string name="allow_resharing">Επιτρέπεται ο επαναδιαμοιρασμός</string>
     <string name="appbar_search_in">Αναζήτηση στο %s</string>
     <string name="associated_account_not_found">Δεν βρέθηκε ο συνδεδεμένος λογαριασμός!</string>
     <string name="auth_access_failed">Αποτυχία πρόσβασης: %1$s</string>
@@ -76,6 +79,7 @@
     <string name="autoupload_disable_power_save_check">Απενεργοποίηση ελέγχου εξοικονόμησης ενέργειας</string>
     <string name="autoupload_hide_folder">Απόκρυψη φακέλου</string>
     <string name="avatar">Εικόνα προφίλ</string>
+    <string name="away">Λείπω</string>
     <string name="battery_optimization_close">Κλείσιμο</string>
     <string name="battery_optimization_disable">Απενεργοποίηση</string>
     <string name="battery_optimization_message">Η συσκευή σας ίσως έχει ενεργές ρυθμίσεις εξοικονόμησης ενέργειας. Η αυτόματη μεταφόρτωση δουλεύει μόνο εάν η εφαρμογή εξαιρεθεί από αυτές.</string>
@@ -87,6 +91,8 @@
     <string name="choose_local_folder">Επιλέξτε τοπικό φάκελο…</string>
     <string name="choose_remote_folder">Επιλέξτε απομακρυσμένο φάκελο…</string>
     <string name="clear_notifications_failed">Αποτυχία εκκαθάρισης όλων των ειδοποιήσεων</string>
+    <string name="clear_status_message">Εκκαθάριση μηνύματος κατάστασης</string>
+    <string name="clear_status_message_after">Εκκαθάριση μηνύματος κατάστασης μετά από</string>
     <string name="clipboard_label">Κείμενο που αντιγράφηκε από τον %1$s</string>
     <string name="clipboard_no_text_to_copy">Δεν ελήφθη κείμενο για αντιγραφή στο πρόχειρο</string>
     <string name="clipboard_text_copied">Ο σύνδεσμος αντιγράφηκε</string>
@@ -165,6 +171,7 @@
     <string name="copy_move_to_encrypted_folder_not_supported">Η αντιγραφή/μετακίνηση σε κρυπτογραφημένο φάκελο δεν υποστηρίζεται αυτή τη στιγμή</string>
     <string name="copy_to">Αντιγραφή σε…</string>
     <string name="could_not_download_image">Αδυναμία λήψης της πλήρους εικόνας</string>
+    <string name="could_not_retrieve_shares">Αδυναμία ανάκτησης κοινόχρηστων</string>
     <string name="could_not_retrieve_url">Αδυναμία ανάκτησης URL</string>
     <string name="create_dir_fail_msg">Αδυναμία δημιουργίας φακέλου</string>
     <string name="create_new">Δημιουργία νέου</string>
@@ -188,6 +195,8 @@
     <string name="disable_new_media_folder_detection_notifications">Απενεργοποίηση</string>
     <string name="dismiss">Αποδέσμευση</string>
     <string name="dismiss_notification_description">Αποδέσμευση ειδοποίησης</string>
+    <string name="dnd">Μην ενοχλείτε</string>
+    <string name="dontClear">Να μη γίνεται εκκαθάριση</string>
     <string name="download_latest_dev_version">Λήψη της τελευταίας έκδοσης προγραμματιστή</string>
     <string name="downloader_download_failed_content">Η λήψη του %1$s δεν μπόρεσε να ολοκληρωθεί</string>
     <string name="downloader_download_failed_credentials_error">Η λήψη απέτυχε, συνδεθείτε ξανά</string>
@@ -272,6 +281,7 @@
     <string name="failed_to_download">Αποτυχία ενημέρωσης διαχειριστή λήψεων </string>
     <string name="failed_to_print">Απέτυχε να εκτυπώσει το αρχείο</string>
     <string name="failed_to_start_editor">Ο επεξεργαστής απέτυχε να ξεκινησει</string>
+    <string name="failed_update_ui">Η ενημέρωση του UI απέτυχε</string>
     <string name="favorite">Προσθήκη στα αγαπημένα</string>
     <string name="favorite_icon">Αγαπημένο</string>
     <string name="file_delete">Διαγραφή</string>
@@ -361,6 +371,7 @@
     <string name="foreign_files_remote_text">Απομακρυσμένα: %1$s</string>
     <string name="foreign_files_success">Όλα τα αρχεία μετακινήθηκαν</string>
     <string name="forward">Προώθηση</string>
+    <string name="fourHours">4 ώρες</string>
     <string name="hint_name">Όνομα</string>
     <string name="hint_note">Σημείωση</string>
     <string name="hint_password">Συνθηματικό</string>
@@ -370,8 +381,12 @@
     <string name="instant_upload_on_charging">Μεταφόρτωση μόνο κατά τη διάρκεια φόρτισης</string>
     <string name="instant_upload_path">/InstantUpload</string>
     <string name="invalid_url">Μη έγκυρη διεύθυνση URL</string>
+    <string name="invisible">Αόρατος</string>
     <string name="label_empty">Η ετικέτα δεν μπορεί να είναι κενή</string>
     <string name="link">Σύνδεσμος</string>
+    <string name="link_share_allow_upload_and_editing">Επέτρεψε την μεταφόρτωση και επεξεργασία</string>
+    <string name="link_share_file_drop">Απόθεση αρχείου (μόνο μεταφόρτωση)</string>
+    <string name="link_share_read_only">Μόνο για ανάγνωση</string>
     <string name="list_layout">Διάταξη λίστας</string>
     <string name="local_file_list_empty">Δεν υπάρχουν αρχεία σε αυτό τον φάκελο.</string>
     <string name="local_file_not_found_message">Το αρχείο δεν βρέθηκε στο τοπικό σύστημα αρχείων</string>
@@ -450,6 +465,9 @@
     <string name="notifications_no_results_headline">Καμία ειδοποίηση</string>
     <string name="notifications_no_results_message">Παρακαλούμε ελέγξτε ξανά αργότερα. </string>
     <string name="offline_mode">Δεν υπάρχει σύνδεση στο διαδίκτυο</string>
+    <string name="oneHour">1 ώρα</string>
+    <string name="online">Σε σύνδεση</string>
+    <string name="online_status">Κατάσταση σε σύνδεση</string>
     <string name="outdated_server">Ο διακομιστής έφτασε στο τέλος το χρόνου υποστήριξης, παρακαλούμε αναβαθμίστε!</string>
     <string name="overflow_menu">Περισσότερο μενού</string>
     <string name="pass_code_configure_your_pass_code">Εισάγετε τον κωδικό πρόσβασης</string>
@@ -476,6 +494,7 @@
     <string name="pref_behaviour_entries_move">μετακινηθεί στον φάκελο εφαρμογών</string>
     <string name="pref_instant_name_collision_policy_dialogTitle">Τι κάνετε όταν το αρχείο υπάρχει;</string>
     <string name="pref_instant_name_collision_policy_entries_always_ask">Ερώτηση πάντα</string>
+    <string name="pref_instant_name_collision_policy_entries_cancel">Παράβλεψη μεταφόρτωσης</string>
     <string name="pref_instant_name_collision_policy_entries_overwrite">Επικάλυψη απομακρυσμένη έκδοσης</string>
     <string name="pref_instant_name_collision_policy_entries_rename">Μετονομασία νέας έκδοσης</string>
     <string name="pref_instant_name_collision_policy_title">Τι κάνετε όταν το αρχείο υπάρχει;</string>
@@ -569,6 +588,8 @@
     <string name="sendbutton_description">Εικονίδιο κουμπιού αποστολής</string>
     <string name="set_as">Ορισμός ως</string>
     <string name="set_picture_as">Χρησιμοποίησε την εικόνα ως</string>
+    <string name="set_status">Ορισμός κατάστασης</string>
+    <string name="set_status_message">Ορισμός μηνύματος κατάστασης</string>
     <string name="share">Διαμοιρασμός</string>
     <string name="share_dialog_title">Γίνεται διαμοιρασμός</string>
     <string name="share_email_clarification">%1$s (ηλ. ταχυδρομείο)</string>
@@ -579,12 +600,14 @@
     <string name="share_internal_link_to_file_text">Οι εσωτερικοί κοινόχρηστοι σύνδεσμοι λειτουργούν μόνο για χρήστες με πρόσβαση στο αρχείο</string>
     <string name="share_internal_link_to_folder_text">Οι εσωτερικοί κοινόχρηστοι σύνδεσμοι λειτουργούν μόνο για χρήστες με πρόσβαση στο φάκελο</string>
     <string name="share_known_remote_clarification">%1$s ( στο %2$s )</string>
+    <string name="share_link">Διαμοιρασμός συνδέσμου</string>
     <string name="share_link_empty_password">Πρέπει να εισάγετε ένα συνθηματικό</string>
     <string name="share_link_file_error">Παρουσιάστηκε σφάλμα κατά την προσπάθεια διαμοιρασμού του αρχείου ή φακέλου.</string>
     <string name="share_link_file_no_exist">Αδυναμία διαμοιρασμού. Παρακαλούμε ελέγξτε αν υπάρχει το αρχείο.</string>
     <string name="share_link_forbidden_permissions">για να διαμοιραστείτε αυτό το αρχείο</string>
     <string name="share_link_optional_password_title">Εισάγετε προαιρετικό συνθηματικό</string>
     <string name="share_link_password_title">Εισάγετε ένα συνθηματικό</string>
+    <string name="share_link_with_label">Κοινή χρήση συνδέσμου (%1$s)</string>
     <string name="share_no_expiration_date_label">Ορισμός ημερομηνίας λήξης</string>
     <string name="share_no_password_title">Ορισμός κωδικού πρόσβασης</string>
     <string name="share_password_title">Προστασία με συνθηματικό</string>
@@ -595,7 +618,6 @@
     <string name="share_privilege_unshare">Αναίρεση διαμοιρασμού</string>
     <string name="share_remote_clarification">%1$s (απομακρυσμένα)</string>
     <string name="share_room_clarification">%1$s (συνομιλιία)</string>
-    <string name="share_search">Όνομα, federated cloud ID ή διεύθυνση ηλεκτροικού ταχυδρομείου…</string>
     <string name="share_send_note">Σημείωση στον παραλήπτη</string>
     <string name="share_via_link_hide_download">Απόκρυψη λήψης</string>
     <string name="share_via_link_hide_file_listing_permission_label">Απόκρυψη λίστας αρχείου</string>
@@ -644,6 +666,7 @@
     <string name="ssl_validator_reason_cert_not_trusted">- Το πιστοποιητικό του διακομιστή δεν είναι έμπιστο</string>
     <string name="ssl_validator_reason_cert_not_yet_valid">- Οι έγκυρες ημερομηνίες του πιστοποιητικού του διακομιστή είναι στο μέλλον</string>
     <string name="ssl_validator_reason_hostname_not_verified">- Η URL δεν ταιριάζει με το όνομα του συστήματος στο πιστοποιητικό</string>
+    <string name="status_message">Μήνυμα κατάστασης</string>
     <string name="storage_camera">Κάμερα</string>
     <string name="storage_choose_location">Επιλογή τοποθεσίας αποθήκευσης</string>
     <string name="storage_description_default">Προεπιλογή</string>
@@ -691,10 +714,13 @@
     <string name="synced_icon">Συγχρονίστηκε</string>
     <string name="tags">Ετικέτες</string>
     <string name="test_server_button">Δοκιμή σύνδεσης με διακομιστή</string>
+    <string name="thirtyMinutes">30 λεπτά</string>
+    <string name="thisWeek">Αυτή την εβδομάδα</string>
     <string name="thumbnail">Μικρογραφία</string>
     <string name="thumbnail_for_existing_file_description">Μικρογραφία υπάρχοντος αρχείου</string>
     <string name="thumbnail_for_new_file_desc">Μικρογραφία νέου αρχείου</string>
     <string name="timeout_richDocuments">Η φόρτωση διαρκεί πολύ…</string>
+    <string name="today">Σήμερα</string>
     <string name="trashbin_activity_title">Διεγραμμένα αρχεία</string>
     <string name="trashbin_empty_headline">Κανένα διαγεγραμμένο αρχείο</string>
     <string name="trashbin_empty_message">Μπορείτε να ανακτήσετε διαγραμμένα αρχεία από εδώ.</string>
@@ -787,6 +813,7 @@
     <string name="uploads_view_upload_status_virus_detected">Ανιχνεύθηκε ιός. Η μεταφόρτωση δεν μπορεί να ολοκληρωθεί!</string>
     <string name="uploads_view_upload_status_waiting_exit_power_save_mode">Αναμονή για έξοδο από τη λειτουργία εξοικονόμησης ενέργειας</string>
     <string name="uploads_view_upload_status_waiting_for_charging">Αναμονή για φόρτιση συσκευής</string>
+    <string name="uploads_view_upload_status_waiting_for_wifi">Αναμονή για ασύρματο δίκτυο.</string>
     <string name="user_icon">Χρήστης</string>
     <string name="user_info_address">Διεύθυνση</string>
     <string name="user_info_email">E-mail</string>
@@ -804,6 +831,7 @@
     <string name="what_s_new_image">Ποιά είναι η νέα εικόνα</string>
     <string name="whats_new_skip">Παράλειψη</string>
     <string name="whats_new_title">Τι νέο υπάρχει στο %1$s</string>
+    <string name="whats_your_status">Ποια είναι η κατάστασή σας;</string>
     <plurals name="sync_fail_in_favourites_content">
         <item quantity="one">Αδύνατος συγχρονισμός %1$d αρχείου (διενέξεις: %2$d)</item>
         <item quantity="other">Αδύνατος συγχρονισμός %1$d αρχείων (διενέξεις: %2$d)</item>

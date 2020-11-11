@@ -35,6 +35,7 @@
     <string name="add_new_public_share">Új nyilvános megosztási link hozzáadása</string>
     <string name="add_to_cloud">Hozzáadás ehhez: %1$s</string>
     <string name="allow_editing">Szerkesztés engedélyezése</string>
+    <string name="allow_resharing">A megosztás továbbadásának engedélyezése</string>
     <string name="appbar_search_in">Keresés itt: %s</string>
     <string name="associated_account_not_found">A kapcsolódó fiók nem található!</string>
     <string name="auth_access_failed">Hozzáférési hiba: %1$s</string>
@@ -370,8 +371,12 @@
     <string name="instant_upload_on_charging">Feltöltés csak töltés közben</string>
     <string name="instant_upload_path">/InstantUpload</string>
     <string name="invalid_url">Érvénytelen URL</string>
+    <string name="invisible">Láthatatlan</string>
     <string name="label_empty">A címke nem lehet üres</string>
     <string name="link">Hivatkozás</string>
+    <string name="link_share_allow_upload_and_editing">Feltöltés és szerkesztés engedélyezése</string>
+    <string name="link_share_file_drop">Fájl ejtés (csak feltöltés)</string>
+    <string name="link_share_read_only">Csak olvasható</string>
     <string name="list_layout">Listás elrendezés</string>
     <string name="local_file_list_empty">Nincs fájl ebben a mappában.</string>
     <string name="local_file_not_found_message">A fájl nem található a helyi fájlrendszeren</string>
@@ -450,6 +455,7 @@
     <string name="notifications_no_results_headline">Nincsenek értesítések</string>
     <string name="notifications_no_results_message">Jöjjön vissza később.</string>
     <string name="offline_mode">Nincs internetkapcsolat</string>
+    <string name="oneHour">1 óra</string>
     <string name="outdated_server">A kiszolgáló elérte az életciklusa végét, kérjük frissítsen!</string>
     <string name="overflow_menu">További menü</string>
     <string name="pass_code_configure_your_pass_code">Írja be a számkódodat</string>
@@ -579,6 +585,7 @@
     <string name="share_internal_link_to_file_text">A belső megosztási hivatkozás csak azon felhasználóknál működik, akik hozzáférnek ehhez a fájlhoz</string>
     <string name="share_internal_link_to_folder_text">A belső megosztási hivatkozás csak azon felhasználóknál működik, akik hozzáférnek ehhez a mappához</string>
     <string name="share_known_remote_clarification">%1$s ( itt: %2$s )</string>
+    <string name="share_link">Hivatkozás megosztása</string>
     <string name="share_link_empty_password">Meg kell adnia a jelszót</string>
     <string name="share_link_file_error">Hiba történt a fájl vagy mappa megosztásakor.</string>
     <string name="share_link_file_no_exist">A megosztás sikertelen. Ellenőrizze, hogy a fájl létezik-e.</string>
@@ -595,7 +602,6 @@
     <string name="share_privilege_unshare">Megosztás visszavonása</string>
     <string name="share_remote_clarification">%1$s (távoli)</string>
     <string name="share_room_clarification">%1$s(beszélgetés)</string>
-    <string name="share_search">Név, egyesített felhőazonosító vagy e-mail cím…</string>
     <string name="share_send_note">Jegyzet a címzettnek</string>
     <string name="share_via_link_hide_download">Letöltés elrejtése</string>
     <string name="share_via_link_hide_file_listing_permission_label">Fájl lista elrejtése</string>
@@ -644,6 +650,7 @@
     <string name="ssl_validator_reason_cert_not_trusted">– A kiszolgáló tanúsítványa nem megbízható</string>
     <string name="ssl_validator_reason_cert_not_yet_valid">– A kiszolgáló tanúsítványa még nem érvényes</string>
     <string name="ssl_validator_reason_hostname_not_verified">– Az URL nem egyezik a tanúsítványban szereplő kiszolgálónévvel</string>
+    <string name="status_message">Állapotüzenet</string>
     <string name="storage_camera">Kamera</string>
     <string name="storage_choose_location">Háttértároló helyének kiválasztása</string>
     <string name="storage_description_default">Alapértelmezett</string>
@@ -709,10 +716,13 @@ A Nextcloud itt érhető el: https://nextcloud.com</string>
     <string name="synced_icon">Szinkronizálva</string>
     <string name="tags">Címkék</string>
     <string name="test_server_button">Kiszolgálókapcsolat tesztelése</string>
+    <string name="thirtyMinutes">30 perc</string>
+    <string name="thisWeek">Ez a hét</string>
     <string name="thumbnail">Bélyegkép</string>
     <string name="thumbnail_for_existing_file_description">Létező fájl bélyegképe</string>
     <string name="thumbnail_for_new_file_desc">Új fájl bélyegképe</string>
     <string name="timeout_richDocuments">A betöltés sokáig tart…</string>
+    <string name="today">Ma</string>
     <string name="trashbin_activity_title">Törölt fájlok</string>
     <string name="trashbin_empty_headline">Nincs törölt fájl</string>
     <string name="trashbin_empty_message">Innen vissza tudja állítani a törölt fájljait.</string>

@@ -35,7 +35,10 @@
     <string name="add_another_public_share_link">Додати інше посилання</string>
     <string name="add_new_public_share">Додати нове публічне посилання</string>
     <string name="add_to_cloud">Додати до %1$s</string>
+    <string name="allow_creating">Може створювати</string>
+    <string name="allow_deleting">Може вилучати</string>
     <string name="allow_editing">Може редагувати</string>
+    <string name="allow_resharing">Можете ділитися</string>
     <string name="appbar_search_in">Пошук у %s</string>
     <string name="associated_account_not_found">Пов\'язаний обліковий запис не знайдено!</string>
     <string name="auth_access_failed">Доступ невдалий: %1$s</string>
@@ -273,6 +276,7 @@
     <string name="failed_to_download">Не вдалося передати файл до менеджера звантажень</string>
     <string name="failed_to_print">Не вдалося роздрукувати файл</string>
     <string name="failed_to_start_editor">Не вдалося запустити редактор</string>
+    <string name="failed_update_ui">Неможливо оновити інтерфейс</string>
     <string name="favorite">Додати до обраного</string>
     <string name="favorite_icon">Улюблений</string>
     <string name="file_delete">Вилучити</string>
@@ -371,8 +375,12 @@
     <string name="instant_upload_on_charging">Завантаження тільки під час заряджання</string>
     <string name="instant_upload_path">/InstantUpload</string>
     <string name="invalid_url">Неправильний URL</string>
+    <string name="invisible">Невидима</string>
     <string name="label_empty">Ярлик не може бути порожнім</string>
     <string name="link">Посилання</string>
+    <string name="link_share_allow_upload_and_editing">Може завантажувати та редагувати</string>
+    <string name="link_share_file_drop">Сховище (тільки завантажування)</string>
+    <string name="link_share_read_only">Тільки читання</string>
     <string name="list_layout">Шаблон списку</string>
     <string name="local_file_list_empty">В цій теці немає файлів.</string>
     <string name="local_file_not_found_message">Файл не знайдено у локальній файловій системі</string>
@@ -451,6 +459,7 @@
     <string name="notifications_no_results_headline">Немає сповіщень</string>
     <string name="notifications_no_results_message">Будь ласка, перегляньте ще раз пізніше.</string>
     <string name="offline_mode">Відсутнє з\'єднання з мережею</string>
+    <string name="oneHour">1 година</string>
     <string name="outdated_server">Завершилася підтримка серверної версії, будь ласка, встановіть нову! </string>
     <string name="overflow_menu">Більше параметрів</string>
     <string name="pass_code_configure_your_pass_code">Введіть Ваш код доступу</string>
@@ -477,6 +486,7 @@
     <string name="pref_behaviour_entries_move">переміщено до теки застосунку</string>
     <string name="pref_instant_name_collision_policy_dialogTitle">Що робити, якщо такий файл уже наявний?</string>
     <string name="pref_instant_name_collision_policy_entries_always_ask">Питати щоразу</string>
+    <string name="pref_instant_name_collision_policy_entries_cancel">Пропустити загрузку</string>
     <string name="pref_instant_name_collision_policy_entries_overwrite">Переписувати віддалену версію</string>
     <string name="pref_instant_name_collision_policy_entries_rename">Перейменовувати нову версію </string>
     <string name="pref_instant_name_collision_policy_title">Що робити, якщо такий файл уже наявний?</string>
@@ -580,12 +590,14 @@
     <string name="share_internal_link_to_file_text">Внутрішнє спільне посилання дійсне лише для користувачів, які мають доступ до цього файлу</string>
     <string name="share_internal_link_to_folder_text">Внутрішнє спільне посилання дійсне лише для користувачів, які мають доступ до цієї теки</string>
     <string name="share_known_remote_clarification">%1$s (о %2$s)</string>
+    <string name="share_link">Поділитися посиланням</string>
     <string name="share_link_empty_password">Ви повинні ввести пароль</string>
     <string name="share_link_file_error">Посилка під час надання спільного доступу до файлу чи теки.</string>
     <string name="share_link_file_no_exist">Неможливо надати спільний доступ. Будь ласка, перевірте, чи файл існує.</string>
     <string name="share_link_forbidden_permissions">для надання доступу до файла</string>
     <string name="share_link_optional_password_title">Зазначте пароль (необов\'язково)</string>
     <string name="share_link_password_title">Ввести пароль</string>
+    <string name="share_link_with_label">Поділитись посиланням (%1$s)</string>
     <string name="share_no_expiration_date_label">Встановити термін дії</string>
     <string name="share_no_password_title">Встановити пароль</string>
     <string name="share_password_title">Захищено паролем</string>
@@ -596,7 +608,6 @@
     <string name="share_privilege_unshare">Закрити доступ</string>
     <string name="share_remote_clarification">%1$s (віддалено)</string>
     <string name="share_room_clarification">%1$s (розмова)</string>
-    <string name="share_search">Ім\'я, ID об\'єднаної хмари або електронна адреса...</string>
     <string name="share_send_note">Примітка для одержувача</string>
     <string name="share_via_link_hide_download">Сховати завантаження</string>
     <string name="share_via_link_hide_file_listing_permission_label">Приховати перелік файлів</string>
@@ -645,6 +656,7 @@
     <string name="ssl_validator_reason_cert_not_trusted">- Не довірений сертифікат серверу</string>
     <string name="ssl_validator_reason_cert_not_yet_valid">- Сертифікат серверу занадто новий</string>
     <string name="ssl_validator_reason_hostname_not_verified">- URL не відповідає імені хоста у сертифікаті</string>
+    <string name="status_message">Повідомлення про статус</string>
     <string name="storage_camera">Камера</string>
     <string name="storage_choose_location">Виберіть місце збереження</string>
     <string name="storage_description_default">За замовчуванням</string>
@@ -690,10 +702,12 @@
     <string name="synced_icon">Синхронізований</string>
     <string name="tags">Позначки</string>
     <string name="test_server_button">Перевірка з\'єднання з сервером</string>
+    <string name="thisWeek">Цього тижня</string>
     <string name="thumbnail">Ескіз</string>
     <string name="thumbnail_for_existing_file_description">Ескіз існуючого файлу</string>
     <string name="thumbnail_for_new_file_desc">Ескіз нового файлу</string>
     <string name="timeout_richDocuments">Завантаження триває досить довго...</string>
+    <string name="today">Сьогодні</string>
     <string name="trashbin_activity_title">Вилучені файли</string>
     <string name="trashbin_empty_headline">Видалені файли відсутні</string>
     <string name="trashbin_empty_message">Тут можна відновити файли, які було вилучено.</string>

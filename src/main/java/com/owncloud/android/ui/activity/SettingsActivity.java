@@ -484,7 +484,7 @@ public class SettingsActivity extends ThemedPreferenceActivity
                         Log_OC.e(TAG, "Base Uri for account could not be resolved to call DAVdroid!", t);
                         DisplayUtils.showSnackMessage(
                                 activity,
-                                R.string.prefs_calendar_contacts_address_resolve_error
+                                R.string.kdrive_prefs_calendar_contacts_address_resolve_error
                         );
                     }
                     return true;

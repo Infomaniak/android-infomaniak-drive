@@ -34,7 +34,10 @@
     <string name="add_another_public_share_link">Přidat další odkaz</string>
     <string name="add_new_public_share">Přidat nový veřejný odkaz na sdílení</string>
     <string name="add_to_cloud">Přidat k %1$s</string>
+    <string name="allow_creating">Umožnit vytváření</string>
+    <string name="allow_deleting">Umožnit mazání</string>
     <string name="allow_editing">Umožnit úpravy</string>
+    <string name="allow_resharing">Umožnit sdílet dál dalším</string>
     <string name="appbar_search_in">Hledat v %s</string>
     <string name="associated_account_not_found">Související účet nenalezen!</string>
     <string name="auth_access_failed">Přístup se nezdařil: %1$s</string>
@@ -76,6 +79,7 @@
     <string name="autoupload_disable_power_save_check">Zakázat kontrolu úspory energie</string>
     <string name="autoupload_hide_folder">Skrýt složku</string>
     <string name="avatar">Avatar</string>
+    <string name="away">Pryč</string>
     <string name="battery_optimization_close">Zavřít</string>
     <string name="battery_optimization_disable">Vypnout</string>
     <string name="battery_optimization_message">Vaše zařízení má zapnuté snížení vybíjení akumulátoru. Automatické nahrávání funguje správně jen tehdy, když pro tuto aplikaci nastavíte výjimku.</string>
@@ -87,6 +91,8 @@
     <string name="choose_local_folder">Zvolte místní složku…</string>
     <string name="choose_remote_folder">Zvolte složku na protějšku…</string>
     <string name="clear_notifications_failed">Upozornění se nepodařilo vyčistit.</string>
+    <string name="clear_status_message">Vyčistit stavovou zprávu</string>
+    <string name="clear_status_message_after">Vyčistit stavovou zprávu po uplynutí</string>
     <string name="clipboard_label">Text zkopírován z %1$s</string>
     <string name="clipboard_no_text_to_copy">Neobdržen žádný text pro zkopírování do schránky</string>
     <string name="clipboard_text_copied">Odkaz zkopírován</string>
@@ -165,6 +171,7 @@
     <string name="copy_move_to_encrypted_folder_not_supported">Kopírování/přesouvání do šifrované složky není v tuto chvíli podporováno.</string>
     <string name="copy_to">Zkopírovat do…</string>
     <string name="could_not_download_image">Nepodařilo se stáhnout celý obrázek</string>
+    <string name="could_not_retrieve_shares">Nedaří se získat sdílení</string>
     <string name="could_not_retrieve_url">Nepodařilo se získat URL</string>
     <string name="create_dir_fail_msg">Nepodařilo se vytvořit složku</string>
     <string name="create_new">Vytvořit nové</string>
@@ -188,6 +195,8 @@
     <string name="disable_new_media_folder_detection_notifications">Vypnout</string>
     <string name="dismiss">Zavřít</string>
     <string name="dismiss_notification_description">Zahodit upozornění</string>
+    <string name="dnd">Nerušit</string>
+    <string name="dontClear">Nečistit</string>
     <string name="download_latest_dev_version">Stáhnout si nejnovější vývojářskou verzi</string>
     <string name="downloader_download_failed_content">Nepodařilo se stáhnout %1$s</string>
     <string name="downloader_download_failed_credentials_error">Stahování se nezdařilo, přihlaste se znovu</string>
@@ -204,6 +213,7 @@
     <string name="drawer_item_activities">Aktivity</string>
     <string name="drawer_item_all_files">Všechny soubory</string>
     <string name="drawer_item_favorites">Oblíbené</string>
+    <string name="drawer_item_gallery">Média</string>
     <string name="drawer_item_home">Domů</string>
     <string name="drawer_item_notifications">Upozornění</string>
     <string name="drawer_item_on_device">Na přístroji</string>
@@ -272,6 +282,7 @@
     <string name="failed_to_download">Předání souboru správci stahování se nezdařilo</string>
     <string name="failed_to_print">Soubor se nepodařilo vytisknout</string>
     <string name="failed_to_start_editor">Editor se nepodařilo spustit</string>
+    <string name="failed_update_ui">Nepodařilo se aktualizovat uživatelské rozhraní</string>
     <string name="favorite">Přidat do oblíbených</string>
     <string name="favorite_icon">Oblíbené</string>
     <string name="file_delete">Smazat</string>
@@ -361,6 +372,7 @@
     <string name="foreign_files_remote_text">Vzdálené: %1$s</string>
     <string name="foreign_files_success">Všechny soubory byly přesunuty</string>
     <string name="forward">Vpřed</string>
+    <string name="fourHours">4 hodiny</string>
     <string name="hint_name">Jméno</string>
     <string name="hint_note">Poznámka</string>
     <string name="hint_password">Heslo</string>
@@ -370,8 +382,12 @@
     <string name="instant_upload_on_charging">Nahrávat pouze při nabíjení</string>
     <string name="instant_upload_path">/InstantUpload</string>
     <string name="invalid_url">Neplatná URL adresa</string>
+    <string name="invisible">Neviditelné</string>
     <string name="label_empty">Štítek nemůže zůstat prázdný</string>
     <string name="link">Odkaz</string>
+    <string name="link_share_allow_upload_and_editing">Umožnit nahrávání a úpravy</string>
+    <string name="link_share_file_drop">Přetažení souboru (pouze nahrání)</string>
+    <string name="link_share_read_only">Pouze pro čtení</string>
     <string name="list_layout">Zobrazit jako seznam</string>
     <string name="local_file_list_empty">V této složce nejsou žádné soubory.</string>
     <string name="local_file_not_found_message">Soubor nenalezen na souborovém systému</string>
@@ -450,6 +466,9 @@
     <string name="notifications_no_results_headline">Žádná upozornění</string>
     <string name="notifications_no_results_message">Vraťte se sem později.</string>
     <string name="offline_mode">Bez připojení k Internetu</string>
+    <string name="oneHour">1 hodina</string>
+    <string name="online">Online</string>
+    <string name="online_status">Stav online</string>
     <string name="outdated_server">Verze aplikace na straně serveru už je příliš stará na to, aby šla nadále používat – přejděte na novou!</string>
     <string name="overflow_menu">Další nabídka</string>
     <string name="pass_code_configure_your_pass_code">Zadejte svůj bezpečnostní kód</string>
@@ -476,6 +495,7 @@
     <string name="pref_behaviour_entries_move">přesunuto do složky aplikace</string>
     <string name="pref_instant_name_collision_policy_dialogTitle">Co udělat pokud soubor už existuje?</string>
     <string name="pref_instant_name_collision_policy_entries_always_ask">Pokaždé se zeptat</string>
+    <string name="pref_instant_name_collision_policy_entries_cancel">Přeskočit nahrávání</string>
     <string name="pref_instant_name_collision_policy_entries_overwrite">Přepsat vzdálenou verzi</string>
     <string name="pref_instant_name_collision_policy_entries_rename">Přejmenovat novou verzi</string>
     <string name="pref_instant_name_collision_policy_title">Co udělat pokud soubor už existuje?</string>
@@ -534,6 +554,7 @@
     <string name="recommend_subject">Vyzkoušejte %1$s ve svém zařízení!</string>
     <string name="recommend_text">Rád(a) bych Vás/Tě pozval(a) k používání %1$s na vašem/tvém zařízení.\nKe stažení zde: %2$s</string>
     <string name="recommend_urls">%1$s nebo %2$s</string>
+    <string name="remote">(vzdálené)</string>
     <string name="remote_file_fetch_failed">Nepodařilo se najít soubor!</string>
     <string name="remove_fail_msg">Odstranění se nezdařilo</string>
     <string name="remove_notification_failed">Upozornění se nepodařilo odebrat.</string>
@@ -569,6 +590,8 @@
     <string name="sendbutton_description">Ikona tlačítka pro odesílání</string>
     <string name="set_as">Nastavit jako</string>
     <string name="set_picture_as">Použít obrázek jako</string>
+    <string name="set_status">Nastavit stav</string>
+    <string name="set_status_message">Nastavit stavovou zprávu</string>
     <string name="share">Sdílet</string>
     <string name="share_dialog_title">Sdílení</string>
     <string name="share_email_clarification">%1$s (e-mail)</string>
@@ -579,12 +602,15 @@
     <string name="share_internal_link_to_file_text">Sdílení interním odkazem funguje pouze pro uživatele, kteří mají k tomuto souboru přístup</string>
     <string name="share_internal_link_to_folder_text">Sdílení interním odkazem funguje pouze pro uživatele, kteří mají k této složce přístup</string>
     <string name="share_known_remote_clarification">%1$s (v %2$s)</string>
+    <string name="share_known_remote_on_clarification">na %1$s</string>
+    <string name="share_link">Odkaz na sdílení</string>
     <string name="share_link_empty_password">Je třeba zadat heslo</string>
     <string name="share_link_file_error">Při pokusu o sdílení tohoto souboru či složky došlo k chybě.</string>
     <string name="share_link_file_no_exist">Nedaří se sdílet – zkontrolujte zda soubor existuje.</string>
     <string name="share_link_forbidden_permissions">pro sdílení tohoto souboru</string>
     <string name="share_link_optional_password_title">Zadejte nepovinné heslo</string>
     <string name="share_link_password_title">Zadejte heslo</string>
+    <string name="share_link_with_label">Odkaz na sdílení (%1$s)</string>
     <string name="share_no_expiration_date_label">Nastavit datum skončení platnosti</string>
     <string name="share_no_password_title">Nastavit heslo</string>
     <string name="share_password_title">Chráněno heslem</string>
@@ -595,7 +621,7 @@
     <string name="share_privilege_unshare">Zrušit sdílení</string>
     <string name="share_remote_clarification">%1$s (vzdálený)</string>
     <string name="share_room_clarification">%1$s (konverzace)</string>
-    <string name="share_search">Jméno, identifikátor v rámci federovaného cloudu, nebo e-mailová adresa…</string>
+    <string name="share_search">Jméno, identifikátor v rámci sdruženého cloudu, nebo e-mailová adresa…</string>
     <string name="share_send_note">Poznámka pro příjemce</string>
     <string name="share_via_link_hide_download">Skrýt stahování</string>
     <string name="share_via_link_hide_file_listing_permission_label">Skrýt seznam souborů</string>
@@ -644,6 +670,7 @@
     <string name="ssl_validator_reason_cert_not_trusted">- Certifikát serveru není důvěryhodný</string>
     <string name="ssl_validator_reason_cert_not_yet_valid">- certifikát serveru ještě nezačal platit (datum začátku platnosti je v budoucnosti)</string>
     <string name="ssl_validator_reason_hostname_not_verified">- URL adresa neodpovídá názvu hostitele v certifikátu</string>
+    <string name="status_message">Stavová zpráva</string>
     <string name="storage_camera">Kamera</string>
     <string name="storage_choose_location">Zvolte umístění úložiště</string>
     <string name="storage_description_default">Výchozí</string>
@@ -712,10 +739,13 @@ Jak vývojová tak produkční verze je k dispozici na F-droid a mohou být nain
     <string name="synced_icon">Synchronizováno</string>
     <string name="tags">Štítky</string>
     <string name="test_server_button">Vyzkoušet připojení k serveru</string>
+    <string name="thirtyMinutes">30 minut</string>
+    <string name="thisWeek">Tento týden</string>
     <string name="thumbnail">Náhled</string>
     <string name="thumbnail_for_existing_file_description">Náhled pro existující soubor</string>
     <string name="thumbnail_for_new_file_desc">Náhled pro nový soubor</string>
     <string name="timeout_richDocuments">Načítání trvá velmi dlouho…</string>
+    <string name="today">Dnes</string>
     <string name="trashbin_activity_title">Smazané soubory</string>
     <string name="trashbin_empty_headline">Žádné smazané soubory</string>
     <string name="trashbin_empty_message">Odsud je možné obnovit smazané soubory.</string>
@@ -826,6 +856,7 @@ Jak vývojová tak produkční verze je k dispozici na F-droid a mohou být nain
     <string name="what_s_new_image">Obrázek „Co je nového“</string>
     <string name="whats_new_skip">Přeskočit</string>
     <string name="whats_new_title">Co je v %1$s nového</string>
+    <string name="whats_your_status">Jaký je váš stav?</string>
     <plurals name="sync_fail_in_favourites_content">
         <item quantity="one">Nedaří se synchronizovat %1$d soubor (konflikty: %2$d)</item>
         <item quantity="few">Nedaří se synchronizovat %1$d soubory (konflikty: %2$d)</item>

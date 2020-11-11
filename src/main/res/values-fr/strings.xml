@@ -34,7 +34,10 @@
     <string name="add_another_public_share_link">Ajouter un autre lien</string>
     <string name="add_new_public_share">Ajouter un nouveau lien de partage public</string>
     <string name="add_to_cloud">Ajouter à %1$s</string>
+    <string name="allow_creating">Autoriser la création</string>
+    <string name="allow_deleting">Autoriser la suppression</string>
     <string name="allow_editing">Autoriser la modification</string>
+    <string name="allow_resharing">Autoriser le repartage</string>
     <string name="appbar_search_in">Recherche dans %s</string>
     <string name="associated_account_not_found">Compte associé introuvable !</string>
     <string name="auth_access_failed">L\'accès a échoué: %1$s</string>
@@ -72,10 +75,11 @@
     <string name="auto_upload_path">/EnvoiAuto</string>
     <string name="autoupload_configure">Configurer</string>
     <string name="autoupload_create_new_custom_folder">Créer une nouvelle configuration de dossier personnalisé</string>
-    <string name="autoupload_custom_folder">Configurer un dossier personnalisé</string>
+    <string name="autoupload_custom_folder">Définir un dossier personnalisé</string>
     <string name="autoupload_disable_power_save_check">Désactiver l\'économie de batterie</string>
     <string name="autoupload_hide_folder">Masquer le dossier</string>
     <string name="avatar">Avatar</string>
+    <string name="away">Absent</string>
     <string name="battery_optimization_close">Fermer</string>
     <string name="battery_optimization_disable">Désactiver</string>
     <string name="battery_optimization_message">L\'optimisation de la batterie est peut-être active sur votre appareil.  Le téléversement automatique ne fonctionne correctement que si vous excluez cette application de l\'optimisation.</string>
@@ -87,6 +91,8 @@
     <string name="choose_local_folder">Sélectionner le dossier local…</string>
     <string name="choose_remote_folder">Sélectionner le dossier distant…</string>
     <string name="clear_notifications_failed">Erreur lors de l\'effacement des notifications.</string>
+    <string name="clear_status_message">Effacer le message d\'état</string>
+    <string name="clear_status_message_after">Effacer le message d\'états après</string>
     <string name="clipboard_label">Texte copié depuis %1$s</string>
     <string name="clipboard_no_text_to_copy">Aucun texte n\'a été reçu pour copier dans le presse-papier</string>
     <string name="clipboard_text_copied">Lien copié</string>
@@ -165,6 +171,7 @@
     <string name="copy_move_to_encrypted_folder_not_supported">Copier/déplacer dans ce dossier chiffré n\'est pas actuellement supporté</string>
     <string name="copy_to">Copier vers…</string>
     <string name="could_not_download_image">Impossible de télécharger l\'image complète</string>
+    <string name="could_not_retrieve_shares">Impossible de récupérer les partages</string>
     <string name="could_not_retrieve_url">Impossible de récupérer l\'URL</string>
     <string name="create_dir_fail_msg">Le dossier n\'a pas pu être créé</string>
     <string name="create_new">Créer un nouveau</string>
@@ -190,6 +197,8 @@ Attention la suppression est irréversible.</string>
     <string name="disable_new_media_folder_detection_notifications">Désactiver</string>
     <string name="dismiss">Ignorer</string>
     <string name="dismiss_notification_description">Ignorer la notification</string>
+    <string name="dnd">Ne pas déranger</string>
+    <string name="dontClear">Ne pas effacer</string>
     <string name="download_latest_dev_version">Télécharger la dernière version de développement</string>
     <string name="downloader_download_failed_content">Impossible de télécharger %1$s</string>
     <string name="downloader_download_failed_credentials_error">Téléchargement échoué, reconnectez-vous</string>
@@ -206,6 +215,7 @@ Attention la suppression est irréversible.</string>
     <string name="drawer_item_activities">Activité</string>
     <string name="drawer_item_all_files">Tous les fichiers</string>
     <string name="drawer_item_favorites">Favoris</string>
+    <string name="drawer_item_gallery">Média</string>
     <string name="drawer_item_home">Accueil</string>
     <string name="drawer_item_notifications">Notifications</string>
     <string name="drawer_item_on_device">Sur l\'appareil</string>
@@ -274,6 +284,7 @@ Attention la suppression est irréversible.</string>
     <string name="failed_to_download">Transmission du fichier au gestionnaire de téléchargement échoué</string>
     <string name="failed_to_print">Impossible d\'imprimer le fichier</string>
     <string name="failed_to_start_editor">Impossible de lancer l\'éditeur</string>
+    <string name="failed_update_ui">Échec de la mise à jour de l\'interface utilisateur</string>
     <string name="favorite">Ajouter aux favoris</string>
     <string name="favorite_icon">Favoris</string>
     <string name="file_delete">Supprimer</string>
@@ -363,6 +374,7 @@ Attention la suppression est irréversible.</string>
     <string name="foreign_files_remote_text">Distant : %1$s</string>
     <string name="foreign_files_success">Tous les fichiers ont été déplacés</string>
     <string name="forward">Suivant</string>
+    <string name="fourHours">4 heures</string>
     <string name="hint_name">Nom</string>
     <string name="hint_note">Note</string>
     <string name="hint_password">Mot de passe</string>
@@ -372,8 +384,12 @@ Attention la suppression est irréversible.</string>
     <string name="instant_upload_on_charging">Envoyer uniquement si le chargeur est branché</string>
     <string name="instant_upload_path">/InstantUpload</string>
     <string name="invalid_url">URL invalide</string>
+    <string name="invisible">Invisible</string>
     <string name="label_empty">Le libellé ne peut pas être vide</string>
     <string name="link">Lien</string>
+    <string name="link_share_allow_upload_and_editing">Autoriser l’envoi et la modification</string>
+    <string name="link_share_file_drop">Dépôt de fichier (envoi uniquement)</string>
+    <string name="link_share_read_only">Lecture seule</string>
     <string name="list_layout">Affichage en liste</string>
     <string name="local_file_list_empty">Aucun fichier n\'est présent dans ce dossier.</string>
     <string name="local_file_not_found_message">Le fichier n\'a pas été trouvé sur le système de fichier local</string>
@@ -452,6 +468,9 @@ Attention la suppression est irréversible.</string>
     <string name="notifications_no_results_headline">Aucune notification</string>
     <string name="notifications_no_results_message">Veuillez revenir plus tard.</string>
     <string name="offline_mode">Aucune connexion Internet</string>
+    <string name="oneHour">1 heure</string>
+    <string name="online">En ligne</string>
+    <string name="online_status">Statut en ligne</string>
     <string name="outdated_server">Le serveur est obsolète, veuillez mettre à jour!</string>
     <string name="overflow_menu">Plus de menu</string>
     <string name="pass_code_configure_your_pass_code">Saisissez votre code de sécurité</string>
@@ -478,11 +497,13 @@ Attention la suppression est irréversible.</string>
     <string name="pref_behaviour_entries_move">déplacé vers le dossier de l\'application</string>
     <string name="pref_instant_name_collision_policy_dialogTitle">Que faire si le fichier existe déjà ?</string>
     <string name="pref_instant_name_collision_policy_entries_always_ask">Me demander à chaque fois</string>
+    <string name="pref_instant_name_collision_policy_entries_cancel">Ignorer l\'envoi</string>
     <string name="pref_instant_name_collision_policy_entries_overwrite">Écraser la version distante</string>
     <string name="pref_instant_name_collision_policy_entries_rename">Renommer la nouvelle version</string>
     <string name="pref_instant_name_collision_policy_title">Que faire si le fichier existe déjà ?</string>
     <string name="prefs_add_account">Ajouter un compte</string>
-    <string name="prefs_calendar_contacts">Synchroniser vos contacts et vos calendriers</string>
+    <string name="prefs_calendar_contacts">Synchroniser les contacts &amp; l\'agenda</string>
+    <string name="prefs_calendar_contacts_address_resolve_error">L\'adresse du serveur pour le compte n\'a pas pu être résolu pour DAVx5 (autrefois connu comme DAVdroid)</string>
     <string name="prefs_calendar_contacts_no_store_error">Ni Google Play Store ou F-Droid ne sont installés</string>
     <string name="prefs_calendar_contacts_sync_setup_successful">Synchronisation de l\'agenda &amp; des contacts configurée</string>
     <string name="prefs_category_about">À propos</string>
@@ -534,6 +555,7 @@ Attention la suppression est irréversible.</string>
     <string name="recommend_subject">Essayez %1$s sur votre appareil !</string>
     <string name="recommend_text">J\'aimerais vous inviter à utiliser %1$s sur votre appareil.\nTéléchargez-la ici : %2$s</string>
     <string name="recommend_urls">%1$s ou %2$s</string>
+    <string name="remote">(distant)</string>
     <string name="remote_file_fetch_failed">Impossible de trouver le fichier</string>
     <string name="remove_fail_msg">Échec de la suppression</string>
     <string name="remove_notification_failed">Erreur lors de la suppression des notifications.</string>
@@ -568,6 +590,8 @@ Attention la suppression est irréversible.</string>
     <string name="sendbutton_description">Icône du bouton d\'envoi</string>
     <string name="set_as">Utiliser comme</string>
     <string name="set_picture_as">Utiliser l\'image comme</string>
+    <string name="set_status">Définir le statut</string>
+    <string name="set_status_message">Message d\'état</string>
     <string name="share">Partager</string>
     <string name="share_dialog_title">Partage</string>
     <string name="share_email_clarification">%1$s (courriel)</string>
@@ -578,12 +602,15 @@ Attention la suppression est irréversible.</string>
     <string name="share_internal_link_to_file_text">le partage de lien interne fonctionne uniquement pour les utilisateurs qui ont accès à ce fichier</string>
     <string name="share_internal_link_to_folder_text">le partage de lien interne fonctionne uniquement pour les utilisateurs qui ont accès à ce dossier</string>
     <string name="share_known_remote_clarification">%1$s (sur %2$s)</string>
+    <string name="share_known_remote_on_clarification">le %1$s</string>
+    <string name="share_link">Lien de partage</string>
     <string name="share_link_empty_password">Vous devez saisir un mot de passe</string>
     <string name="share_link_file_error">Une erreur s\'est produite lors de la tentative de partage de ce fichier ou dossier.</string>
     <string name="share_link_file_no_exist">Impossible de partager. Veuillez vérifier si le fichier existe.</string>
     <string name="share_link_forbidden_permissions">de partager ce fichier</string>
     <string name="share_link_optional_password_title">Saisissez un mot de passe optionnel</string>
     <string name="share_link_password_title">Saisissez un mot de passe</string>
+    <string name="share_link_with_label">Partager le lien (%1$s)</string>
     <string name="share_no_expiration_date_label">Définir une date d\'expiration</string>
     <string name="share_no_password_title">Définir le mot de passe</string>
     <string name="share_password_title">Protégé par mot de passe</string>
@@ -643,6 +670,7 @@ Attention la suppression est irréversible.</string>
     <string name="ssl_validator_reason_cert_not_trusted">- Le certificat du serveur n\'est pas sûr</string>
     <string name="ssl_validator_reason_cert_not_yet_valid">- Le certificat du serveur n\'est pas encore valide</string>
     <string name="ssl_validator_reason_hostname_not_verified">- L\'URL ne correspond pas au nom d\'hôte du certificat</string>
+    <string name="status_message">Message d\'état</string>
     <string name="storage_camera">Appareil photo</string>
     <string name="storage_choose_location">Sélectionnez l\'emplacement de stockage</string>
     <string name="storage_description_default">Défaut</string>
@@ -690,10 +718,13 @@ Attention la suppression est irréversible.</string>
     <string name="synced_icon">Synchronisé</string>
     <string name="tags">Étiquettes</string>
     <string name="test_server_button">Tester la connexion du serveur</string>
+    <string name="thirtyMinutes">30 minutes</string>
+    <string name="thisWeek">Cette semaine</string>
     <string name="thumbnail">Miniature</string>
     <string name="thumbnail_for_existing_file_description">Vignette pour fichier existant</string>
     <string name="thumbnail_for_new_file_desc">Vignette pour nouveau fichier</string>
     <string name="timeout_richDocuments">Le chargement est très long ...</string>
+    <string name="today">Aujourd\'hui</string>
     <string name="trashbin_activity_title">Fichiers supprimés</string>
     <string name="trashbin_empty_headline">Aucun fichier supprimé</string>
     <string name="trashbin_empty_message">Les fichiers supprimés s\'afficheront ici et vous pourrez les restaurer.</string>
@@ -804,6 +835,7 @@ Attention la suppression est irréversible.</string>
     <string name="what_s_new_image">Image quoi de neuf</string>
     <string name="whats_new_skip">Ignorer</string>
     <string name="whats_new_title">Nouveautés dans %1$s</string>
+    <string name="whats_your_status">Quel est votre statut ?</string>
     <plurals name="sync_fail_in_favourites_content">
         <item quantity="one">Impossible de synchroniser %1$d fichier (conflits : %2$d)</item>
         <item quantity="other">Impossible de synchroniser %1$d fichiers (conflits : %2$d)</item>

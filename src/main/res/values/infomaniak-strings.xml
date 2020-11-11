@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="prefs_calendar_contacts_summary">Set up kSync</string>
-    <string name="prefs_calendar_contacts_address_resolve_error">Server address for the account could not be resolved for kSync</string>
-    <string name="screenshot_06_davdroid_subline">Sync with kSync</string>
+    <string name="kdrive_prefs_calendar_contacts_summary">Set up kSync</string>
+    <string name="kdrive_prefs_calendar_contacts_address_resolve_error">Server address for the account could not be resolved for kSync</string>
 
     <string name="intro_title_1">A secure cloud for SMEs and private individuals</string>
     <string name="intro_title_2">Access your files on all your devices</string>
     <string name="intro_title_3">Share and work together in the same place</string>
     <string name="intro_title_4">Backup your photos automatically</string>
-
-    <string name="unavailable_operation_beta">This operation is unavailable during the beta-testing phase</string>
 
     <string name="nextcloud_repo_url">https://github.com/nextcloud/android</string>
     <string name="prefs_redistribution">Redistribution</string>

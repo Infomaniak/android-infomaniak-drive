@@ -27,12 +27,17 @@
     <string name="actionbar_sort">Сортирај</string>
     <string name="active_user">Активен корисник</string>
     <string name="activities_no_results_headline">Сеуште нема активности</string>
+    <string name="activities_no_results_message">Сè уште нема настани како дополнувања, промени и споделувања.</string>
     <string name="activity_chooser_send_file_title">Прати</string>
     <string name="activity_chooser_title">Испрати линк до…</string>
     <string name="activity_icon">Активност</string>
     <string name="add_another_public_share_link">Додади линк</string>
+    <string name="add_new_public_share">Додади нов линк за споделување</string>
     <string name="add_to_cloud">Додади во %1$s</string>
+    <string name="allow_creating">Дозволи креирање</string>
+    <string name="allow_deleting">Дозволи бришење</string>
     <string name="allow_editing">Овозможи уредување</string>
+    <string name="allow_resharing">Дозволи повторно споделување</string>
     <string name="appbar_search_in">Барај во %s</string>
     <string name="associated_account_not_found">Не е пронајдена поврзана сметка!</string>
     <string name="auth_access_failed">Неуспешен пристап: %1$s</string>
@@ -41,6 +46,7 @@
     <string name="auth_account_not_the_same">Внесениот корисник не се совпаѓа со корисникот на оваа сметка</string>
     <string name="auth_bad_oc_version_title">Верзијата на серверот не е препознаена</string>
     <string name="auth_connection_established">Конекцијата е воспоставена</string>
+    <string name="auth_fail_get_user_name">Вашиот сервер не испраќа точен кориснички ID, контактирајте го администраторот</string>
     <string name="auth_host_address">Адреса на сервер</string>
     <string name="auth_host_url">Адреса на серверот https://…</string>
     <string name="auth_incorrect_address_title">Погрешен формат за адреса на сервер</string>
@@ -73,6 +79,7 @@
     <string name="autoupload_disable_power_save_check">Оневозможи проверка за заштеда на енергија</string>
     <string name="autoupload_hide_folder">Сокриј папка</string>
     <string name="avatar">Аватар</string>
+    <string name="away">Далеку</string>
     <string name="battery_optimization_close">Затвори</string>
     <string name="battery_optimization_disable">Оневозможи</string>
     <string name="battery_optimization_message">Вашиот уред може да има овозможено оптимизација на батеријата. Автоматското прикачување работи само ако соодветно ја исклучите оваа апликација од оптимизацијата на батеријата.</string>
@@ -84,6 +91,8 @@
     <string name="choose_local_folder">Избери локална папка…</string>
     <string name="choose_remote_folder">Избери папка на серверот…</string>
     <string name="clear_notifications_failed">Неуспешно чистење на нотификациите.</string>
+    <string name="clear_status_message">Тргни ја статус пораката</string>
+    <string name="clear_status_message_after">Тргни го статусот после</string>
     <string name="clipboard_label">Текст копиран од %1$s</string>
     <string name="clipboard_no_text_to_copy">Нема текст за да се копира во клипборд</string>
     <string name="clipboard_text_copied">Линкот е копиран</string>
@@ -106,6 +115,7 @@
     <string name="common_send">Испрати</string>
     <string name="common_share">Сподели</string>
     <string name="common_switch_account">Промени сметка</string>
+    <string name="common_switch_to_account">Промени сметка</string>
     <string name="common_unknown">непознат</string>
     <string name="common_yes">Да</string>
     <string name="community_beta_headline">Test the dev version</string>
@@ -155,11 +165,15 @@
     <string name="copy_file_error">Настана грешка при обидот за копирање на оваа датотека или папка</string>
     <string name="copy_file_invalid_into_descendent">Не е возможно да се копира папката во истата таа папка</string>
     <string name="copy_file_invalid_overwrite">Датотеката веќе постои во папката</string>
+    <string name="copy_file_not_found">Не може да се копира. Проверете дали постои датотеката.</string>
     <string name="copy_link">Копирај врска</string>
     <string name="copy_move_to_encrypted_folder_not_supported">Не е поддржано копирање/преместување во папка која е шифрирана.</string>
     <string name="copy_to">Копирај во…</string>
     <string name="could_not_download_image">Неможе да се преземе целосната слика</string>
+    <string name="could_not_retrieve_shares">Неможе да се превземат споделувањата</string>
+    <string name="could_not_retrieve_url">Неможе да се превземе адресата</string>
     <string name="create_dir_fail_msg">Не множе да креира папка</string>
+    <string name="create_new">Креирај нова</string>
     <string name="create_new_document">Креирај нов документ</string>
     <string name="create_new_folder">Креирај нова папка</string>
     <string name="create_new_presentation">Креирај нова презентација</string>
@@ -179,6 +193,8 @@
     <string name="disable_new_media_folder_detection_notifications">Оневозможи</string>
     <string name="dismiss">Отфрли</string>
     <string name="dismiss_notification_description">Отфрли известување</string>
+    <string name="dnd">Не вознемирувај</string>
+    <string name="dontClear">Не го тргај</string>
     <string name="download_latest_dev_version">Download latest dev version</string>
     <string name="downloader_download_failed_content">%1$s неможе да се превземе</string>
     <string name="downloader_download_failed_credentials_error">Преземањето не беше успешно, најавете се повторно</string>
@@ -212,6 +228,7 @@
     <string name="drawer_synced_folders">Автоматско прикачување</string>
     <string name="edit_label">Промени име</string>
     <string name="edit_permission_label">уреди</string>
+    <string name="edit_rich_workspace">уреди информации за папката</string>
     <string name="encrypted">Постави како енкриптирано</string>
     <string name="end_to_end_encryption_confirm_button">Постави енкрипција</string>
     <string name="end_to_end_encryption_decrypting">Дешифрирање…</string>
@@ -240,8 +257,14 @@
     <string name="error_retrieving_templates">Грешка при превземањето на шаблоните</string>
     <string name="error_starting_direct_camera_upload">Грешка при стартување на камерата</string>
     <string name="etm_accounts">Сметки</string>
+    <string name="etm_background_job_progress">Напредок</string>
+    <string name="etm_background_job_started">Започна</string>
+    <string name="etm_background_job_state">Статус</string>
     <string name="etm_background_job_user">Корисник</string>
+    <string name="etm_background_job_uuid">UUID</string>
     <string name="etm_background_jobs">Задачи кој се извршуваат во позадина</string>
+    <string name="etm_background_jobs_cancel_all">Откажи ги сите активности</string>
+    <string name="etm_downloader">Преземач</string>
     <string name="etm_preferences">Перформанси</string>
     <string name="etm_title">Инженерски мод за тестирање</string>
     <string name="fab_label">Додади или прикачи</string>
@@ -336,6 +359,7 @@
     <string name="foreign_files_remote_text">Одалечено: %1$s</string>
     <string name="foreign_files_success">Сите датотеки беа преместени</string>
     <string name="forward">Препрати</string>
+    <string name="fourHours">4 часа</string>
     <string name="hint_name">Име</string>
     <string name="hint_note">Белешка</string>
     <string name="hint_password">Лозинка</string>
@@ -345,7 +369,11 @@
     <string name="instant_upload_on_charging">Прикачувај само додека се полни</string>
     <string name="instant_upload_path">/InstantUpload</string>
     <string name="invalid_url">Неправилна URL</string>
+    <string name="invisible">Невидлив</string>
     <string name="link">Линк</string>
+    <string name="link_share_allow_upload_and_editing">Дозволи прикачување и уредување</string>
+    <string name="link_share_file_drop">Испуши датотека (само за прикачување)</string>
+    <string name="link_share_read_only">Само читај</string>
     <string name="list_layout">Listed layout</string>
     <string name="local_file_list_empty">Нема датотеки во оваа папка.</string>
     <string name="local_file_not_found_message">Датотеката не е пронајдена во локалното складиште</string>
@@ -387,7 +415,9 @@
     <string name="move_file_invalid_into_descendent">Не е возможно да се копира папката во истата таа папка</string>
     <string name="move_file_invalid_overwrite">Датотеката веќе постои во папката</string>
     <string name="move_to">Премести во…</string>
+    <string name="network_error_connect_timeout_exception">Се случи грешка при чекање на на серверот, операцијата не можеше да се изврши.</string>
     <string name="network_error_socket_exception">Настана грешка при обидот за поврзување со серверот</string>
+    <string name="network_error_socket_timeout_exception">Се случи грешка при чекање на на серверот, операцијата не можеше да се изврши.</string>
     <string name="new_comment">Нов коментар…</string>
     <string name="new_media_folder_detected">Нова папка %1$s е детектирана.</string>
     <string name="new_media_folder_photos">слика</string>
@@ -419,6 +449,9 @@
     <string name="notifications_no_results_headline">Нема известувања</string>
     <string name="notifications_no_results_message">Ве молиме проверете подоцна.</string>
     <string name="offline_mode">Нема интернет врска</string>
+    <string name="oneHour">1 час</string>
+    <string name="online">Приклучен</string>
+    <string name="online_status">Присутен</string>
     <string name="outdated_server">Серверот го достигна крајот на животот, ве молиме надградете го!</string>
     <string name="overflow_menu">Мени повеќе</string>
     <string name="pass_code_configure_your_pass_code">Венсете го вашиот код</string>
@@ -535,6 +568,8 @@
     <string name="sendbutton_description">Икона на копчето за испраќање</string>
     <string name="set_as">Постави како</string>
     <string name="set_picture_as">Користи ја сликата како</string>
+    <string name="set_status">Постави статус</string>
+    <string name="set_status_message">Постави статус порака</string>
     <string name="share">Сподели</string>
     <string name="share_dialog_title">Споделување</string>
     <string name="share_email_clarification">%1$s (е-пошта)</string>
@@ -543,6 +578,7 @@
     <string name="share_group_clarification">%1$s (група)</string>
     <string name="share_internal_link">Сподели внатрешен линк</string>
     <string name="share_known_remote_clarification">%1$s ( на %2$s )</string>
+    <string name="share_link">Сподели линк</string>
     <string name="share_link_empty_password">Морате да внесете лозинка</string>
     <string name="share_link_forbidden_permissions">да ја споделите оваа датотека</string>
     <string name="share_link_optional_password_title">Опционално внесете лозинка</string>
@@ -557,7 +593,6 @@
     <string name="share_privilege_unshare">Несподелувај</string>
     <string name="share_remote_clarification">%1$s (далечински)</string>
     <string name="share_room_clarification">%1$s (разговор)</string>
-    <string name="share_search">Име, ИД на федериран cloud или адреса на е-пошта…</string>
     <string name="share_send_note">Белешка до примачот</string>
     <string name="share_via_link_hide_download">Сокриј превземање</string>
     <string name="share_via_link_hide_file_listing_permission_label">Сокриј ја листата на датотеки</string>
@@ -606,6 +641,7 @@
     <string name="ssl_validator_reason_cert_not_trusted">- Сертификатот на серверот не е доверлив</string>
     <string name="ssl_validator_reason_cert_not_yet_valid">- Датумите на сертификатот се од иднината</string>
     <string name="ssl_validator_reason_hostname_not_verified">- URL не се совпаѓа со hostname во сертификатот</string>
+    <string name="status_message">Статус порака</string>
     <string name="storage_camera">Камера</string>
     <string name="storage_choose_location">Избери локација на складиште</string>
     <string name="storage_description_default">Стандардно</string>
@@ -651,8 +687,11 @@
     <string name="synced_icon">Синхронизирано</string>
     <string name="tags">Ознаки</string>
     <string name="test_server_button">Тестирајте ја врската со серверот</string>
+    <string name="thirtyMinutes">30 минути</string>
+    <string name="thisWeek">Оваа недела</string>
     <string name="thumbnail">Мали слики</string>
     <string name="timeout_richDocuments">Вчитувањето трае премногу долго…</string>
+    <string name="today">Денес</string>
     <string name="trashbin_activity_title">Избришани датотеки</string>
     <string name="trashbin_empty_headline">Нема избришани датотеки</string>
     <string name="trashbin_file_not_deleted">Датотеката %1$s неможе да се избрише!</string>
@@ -756,6 +795,7 @@
     <string name="what_s_new_image">Слика од тоа што е ново</string>
     <string name="whats_new_skip">Прескокни</string>
     <string name="whats_new_title">Ново во %1$s</string>
+    <string name="whats_your_status">Кој е вашиот статус?</string>
     <plurals name="sync_fail_in_favourites_content">
         <item quantity="one">Неможе да се синхронизира %1$d датотека (конфликт: %2$d)</item>
         <item quantity="other">Неможе да се синхронизираат %1$d датотеки (конфликти: %2$d)</item>

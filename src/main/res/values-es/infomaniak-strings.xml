@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="prefs_calendar_contacts_summary">Configurar kSync para la cuenta actual</string>
-    <string name="prefs_calendar_contacts_address_resolve_error">kSync no ha podido resolver la dirección del servidor para la cuenta.</string>
-    <string name="screenshot_06_davdroid_subline">Sincronización con kSync</string>
+    <string name="kdrive_prefs_calendar_contacts_summary">Configurar kSync para la cuenta actual</string>
+    <string name="kdrive_prefs_calendar_contacts_address_resolve_error">kSync no ha podido resolver la dirección del servidor para la cuenta.</string>
 
     <string name="intro_title_1">El Cloud seguro para pymes y particulares</string>
     <string name="intro_title_2">Accede a tus archivos en todos tus dispositivos</string>
     <string name="intro_title_3">Comparte y trabaja con otros en el mismo lugar</string>
     <string name="intro_title_4">Realiza la copia de seguridad automática de tus fotos</string>
-
-    <string name="unavailable_operation_beta">This operation is unavailable during the beta-testing phase</string>
 
     <string name="prefs_redistribution">Redistribución</string>
     <string name="prefs_redistribution_text">Esta aplicación se redistribuye desde el código fuente de Nextcloud bajo licencia GPLv2/AGPLv3.</string>

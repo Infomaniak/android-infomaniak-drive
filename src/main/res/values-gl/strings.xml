@@ -34,7 +34,10 @@
     <string name="add_another_public_share_link">Engadir outra ligazón</string>
     <string name="add_new_public_share">Engadir unha nova ligazón pública</string>
     <string name="add_to_cloud">Engadir en %1$s</string>
+    <string name="allow_creating">Permitir a creación</string>
+    <string name="allow_deleting">Permitir a eliminación</string>
     <string name="allow_editing">Permitir a edición</string>
+    <string name="allow_resharing">Permitir compartir</string>
     <string name="appbar_search_in">Buscar en %s</string>
     <string name="associated_account_not_found">Non se atopou unha conta asociada!</string>
     <string name="auth_access_failed">Acceso fallado: %1$s</string>
@@ -76,6 +79,7 @@
     <string name="autoupload_disable_power_save_check">Desactivar a verificación de aforro de enerxía</string>
     <string name="autoupload_hide_folder">Agochar o cartafol</string>
     <string name="avatar">Avatar</string>
+    <string name="away">Ausente</string>
     <string name="battery_optimization_close">Pechar</string>
     <string name="battery_optimization_disable">Desactivar</string>
     <string name="battery_optimization_message">É posíbel que o seu dispositivo teña activada a optimización da batería. O envío automático só funciona correctamente se exclúe esta aplicación.</string>
@@ -87,6 +91,8 @@
     <string name="choose_local_folder">Escoller cartafol local…</string>
     <string name="choose_remote_folder">Escoller cartafol remoto…</string>
     <string name="clear_notifications_failed">Produciuse un fallo ao limpar as notificacións.</string>
+    <string name="clear_status_message">Limpar a mensaxe de estado</string>
+    <string name="clear_status_message_after">Limpar a mensaxe de estado após</string>
     <string name="clipboard_label">Texto copiado dende %1$s</string>
     <string name="clipboard_no_text_to_copy">Non se recibiu ningún texto para copiar no portapapeis</string>
     <string name="clipboard_text_copied">Ligazón copiada</string>
@@ -137,7 +143,7 @@
     <string name="confirmation_remove_folder_alert">Confirma que quere eliminar %1$s e todo o seu contido?</string>
     <string name="confirmation_remove_folders_alert">Confirma que quere eliminar os elementos seleccionados e o seu contido?</string>
     <string name="confirmation_remove_local">Só local</string>
-    <string name="conflict_already_existing_file">O  ficheiro xa existe</string>
+    <string name="conflict_already_existing_file">Ficheiro existente</string>
     <string name="conflict_dialog_error">Produciuse un erro ao crear o diálogo de conflitos!</string>
     <string name="conflict_message_description">Se selecciona ambas versións, o ficheiro local terá un número engadido ao nome.</string>
     <string name="conflict_message_headline">Que ficheiros quere conservar?</string>
@@ -165,6 +171,7 @@
     <string name="copy_move_to_encrypted_folder_not_supported">Copiar/mover dentro dun cartafol cifrado aínda non está admitido.</string>
     <string name="copy_to">Copiar en…</string>
     <string name="could_not_download_image">Non foi posíbel descargar a imaxe completa</string>
+    <string name="could_not_retrieve_shares">Non foi posíbel recuperar as comparticións</string>
     <string name="could_not_retrieve_url">Non foi posíbel recuperar o URL</string>
     <string name="create_dir_fail_msg">Non foi posíbel crear o cartafol</string>
     <string name="create_new">Crear novo</string>
@@ -188,6 +195,8 @@
     <string name="disable_new_media_folder_detection_notifications">Desactivar</string>
     <string name="dismiss">Rexeitar</string>
     <string name="dismiss_notification_description">Rexeitar a notificación</string>
+    <string name="dnd">Non molestar</string>
+    <string name="dontClear">Non limpar</string>
     <string name="download_latest_dev_version">Descargar a última versión de desenvolvemento</string>
     <string name="downloader_download_failed_content">Non foi posíbel descargar %1$s</string>
     <string name="downloader_download_failed_credentials_error">Produciuse un fallo na descarga, acceda de novo.</string>
@@ -204,6 +213,7 @@
     <string name="drawer_item_activities">Actividades</string>
     <string name="drawer_item_all_files">Todos os ficheiros</string>
     <string name="drawer_item_favorites">Favoritos</string>
+    <string name="drawer_item_gallery">Multimedia</string>
     <string name="drawer_item_home">Inicio</string>
     <string name="drawer_item_notifications">Notificacións</string>
     <string name="drawer_item_on_device">No dispositivo</string>
@@ -272,6 +282,7 @@
     <string name="failed_to_download">Produciuse un fallo ao pasar o ficheiro para o xestor de descargas</string>
     <string name="failed_to_print">Produciuse un fallo ao imprimir o ficheiro</string>
     <string name="failed_to_start_editor">Produciuse un fallo ao iniciar o editor</string>
+    <string name="failed_update_ui">Produciuse un fallo ao actualizar a IU</string>
     <string name="favorite">Engadir a favoritos</string>
     <string name="favorite_icon">Favorito</string>
     <string name="file_delete">Eliminar</string>
@@ -304,7 +315,7 @@
     <string name="file_list_folder">cartafol</string>
     <string name="file_list_loading">Cargando…</string>
     <string name="file_list_no_app_for_file_type">Non foi estabelecida unha aplicación para manexar este tipo de ficheiro.</string>
-    <string name="file_list_seconds_ago">segundos atrás</string>
+    <string name="file_list_seconds_ago">hai uns segundos</string>
     <string name="file_migration_checking_destination">Comprobando o destino…</string>
     <string name="file_migration_cleaning">Limpando…</string>
     <string name="file_migration_dialog_title">Actualizando a ruta do almacenamento</string>
@@ -361,6 +372,7 @@
     <string name="foreign_files_remote_text">Remoto: %1$s</string>
     <string name="foreign_files_success">Foron movidos todos os ficheiros</string>
     <string name="forward">Adiante</string>
+    <string name="fourHours">4 horas</string>
     <string name="hint_name">Nome</string>
     <string name="hint_note">Nota</string>
     <string name="hint_password">Contrasinal</string>
@@ -370,8 +382,12 @@
     <string name="instant_upload_on_charging">Enviar só cando estea cargando</string>
     <string name="instant_upload_path">/EnvíoInstantáneo</string>
     <string name="invalid_url">URL incorrecto</string>
+    <string name="invisible">Invisíbel</string>
     <string name="label_empty">A etiqueta non pode estar baleira</string>
     <string name="link">Ligazón</string>
+    <string name="link_share_allow_upload_and_editing">Permitir o envío e a edición</string>
+    <string name="link_share_file_drop">Soltar ficheiro (só envíos) </string>
+    <string name="link_share_read_only">Só lectura</string>
     <string name="list_layout">Ver como lista</string>
     <string name="local_file_list_empty">Non hai ficheiros neste cartafol.</string>
     <string name="local_file_not_found_message">Non se atopou o ficheiro no sistema local de ficheiros</string>
@@ -450,7 +466,10 @@
     <string name="notifications_no_results_headline">Non hai notificacións</string>
     <string name="notifications_no_results_message">Compróbeo máis adiante.</string>
     <string name="offline_mode">Sen conexión coa Internet</string>
-    <string name="outdated_server">O servidor acadou a fin da súa vida. Actualíceo!</string>
+    <string name="oneHour">1 hora</string>
+    <string name="online">En liña</string>
+    <string name="online_status">Estado en liña</string>
+    <string name="outdated_server">O servidor acadou a fin da súa vida. Anóveo!</string>
     <string name="overflow_menu">Máis menús</string>
     <string name="pass_code_configure_your_pass_code">Introduza o seu código de seguridade</string>
     <string name="pass_code_configure_your_pass_code_explanation">Solicitaráselle o código de seguridade cada vez que inicie a aplicación</string>
@@ -476,6 +495,7 @@
     <string name="pref_behaviour_entries_move">movido cara ao cartafol da aplicación</string>
     <string name="pref_instant_name_collision_policy_dialogTitle">Que facer se o ficheiro xa existe?</string>
     <string name="pref_instant_name_collision_policy_entries_always_ask">Pregúntarme cada vez</string>
+    <string name="pref_instant_name_collision_policy_entries_cancel">Omitir o envío</string>
     <string name="pref_instant_name_collision_policy_entries_overwrite">Sobrescribir a versión remota</string>
     <string name="pref_instant_name_collision_policy_entries_rename">Renomear a versión nova</string>
     <string name="pref_instant_name_collision_policy_title">Que facer se o ficheiro xa existe?</string>
@@ -533,8 +553,9 @@
     <string name="push_notifications_temp_error">Actualmente non están dispoñíbeis as notificacións do servidor.</string>
     <string name="qr_could_not_be_read">Non foi posíbel crear o código QR!</string>
     <string name="recommend_subject">Probe %1$s no seu dispositivo!</string>
-    <string name="recommend_text">Quixera convidalo a usar %1$s no seu dispositivo\nDescargueo aquí: %2$s</string>
+    <string name="recommend_text">Quixera convidalo a usar %1$s no seu dispositivo.\nDescargueo aquí: %2$s</string>
     <string name="recommend_urls">%1$s ou %2$s</string>
+    <string name="remote">(remoto)</string>
     <string name="remote_file_fetch_failed">Produciuse un fallo ao atopar o ficheiro!</string>
     <string name="remove_fail_msg">Produciuse un fallo na eliminación</string>
     <string name="remove_notification_failed">Produciuse un fallo ao retirar a notificación.</string>
@@ -570,6 +591,8 @@
     <string name="sendbutton_description">Icona do botón de envío</string>
     <string name="set_as">Estabelecer como</string>
     <string name="set_picture_as">Usar a imaxe como</string>
+    <string name="set_status">Estabelecer o estado</string>
+    <string name="set_status_message">Establecer a mensaxe de estado</string>
     <string name="share">Compartir</string>
     <string name="share_dialog_title">Compartindo</string>
     <string name="share_email_clarification">%1$s (correo-e)</string>
@@ -580,12 +603,15 @@
     <string name="share_internal_link_to_file_text">A ligazón de compartición interna só funciona para usuarios con acceso a este ficheiro</string>
     <string name="share_internal_link_to_folder_text">A ligazón de compartición interna só funciona para usuarios con acceso a este cartafol</string>
     <string name="share_known_remote_clarification">%1$s ( en %2$s )</string>
+    <string name="share_known_remote_on_clarification">en %1$s</string>
+    <string name="share_link">Compartir ligazón</string>
     <string name="share_link_empty_password">Ten que introducir un contrasinal</string>
     <string name="share_link_file_error">Produciuse un erro ao tentar compartir este ficheiro ou cartafol.</string>
     <string name="share_link_file_no_exist">Non é posíbel compartir, Comprobe que o ficheiro existe.</string>
     <string name="share_link_forbidden_permissions">para compartir este ficheiro</string>
     <string name="share_link_optional_password_title">Escriba un contrasinal opcional</string>
     <string name="share_link_password_title">Introduza un contrasinal</string>
+    <string name="share_link_with_label">Compartir ligazón (%1$s)</string>
     <string name="share_no_expiration_date_label">Estabelecer a data de caducidade</string>
     <string name="share_no_password_title">Estabelecer o contrasinal</string>
     <string name="share_password_title">Protexido con contrasinal</string>
@@ -645,6 +671,7 @@
     <string name="ssl_validator_reason_cert_not_trusted">- O certificado do servidor non é de confianza</string>
     <string name="ssl_validator_reason_cert_not_yet_valid">- As datas de validez do certificado son do futuro</string>
     <string name="ssl_validator_reason_hostname_not_verified">- O URL non coincide co nome de máquina no certificado</string>
+    <string name="status_message">Mensaxe de estado</string>
     <string name="storage_camera">Cámara</string>
     <string name="storage_choose_location">Escolla a localización do almacenamento</string>
     <string name="storage_description_default">Predeterminado</string>
@@ -674,7 +701,7 @@
     <string name="sync_folder_failed_content">Non foi posíbel completar a sincronización do cartafol %1$s</string>
     <string name="sync_foreign_files_forgotten_explanation">A partires da versión 1.3.16, os ficheiros enviados dende este dispositivo cópianse no cartafol local %1$s para evitar a perda de datos cando se sincroniza un único ficheiro con varias contas.\n\nPor mor deste cambio, todos os ficheiros enviados con versións anteriores desta aplicación foron copiados no cartafol %2$s. Porén, un erro impediu que se completara esta operación durante a sincronización da conta. Pode deixar o(s) ficheiro(s) tal e como está(n) e eliminar a ligazón cara a %3$s ou mover o(s) ficheiro(s) para o cartafol %1$s e manter a ligazón cara a %4$s.\n\nEmbaixo amósanse os ficheiros locais e os ficheiros remotos en %5$s aos que foron enlazados.</string>
     <string name="sync_foreign_files_forgotten_ticker">Esquecéronse algúns ficheiros locais</string>
-    <string name="sync_in_progress">Recuperando a versión mais recente do ficheiro.</string>
+    <string name="sync_in_progress">Obtendo a versión mais recente do ficheiro.</string>
     <string name="sync_not_enough_space_dialog_action_choose">Escolla que sincronizar</string>
     <string name="sync_not_enough_space_dialog_action_free_space">Liberar espazo</string>
     <string name="sync_not_enough_space_dialog_placeholder">%1$s son %2$s, mais só hai %3$sdispoñíbeis no dispositivo.</string>
@@ -692,10 +719,13 @@
     <string name="synced_icon">Sincronizado</string>
     <string name="tags">Etiquetas</string>
     <string name="test_server_button">Probar a conexión co servidor</string>
+    <string name="thirtyMinutes">30 minutos</string>
+    <string name="thisWeek">Esta semana</string>
     <string name="thumbnail">Miniatura</string>
     <string name="thumbnail_for_existing_file_description">Miniatura do ficheiro existente</string>
     <string name="thumbnail_for_new_file_desc">Miniatura do novo ficheiro</string>
     <string name="timeout_richDocuments">A carga tarda moito…</string>
+    <string name="today">Hoxe</string>
     <string name="trashbin_activity_title">Ficheiros eliminados</string>
     <string name="trashbin_empty_headline">Non hai ficheiros eliminados</string>
     <string name="trashbin_empty_message">Poderá recuperar ficheiros eliminados de aquí.</string>
@@ -722,8 +752,8 @@
     <string name="upload_direct_camera_upload">Enviar dende a cámara</string>
     <string name="upload_file_dialog_filename">Nome de ficheiro</string>
     <string name="upload_file_dialog_filetype">Tipo de ficheiro</string>
-    <string name="upload_file_dialog_filetype_googlemap_shortcut">Ficheiro de atallo a Google Maps (%s)</string>
-    <string name="upload_file_dialog_filetype_internet_shortcut">Ficheiro de atallo a internet(%s)</string>
+    <string name="upload_file_dialog_filetype_googlemap_shortcut">Ficheiro(%s) de atallo a Google Maps</string>
+    <string name="upload_file_dialog_filetype_internet_shortcut">Ficheiro(%s) de atallo a internet</string>
     <string name="upload_file_dialog_filetype_snippet_text">Ficheiro de fragmento de texto(.txt)</string>
     <string name="upload_file_dialog_title">Introduza o nome e o tipo do ficheiro a enviar</string>
     <string name="upload_files">Enviar ficheiros</string>
@@ -740,7 +770,7 @@
     <string name="upload_sync_conflict">Conflito ao sincronizar, resólvao manualmente</string>
     <string name="upload_unknown_error">Produciuse un erro descoñecido</string>
     <string name="uploader_btn_alternative_text">Escoller</string>
-    <string name="uploader_btn_upload_text">Subir</string>
+    <string name="uploader_btn_upload_text">Enviar</string>
     <string name="uploader_error_message_no_file_to_upload">Os datos recibidos non inclúen un ficheiro correcto.</string>
     <string name="uploader_error_message_read_permission_not_granted">%1$s non ten permisos para ler o ficheiro recibido</string>
     <string name="uploader_error_message_source_file_not_copied">Non foi posíbel copiar o ficheiro nun cartafol temporal. Tente volver envialo.</string>
@@ -806,6 +836,7 @@
     <string name="what_s_new_image">Imaxe de Que hai de novo</string>
     <string name="whats_new_skip">Omitir</string>
     <string name="whats_new_title">Novo en %1$s</string>
+    <string name="whats_your_status">Cal é o seu estado?</string>
     <plurals name="sync_fail_in_favourites_content">
         <item quantity="one">Non foi posíbel sincronizar  %1$d ficheiro (conflitos: %2$d)</item>
         <item quantity="other">Non foi posíbel sincronizar  %1$d ficheiros (conflitos: %2$d)</item>

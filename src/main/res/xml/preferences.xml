@@ -62,7 +62,7 @@
 	<PreferenceCategory android:title="@string/prefs_category_more" android:key="more">
 		<Preference android:title="@string/prefs_calendar_contacts"
 					android:key="calendar_contacts"
-					android:summary="@string/prefs_calendar_contacts_summary" />
+					android:summary="@string/kdrive_prefs_calendar_contacts_summary" />
 		<Preference
 			android:title="@string/actionbar_contacts"
 			android:key="contacts"
