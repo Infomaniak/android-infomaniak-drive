@@ -50,7 +50,6 @@ import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.navigation.NavigationView;
-import com.infomaniak.drive.Utils;
 import com.nextcloud.client.account.User;
 import com.nextcloud.client.di.Injectable;
 import com.nextcloud.client.network.ClientFactory;
@@ -84,6 +83,7 @@ import com.owncloud.android.ui.events.DummyDrawerEvent;
 import com.owncloud.android.ui.events.SearchEvent;
 import com.owncloud.android.ui.fragment.OCFileListFragment;
 import com.owncloud.android.ui.fragment.PhotoFragment;
+import com.owncloud.android.ui.preview.PreviewTextStringFragment;
 import com.owncloud.android.ui.trashbin.TrashbinActivity;
 import com.owncloud.android.utils.DisplayUtils;
 import com.owncloud.android.utils.DrawerMenuUtil;
@@ -330,9 +330,10 @@ public abstract class DrawerActivity extends ToolbarActivity
 
         switch (menuItem.getItemId()) {
             case R.id.nav_all_files:
-                showFiles(false);
-                if ((this instanceof FileDisplayActivity) &&
-                    !(((FileDisplayActivity) this).getListOfFilesFragment() instanceof PhotoFragment)) {
+                if (this instanceof FileDisplayActivity &&
+                    !(((FileDisplayActivity) this).getLeftFragment() instanceof PhotoFragment) &&
+                    !(((FileDisplayActivity) this).getLeftFragment() instanceof PreviewTextStringFragment)) {
+                    showFiles(false);
                     ((FileDisplayActivity) this).browseToRoot();
                     EventBus.getDefault().post(new ChangeMenuEvent());
                 } else {
@@ -472,14 +473,6 @@ public abstract class DrawerActivity extends ToolbarActivity
             startActivity(intent);
         }
     }
-
-    /**
-     * show the file list to the user.
-     *
-     * @param onDeviceOnly flag to decide if all files or only the ones on the device should be shown
-     */
-    public abstract void showFiles(boolean onDeviceOnly);
-
 
     /**
      * sets the new/current account and restarts. In case the given account equals the actual/current account the call
@@ -948,7 +941,26 @@ public abstract class DrawerActivity extends ToolbarActivity
     /**
      * restart helper method which is called after a changing the current account.
      */
-    protected abstract void restart();
+    private void restart() {
+        Intent i = new Intent(this, FileDisplayActivity.class);
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        i.setAction(FileDisplayActivity.RESTART);
+        startActivity(i);
+
+        fetchExternalLinks(false);
+    }
+
+    /**
+     * show the file list to the user.
+     *
+     * @param onDeviceOnly flag to decide if all files or only the ones on the device should be shown
+     */
+    public void showFiles(boolean onDeviceOnly) {
+        MainApp.showOnlyFilesOnDevice(onDeviceOnly);
+        Intent fileDisplayActivity = new Intent(getApplicationContext(), FileDisplayActivity.class);
+        fileDisplayActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(fileDisplayActivity);
+    }
 
     @Override
     public void avatarGenerated(Drawable avatarDrawable, Object callContext) {

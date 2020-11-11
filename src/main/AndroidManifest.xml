@@ -60,7 +60,6 @@
     <uses-permission android:name="android.permission.READ_SYNC_STATS" />
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
-    <uses-permission android:name="android.permission.BROADCAST_STICKY" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -71,8 +70,6 @@
     <!-- Apps that target Android 9 (API level 28) or higher and use foreground services
     must request the FOREGROUND_SERVICE permission -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-
-    <uses-sdk tools:overrideLibrary="com.blikoon.qrcodescanner, io.noties.markwon.ext.latex, io.noties.markwon.ext.strikethrough, io.noties.markwon.ext.tables, io.noties.markwon.ext.tasklist, io.noties.markwon.html, io.noties.markwon.linkify, io.noties.markwon.syntax, io.noties.markwon, ru.noties.jlatexmath.android" />
 
     <!-- Some Chromebooks don't support touch. Although not essential,
          it's a good idea to explicitly include this declaration. -->
@@ -258,7 +255,7 @@
             android:exported="true"
             android:grantUriPermissions="true"
             android:permission="android.permission.MANAGE_DOCUMENTS"
-            android:enabled="@bool/atLeastKitKat">
+            android:enabled="true">
             <intent-filter>
                 <action android:name="android.content.action.DOCUMENTS_PROVIDER" />
             </intent-filter>

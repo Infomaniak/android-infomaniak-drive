@@ -70,10 +70,10 @@ else
     -X POST https://api.github.com/repos/nextcloud/android/issues/$PR/comments \
     -d "{ \"body\" : \"$BRANCH_TYPE test failed, but no output was generated. Maybe a preliminary stage failed. \" }"
 
-    if [ -e build/reports/androidTests/connected/flavors/GPLAY ] ; then
+    if [ -e build/reports/androidTests/connected/flavors/gplayDebugAndroidTest ] ; then
         TYPE="IT"
         BRANCH_TYPE=$BRANCH-$TYPE
-        upload "build/reports/androidTests/connected/flavors/GPLAY"
+        upload "build/reports/androidTests/connected/flavors/gplayDebugAndroidTest"
     fi
 
     if [ -e build/reports/tests/testGplayDebugUnitTest ] ; then
@@ -87,4 +87,6 @@ else
         BRANCH_TYPE=$BRANCH-$TYPE
         upload "build/reports/shot/verification"
     fi
+
+    exit 1 # always fail
 fi

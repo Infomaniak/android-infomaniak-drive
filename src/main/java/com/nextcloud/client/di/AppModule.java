@@ -68,10 +68,11 @@ import java.io.File;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import dagger.Module;
 import dagger.Provides;
 
-@Module(includes = {ComponentsModule.class, VariantComponentsModule.class})
+@Module(includes = {ComponentsModule.class, VariantComponentsModule.class, BuildTypeComponentsModule.class})
 class AppModule {
 
     @Provides
@@ -216,5 +217,10 @@ class AppModule {
     @Singleton
     AppNotificationManager notificationsManager(Context context, NotificationManager platformNotificationsManager) {
         return new AppNotificationManagerImpl(context, context.getResources(), platformNotificationsManager);
+    }
+
+    @Provides
+    LocalBroadcastManager localBroadcastManager(Context context) {
+        return LocalBroadcastManager.getInstance(context);
     }
 }

@@ -22,22 +22,28 @@
 
 package com.owncloud.android.ui.dialog;
 
-import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.Intent;
 import android.os.Looper;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
-import com.facebook.testing.screenshot.Screenshot;
 import com.nextcloud.client.account.RegisteredUser;
 import com.nextcloud.client.account.Server;
 import com.nextcloud.ui.ChooseAccountDialogFragment;
 import com.owncloud.android.AbstractIT;
 import com.owncloud.android.MainApp;
+import com.owncloud.android.datamodel.FileDataStorageManager;
 import com.owncloud.android.datamodel.OCFile;
 import com.owncloud.android.lib.common.OwnCloudAccount;
 import com.owncloud.android.lib.common.accounts.AccountUtils;
+import com.owncloud.android.lib.resources.status.CapabilityBooleanType;
+import com.owncloud.android.lib.resources.status.OCCapability;
 import com.owncloud.android.lib.resources.status.OwnCloudVersion;
+import com.owncloud.android.lib.resources.users.Status;
+import com.owncloud.android.lib.resources.users.StatusType;
 import com.owncloud.android.ui.activity.FileDisplayActivity;
 import com.owncloud.android.utils.ScreenshotTest;
 
@@ -50,17 +56,12 @@ import java.util.Objects;
 
 import androidx.fragment.app.DialogFragment;
 import androidx.test.espresso.intent.rule.IntentsTestRule;
-import androidx.test.rule.GrantPermissionRule;
 
 import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
 
 public class DialogFragmentIT extends AbstractIT {
     @Rule public IntentsTestRule<FileDisplayActivity> activityRule =
         new IntentsTestRule<>(FileDisplayActivity.class, true, false);
-
-    @Rule
-    public final GrantPermissionRule permissionRule = GrantPermissionRule.grant(
-        Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
     @Test
     @ScreenshotTest
@@ -129,7 +130,7 @@ public class DialogFragmentIT extends AbstractIT {
     @ScreenshotTest
     public void testAccountChooserDialog() throws AccountUtils.AccountNotFoundException {
         AccountManager accountManager = AccountManager.get(targetContext);
-        for (Account account : accountManager.getAccounts()) {
+        for (Account account : accountManager.getAccountsByType(MainApp.getAccountType(targetContext))) {
             accountManager.removeAccountExplicitly(account);
         }
 
@@ -143,17 +144,86 @@ public class DialogFragmentIT extends AbstractIT {
         accountManager.addAccountExplicitly(newAccount2, "password", null);
         accountManager.setUserData(newAccount2, AccountUtils.Constants.KEY_OC_BASE_URL, "https://server.com");
         accountManager.setUserData(newAccount2, AccountUtils.Constants.KEY_USER_ID, "user1");
-        accountManager.setUserData(newAccount2, AccountUtils.Constants.KEY_OC_VERSION, "19.0.0.0");
+        accountManager.setUserData(newAccount2, AccountUtils.Constants.KEY_OC_VERSION, "20.0.0");
+
+        FileDataStorageManager fileDataStorageManager = new FileDataStorageManager(newAccount,
+                                                                                   targetContext.getContentResolver());
+
+        OCCapability capability = new OCCapability();
+        capability.setUserStatus(CapabilityBooleanType.TRUE);
+        capability.setUserStatusSupportsEmoji(CapabilityBooleanType.TRUE);
+        fileDataStorageManager.saveCapabilities(capability);
 
         ChooseAccountDialogFragment sut =
             ChooseAccountDialogFragment.newInstance(new RegisteredUser(newAccount,
                                                                        new OwnCloudAccount(newAccount, targetContext),
                                                                        new Server(URI.create("https://server.com"),
-                                                                                  OwnCloudVersion.nextcloud_19)));
+                                                                                  OwnCloudVersion.nextcloud_20)));
+        FileDisplayActivity activity = showDialog(sut);
+
+        activity.runOnUiThread(() -> sut.setStatus(new Status(StatusType.DND,
+                                                              "Busy fixing 🐛…",
+                                                              "",
+                                                              -1),
+                                                   targetContext));
+        shortSleep();
+        screenshot(sut, "dnd");
+
+        activity.runOnUiThread(() -> sut.setStatus(new Status(StatusType.ONLINE,
+                                                              "",
+                                                              "",
+                                                              -1),
+                                                   targetContext));
+        shortSleep();
+        screenshot(sut, "online");
+
+        activity.runOnUiThread(() -> sut.setStatus(new Status(StatusType.ONLINE,
+                                                              "Let's have some fun",
+                                                              "🎉",
+                                                              -1),
+                                                   targetContext));
+        shortSleep();
+        screenshot(sut, "fun");
+
+        activity.runOnUiThread(() -> sut.setStatus(new Status(StatusType.OFFLINE, "", "", -1), targetContext));
+        shortSleep();
+        screenshot(sut, "offline");
+
+        activity.runOnUiThread(() -> sut.setStatus(new Status(StatusType.AWAY, "Vacation", "🌴", -1), targetContext));
+        shortSleep();
+        screenshot(sut, "away");
+    }
+
+    @Test
+    @ScreenshotTest
+    public void testAccountChooserDialogWithStatusDisabled() throws AccountUtils.AccountNotFoundException {
+        AccountManager accountManager = AccountManager.get(targetContext);
+        for (Account account : accountManager.getAccounts()) {
+            accountManager.removeAccountExplicitly(account);
+        }
+
+        Account newAccount = new Account("test@https://server.com", MainApp.getAccountType(targetContext));
+        accountManager.addAccountExplicitly(newAccount, "password", null);
+        accountManager.setUserData(newAccount, AccountUtils.Constants.KEY_OC_BASE_URL, "https://server.com");
+        accountManager.setUserData(newAccount, AccountUtils.Constants.KEY_USER_ID, "test");
+
+        FileDataStorageManager fileDataStorageManager = new FileDataStorageManager(newAccount,
+                                                                                   targetContext.getContentResolver());
+
+        OCCapability capability = new OCCapability();
+        capability.setUserStatus(CapabilityBooleanType.FALSE);
+
+        fileDataStorageManager.saveCapabilities(capability);
+
+        ChooseAccountDialogFragment sut =
+            ChooseAccountDialogFragment.newInstance(new RegisteredUser(newAccount,
+                                                                       new OwnCloudAccount(newAccount, targetContext),
+                                                                       new Server(URI.create("https://server.com"),
+                                                                                  OwnCloudVersion.nextcloud_20)));
         showDialog(sut);
     }
 
-    private void showDialog(DialogFragment dialog) {
+    private FileDisplayActivity showDialog(DialogFragment dialog) {
         Intent intent = new Intent(targetContext, FileDisplayActivity.class);
         FileDisplayActivity sut = activityRule.launchActivity(intent);
 
@@ -162,6 +232,25 @@ public class DialogFragmentIT extends AbstractIT {
         getInstrumentation().waitForIdleSync();
         shortSleep();
 
-        Screenshot.snap(Objects.requireNonNull(dialog.requireDialog().getWindow()).getDecorView()).record();
+        ViewGroup viewGroup = dialog.requireDialog().getWindow().findViewById(android.R.id.content);
+        hideCursors(viewGroup);
+
+        screenshot(Objects.requireNonNull(dialog.requireDialog().getWindow()).getDecorView());
+
+        return sut;
+    }
+
+    private void hideCursors(ViewGroup viewGroup) {
+        for (int i = 0; i < viewGroup.getChildCount(); i++) {
+            View child = viewGroup.getChildAt(i);
+
+            if (child instanceof ViewGroup) {
+                hideCursors((ViewGroup) child);
+            }
+
+            if (child instanceof TextView) {
+                ((TextView) child).setCursorVisible(false);
+            }
+        }
     }
 }

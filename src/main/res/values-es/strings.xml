@@ -501,7 +501,9 @@
     <string name="pref_instant_name_collision_policy_title">¿Cómo proceder si ya existe el archivo?</string>
     <string name="prefs_add_account">Agregar cuenta</string>
     <string name="prefs_calendar_contacts">Sincronizar calendario y contactos</string>
+    <string name="prefs_calendar_contacts_address_resolve_error">DAVx5 (antes conocido como DAVdroid) no ha podido resolver la dirección del servidor para la cuenta.</string>
     <string name="prefs_calendar_contacts_no_store_error">Ni F-Droid ni Google Play están instalados</string>
+    <string name="prefs_calendar_contacts_summary">Configurar DAVx5 (antes conocido como DAVdroid) (v1.3.0+) para la cuenta actual</string>
     <string name="prefs_calendar_contacts_sync_setup_successful">Sincronización de calendario y contactos configurada</string>
     <string name="prefs_category_about">Acerca de</string>
     <string name="prefs_category_details">Detalles</string>
@@ -580,6 +582,7 @@
     <string name="screenshot_05_autoUpload_heading">Subida automática</string>
     <string name="screenshot_05_autoUpload_subline">para sus fotos &amp; vídeos</string>
     <string name="screenshot_06_davdroid_heading">Calendario y contactos</string>
+    <string name="screenshot_06_davdroid_subline">Sincronizar con DAVx5</string>
     <string name="select_all">Seleccionar todo</string>
     <string name="select_template">Escoge plantilla</string>
     <string name="send">Mandar</string>

@@ -96,6 +96,7 @@ import java.util.Vector;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.drawable.RoundedBitmapDrawable;
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
@@ -645,6 +646,7 @@ public class OCFileListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                                      LoaderImageView shimmerThumbnail,
                                      AppPreferences preferences) {
         if (file.isFolder()) {
+            stopShimmer(shimmerThumbnail, thumbnailView);
             thumbnailView.setImageDrawable(MimeTypeUtil
                                                .getFolderTypeIcon(file.isSharedWithMe() || file.isSharedWithSharee(),
                                                                   file.isSharedViaLink(), file.isEncrypted(),
@@ -657,6 +659,8 @@ public class OCFileListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 );
 
                 if (thumbnail != null && !file.isUpdateThumbnailNeeded()) {
+                    stopShimmer(shimmerThumbnail, thumbnailView);
+
                     if (MimeTypeUtil.isVideo(file)) {
                         Bitmap withOverlay = ThumbnailsCacheManager.addVideoOverlay(thumbnail);
                         thumbnailView.setImageBitmap(withOverlay);
@@ -726,6 +730,7 @@ public class OCFileListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                     thumbnailView.setBackgroundColor(context.getResources().getColor(R.color.bg_default));
                 }
             } else {
+                stopShimmer(shimmerThumbnail, thumbnailView);
                 thumbnailView.setImageDrawable(MimeTypeUtil.getFileTypeIcon(file.getMimeType(),
                                                                             file.getFileName(),
                                                                             user,
@@ -783,10 +788,11 @@ public class OCFileListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     private static void stopShimmer(@Nullable LoaderImageView thumbnailShimmer, ImageView thumbnailView) {
-        if (thumbnailShimmer != null){
+        if (thumbnailShimmer != null) {
             thumbnailShimmer.setVisibility(View.GONE);
-            thumbnailView.setVisibility(View.VISIBLE);
         }
+
+        thumbnailView.setVisibility(View.VISIBLE);
     }
 
     private String getFooterText() {
@@ -847,7 +853,11 @@ public class OCFileListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             return false;
         }
 
-        return !TextUtils.isEmpty(currentDirectory.getRichWorkspace());
+        if (currentDirectory.getRichWorkspace() == null) {
+            return false;
+        }
+
+        return !TextUtils.isEmpty(currentDirectory.getRichWorkspace().trim());
     }
 
     @Override
@@ -1283,6 +1293,16 @@ public class OCFileListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     public void setGridView(boolean bool) {
         gridView = bool;
+    }
+
+    @VisibleForTesting
+    public void setShowShareAvatar(boolean bool) {
+        showShareAvatar = bool;
+    }
+
+    @VisibleForTesting
+    public void setCurrentDirectory(OCFile folder) {
+        currentDirectory = folder;
     }
 
     static class OCFileListItemViewHolder extends OCFileListGridItemViewHolder {

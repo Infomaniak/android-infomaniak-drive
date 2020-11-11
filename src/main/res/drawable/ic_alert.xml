@@ -1,10 +1,23 @@
-<vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt"
-    android:viewportWidth="24"
-    android:viewportHeight="24"
+<!--
+    @author Google LLC
+    Copyright (C) 2018 Google LLC
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:height="24dp"
     android:width="24dp"
-    android:height="24dp">
-    <path
-        android:pathData="M22.7786583 19.185862L13.7177608 2.03000023L13.7177608 2.03000023C13.3830645 1.39676181 12.7215602 1 12.0004847 1C11.2794092 1 10.6179049 1.39676181 10.2832086 2.03000023L1.22134169 19.185862C0.906515556 19.7817725 0.92880109 20.4974994 1.28010203 21.0730215C1.63140297 21.6485436 2.26059794 22 2.93910251 22L21.0608975 22C21.7394021 22 22.368597 21.6485436 22.719898 21.0730215C23.0711989 20.4974994 23.0934844 19.7817725 22.7786583 19.185862ZM11.030609 8.05906021C11.030609 7.52825232 11.4646201 7.09794751 12 7.09794751C12.5353799 7.09794751 12.969391 7.52825232 12.969391 8.05906021L12.969391 13.8257364C12.969391 14.3565443 12.5353799 14.7868491 12 14.7868491C11.4646201 14.7868491 11.030609 14.3565443 11.030609 13.8257364L11.030609 8.05906021ZM12.0484695 19.1214674L12.0213266 19.1214674C11.2269841 19.1189423 10.5760613 18.4956275 10.5459135 17.7086318C10.5317984 17.3281116 10.6725683 16.9579406 10.9365599 16.6813812C11.2005515 16.4048219 11.5655988 16.2450955 11.9495917 16.2381293L11.9767346 16.2381293C12.7709471 16.2390683 13.4228802 16.861259 13.4540865 17.6480817C13.4692756 18.0294906 13.3286905 18.4008568 13.0641358 18.6781665C12.7995811 18.9554761 12.4334131 19.115295 12.0484695 19.1214674Z"
-        android:fillType="evenOdd"
-        android:fillColor="#FFFFFF" />
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path android:fillColor="#FFFFFF" android:pathData="M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z" />
 </vector>

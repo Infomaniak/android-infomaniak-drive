@@ -56,13 +56,13 @@ class DownloaderService : Service() {
     }
 
     /**
-     * Binder forwards [Downloader] API calls to selected instance of downloader.
+     * Binder forwards [TransferManager] API calls to selected instance of downloader.
      */
     class Binder(
-        downloader: DownloaderImpl,
+        downloader: TransferManagerImpl,
         service: DownloaderService
     ) : LocalBinder<DownloaderService>(service),
-        Downloader by downloader
+        TransferManager by downloader
 
     @Inject
     lateinit var notificationsManager: AppNotificationManager
@@ -79,7 +79,7 @@ class DownloaderService : Service() {
 
     val isRunning: Boolean get() = downloaders.any { it.value.isRunning }
 
-    private val downloaders: MutableMap<String, DownloaderImpl> = mutableMapOf()
+    private val downloaders: MutableMap<String, TransferManagerImpl> = mutableMapOf()
 
     override fun onCreate() {
         AndroidInjection.inject(this)
@@ -99,7 +99,7 @@ class DownloaderService : Service() {
 
         val request = intent.getParcelableExtra(EXTRA_REQUEST) as Request
         val downloader = getDownloader(request.user)
-        downloader.download(request)
+        downloader.enqueue(request)
 
         logger.d(TAG, "Enqueued new download: ${request.uuid} ${request.file.remotePath}")
 
@@ -115,7 +115,7 @@ class DownloaderService : Service() {
         }
     }
 
-    private fun onDownloadUpdate(download: Download) {
+    private fun onDownloadUpdate(transfer: Transfer) {
         if (!isRunning) {
             logger.d(TAG, "All downloads completed")
             notificationsManager.cancelDownloadProgress()
@@ -123,10 +123,10 @@ class DownloaderService : Service() {
             stopSelf()
         } else {
             notificationsManager.postDownloadProgress(
-                fileOwner = download.request.user,
-                file = download.request.file,
-                progress = download.progress,
-                allowPreview = !download.request.test
+                fileOwner = transfer.request.user,
+                file = transfer.request.file,
+                progress = transfer.progress,
+                allowPreview = !transfer.request.test
             )
         }
     }
@@ -136,7 +136,7 @@ class DownloaderService : Service() {
         logger.d(TAG, "Stopping downloader service")
     }
 
-    private fun getDownloader(user: User): DownloaderImpl {
+    private fun getDownloader(user: User): TransferManagerImpl {
         val existingDownloader = downloaders[user.accountName]
         return if (existingDownloader != null) {
             existingDownloader
@@ -146,8 +146,8 @@ class DownloaderService : Service() {
                 { clientFactory.create(user) },
                 contentResolver
             )
-            val newDownloader = DownloaderImpl(runner, downloadTaskFactory)
-            newDownloader.registerDownloadListener(this::onDownloadUpdate)
+            val newDownloader = TransferManagerImpl(runner, downloadTaskFactory)
+            newDownloader.registerTransferListener(this::onDownloadUpdate)
             downloaders[user.accountName] = newDownloader
             newDownloader
         }

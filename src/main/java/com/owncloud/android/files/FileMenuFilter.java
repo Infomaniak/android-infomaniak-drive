@@ -60,6 +60,7 @@ import static com.infomaniak.drive.Utils.filterShare;
 public class FileMenuFilter {
 
     private static final int SINGLE_SELECT_ITEMS = 1;
+    public static final String SEND_OFF = "off";
 
     private int numberOfAllFiles;
     private Collection<OCFile> files;
@@ -205,6 +206,7 @@ public class FileMenuFilter {
         filterCancelSync(toShow, toHide, synchronizing);
         filterSync(toShow, toHide, synchronizing);
         filterShareFile(toShow, toHide, capability);
+        filterSendFiles(toShow, toHide);
         filterDetails(toShow, toHide);
         filterFavorite(toShow, toHide, synchronizing);
         filterUnfavorite(toShow, toHide, synchronizing);
@@ -224,6 +226,15 @@ public class FileMenuFilter {
             toHide.add(R.id.action_send_share_file);
         } else {
             toShow.add(R.id.action_send_share_file);
+        }
+    }
+
+    private void filterSendFiles(List<Integer> toShow, List<Integer> toHide) {
+        if (containsEncryptedFile() || isSingleSelection() || overflowMenu || !anyFileDown() ||
+            SEND_OFF.equalsIgnoreCase(context.getString(R.string.send_files_to_other_apps))) {
+            toHide.add(R.id.action_send_file);
+        } else {
+            toShow.add(R.id.action_send_file);
         }
     }
 
@@ -303,8 +314,7 @@ public class FileMenuFilter {
 
     @Nullable
     public static Editor getEditor(ContentResolver contentResolver, User user, String mimeType) {
-        String json = new ArbitraryDataProvider(contentResolver).getValue(user.toPlatformAccount(),
-                                                                          ArbitraryDataProvider.DIRECT_EDITING);
+        String json = new ArbitraryDataProvider(contentResolver).getValue(user, ArbitraryDataProvider.DIRECT_EDITING);
 
         if (json.isEmpty()) {
             return null;

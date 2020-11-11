@@ -25,7 +25,6 @@ package com.nextcloud.client;
 import android.Manifest;
 import android.app.Activity;
 
-import com.facebook.testing.screenshot.Screenshot;
 import com.owncloud.android.AbstractOnServerIT;
 import com.owncloud.android.R;
 import com.owncloud.android.datamodel.OCFile;
@@ -98,7 +97,7 @@ public class FileDisplayActivityIT extends AbstractOnServerIT {
                                                          "users",
                                                          false,
                                                          "",
-                                                         OCShare.DEFAULT_PERMISSION)
+                                                         OCShare.NO_PERMISSION)
                               .execute(client).isSuccess());
 
         // share folder to circle
@@ -126,7 +125,7 @@ public class FileDisplayActivityIT extends AbstractOnServerIT {
         shortSleep();
         shortSleep();
 
-        Screenshot.snapActivity(sut).record();
+        screenshot(sut);
     }
 
     @Test

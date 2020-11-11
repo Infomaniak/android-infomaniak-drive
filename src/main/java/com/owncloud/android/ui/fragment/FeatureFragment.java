@@ -15,10 +15,10 @@ import android.widget.TextView;
 
 import com.owncloud.android.R;
 import com.owncloud.android.features.FeatureItem;
-import com.owncloud.android.utils.ThemeUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 
 
@@ -48,7 +48,7 @@ public class FeatureFragment extends Fragment {
 
         ImageView whatsNewImage = view.findViewById(R.id.whatsNewImage);
         if (item.shouldShowImage()) {
-            whatsNewImage.setImageDrawable(getResources().getDrawable(item.getImage())); //kDrive
+            whatsNewImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), item.getImage(), null)); //kDrive
         }
 
         TextView whatsNewTitle = view.findViewById(R.id.whatsNewTitle);
@@ -67,13 +67,13 @@ public class FeatureFragment extends Fragment {
 
                 for (String text : texts) {
                     TextView textView = generateTextView(text, getContext(),
-                            item.shouldContentCentered(), fontColor, true);
+                                                         item.shouldContentCentered(), fontColor, true);
 
                     linearLayout.addView(textView);
                 }
             } else {
                 TextView textView = generateTextView(getText(item.getContentText()).toString(),
-                        getContext(), item.shouldContentCentered(), fontColor, false);
+                                                     getContext(), item.shouldContentCentered(), fontColor, false);
 
                 linearLayout.addView(textView);
             }
@@ -89,12 +89,12 @@ public class FeatureFragment extends Fragment {
                                       boolean showBulletPoints) {
         int standardMargin = context.getResources().getDimensionPixelSize(R.dimen.standard_margin);
         int doubleMargin = context.getResources()
-                .getDimensionPixelSize(R.dimen.standard_double_margin);
+            .getDimensionPixelSize(R.dimen.standard_double_margin);
         int zeroMargin = context.getResources().getDimensionPixelSize(R.dimen.zero);
 
         TextView textView = new TextView(context);
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParams.setMargins(doubleMargin, standardMargin, doubleMargin, zeroMargin);
         textView.setTextAppearance(context, R.style.NextcloudTextAppearanceMedium);
         textView.setLayoutParams(layoutParams);
@@ -103,7 +103,7 @@ public class FeatureFragment extends Fragment {
             BulletSpan bulletSpan = new BulletSpan(standardMargin, fontColor);
             SpannableString spannableString = new SpannableString(text);
             spannableString.setSpan(bulletSpan, 0, spannableString.length(),
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             textView.setText(spannableString);
         } else {
             textView.setText(text);

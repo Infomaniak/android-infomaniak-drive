@@ -2,9 +2,9 @@ name: "Generic Flavor"
 
 on:
     push:
-        branches: [ stable-3.13 ]
+        branches: [ stable-3.14 ]
     pull_request:
-        branches: [ stable-3.13 ]
+        branches: [ stable-3.14 ]
 
 jobs:
     genericFlavor:

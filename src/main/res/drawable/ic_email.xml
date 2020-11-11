@@ -1,9 +1,23 @@
-<vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt"
-    android:viewportWidth="24"
-    android:viewportHeight="24"
+<!--
+    @author Google LLC
+    Copyright (C) 2018 Google LLC
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:height="24dp"
     android:width="24dp"
-    android:height="24dp">
-    <path
-        android:pathData="M2.25223101 8.10128624C2.40791233 8.01579605 2.59797642 8.02141189 2.74829275 8.11594341L2.74829275 8.11594341L11.3229269 13.5054289C11.891616 13.8614319 12.6171088 13.852307 13.1765854 13.4821146L13.1765854 13.4821146L21.2419512 8.12857198C21.3916222 8.02939995 21.5839447 8.02023913 21.7424396 8.10473243C21.9009345 8.18922573 22 8.35367543 22 8.53268625L22 8.53268625L22 19.0571429C22 20.1301533 21.1264093 21 20.0487805 21L20.0487805 21L3.95121957 21C2.87359079 21 2 20.1301533 2 19.0571429L2 19.0571429L2 8.52685768C2 8.34983243 2.09654968 8.18677642 2.25223101 8.10128624ZM20.0487805 4.00000037C20.9675522 4.00165567 21.7606893 4.64129481 21.9531707 5.53582924C21.9942346 5.73018581 21.9123231 5.9298551 21.7463415 6.04000064L21.7463415 6.04000064L12.3648781 12.2726861C12.2840892 12.3245447 12.1803012 12.3245447 12.0995122 12.2726861L12.0995122 12.2726861L2.24975616 6.0963435C2.0819742 5.99116233 1.99481926 5.79532817 2.02926836 5.60091495C2.19569459 4.67406045 3.00561518 3.99942657 3.95121957 4.00000037L3.95121957 4.00000037Z"
-        android:fillColor="#757575" />
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path android:fillColor="#757575" android:pathData="M20,8L12,13L4,8V6L12,11L20,6M20,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6C22,4.89 21.1,4 20,4Z" />
 </vector>

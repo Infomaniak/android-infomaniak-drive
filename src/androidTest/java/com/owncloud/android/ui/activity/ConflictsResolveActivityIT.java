@@ -24,7 +24,6 @@ package com.owncloud.android.ui.activity;
 
 import android.content.Intent;
 
-import com.facebook.testing.screenshot.Screenshot;
 import com.nextcloud.client.account.UserAccountManagerImpl;
 import com.owncloud.android.AbstractIT;
 import com.owncloud.android.R;
@@ -38,6 +37,8 @@ import com.owncloud.android.utils.ScreenshotTest;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
+
+import java.util.Objects;
 
 import androidx.fragment.app.DialogFragment;
 import androidx.test.espresso.intent.rule.IntentsTestRule;
@@ -88,7 +89,7 @@ public class ConflictsResolveActivityIT extends AbstractIT {
 
         shortSleep();
 
-        Screenshot.snap(dialog.getDialog().getWindow().getDecorView()).record();
+        screenshot(Objects.requireNonNull(dialog.requireDialog().getWindow()).getDecorView());
     }
 
 //    @Test
@@ -142,7 +143,7 @@ public class ConflictsResolveActivityIT extends AbstractIT {
 //        getInstrumentation().waitForIdleSync();
 //        shortSleep();
 //
-//        Screenshot.snap(dialog.getDialog().getWindow().getDecorView()).record();
+//        screenshot(Objects.requireNonNull(dialog.requireDialog().getWindow()).getDecorView());
 //    }
 
     @Test
@@ -168,7 +169,7 @@ public class ConflictsResolveActivityIT extends AbstractIT {
         Intent intent = new Intent(targetContext, ConflictsResolveActivity.class);
         intent.putExtra(ConflictsResolveActivity.EXTRA_FILE, newFile);
         intent.putExtra(ConflictsResolveActivity.EXTRA_EXISTING_FILE, existingFile);
-        intent.putExtra(ConflictsResolveActivity.EXTRA_CONFLICT_UPLOAD, newUpload);
+        intent.putExtra(ConflictsResolveActivity.EXTRA_CONFLICT_UPLOAD_ID, newUpload.getUploadId());
 
         ConflictsResolveActivity sut = activityRule.launchActivity(intent);
 
@@ -209,7 +210,7 @@ public class ConflictsResolveActivityIT extends AbstractIT {
         Intent intent = new Intent(targetContext, ConflictsResolveActivity.class);
         intent.putExtra(ConflictsResolveActivity.EXTRA_FILE, newFile);
         intent.putExtra(ConflictsResolveActivity.EXTRA_EXISTING_FILE, existingFile);
-        intent.putExtra(ConflictsResolveActivity.EXTRA_CONFLICT_UPLOAD, newUpload);
+        intent.putExtra(ConflictsResolveActivity.EXTRA_CONFLICT_UPLOAD_ID, newUpload.getUploadId());
 
         ConflictsResolveActivity sut = activityRule.launchActivity(intent);
 
@@ -223,7 +224,7 @@ public class ConflictsResolveActivityIT extends AbstractIT {
         onView(withId(R.id.existing_checkbox)).perform(click());
 
         DialogFragment dialog = (DialogFragment) sut.getSupportFragmentManager().findFragmentByTag("conflictDialog");
-        Screenshot.snap(dialog.getDialog().getWindow().getDecorView()).record();
+        screenshot(Objects.requireNonNull(dialog.requireDialog().getWindow()).getDecorView());
 
         onView(withText("OK")).perform(click());
 
@@ -255,7 +256,7 @@ public class ConflictsResolveActivityIT extends AbstractIT {
         Intent intent = new Intent(targetContext, ConflictsResolveActivity.class);
         intent.putExtra(ConflictsResolveActivity.EXTRA_FILE, newFile);
         intent.putExtra(ConflictsResolveActivity.EXTRA_EXISTING_FILE, existingFile);
-        intent.putExtra(ConflictsResolveActivity.EXTRA_CONFLICT_UPLOAD, newUpload);
+        intent.putExtra(ConflictsResolveActivity.EXTRA_CONFLICT_UPLOAD_ID, newUpload.getUploadId());
 
         ConflictsResolveActivity sut = activityRule.launchActivity(intent);
 
@@ -269,7 +270,7 @@ public class ConflictsResolveActivityIT extends AbstractIT {
         onView(withId(R.id.new_checkbox)).perform(click());
 
         DialogFragment dialog = (DialogFragment) sut.getSupportFragmentManager().findFragmentByTag("conflictDialog");
-        Screenshot.snap(dialog.getDialog().getWindow().getDecorView()).record();
+        screenshot(Objects.requireNonNull(dialog.requireDialog().getWindow()).getDecorView());
 
         onView(withText("OK")).perform(click());
 
@@ -300,7 +301,7 @@ public class ConflictsResolveActivityIT extends AbstractIT {
         Intent intent = new Intent(targetContext, ConflictsResolveActivity.class);
         intent.putExtra(ConflictsResolveActivity.EXTRA_FILE, newFile);
         intent.putExtra(ConflictsResolveActivity.EXTRA_EXISTING_FILE, existingFile);
-        intent.putExtra(ConflictsResolveActivity.EXTRA_CONFLICT_UPLOAD, newUpload);
+        intent.putExtra(ConflictsResolveActivity.EXTRA_CONFLICT_UPLOAD_ID, newUpload.getUploadId());
 
         ConflictsResolveActivity sut = activityRule.launchActivity(intent);
 
@@ -315,7 +316,7 @@ public class ConflictsResolveActivityIT extends AbstractIT {
         onView(withId(R.id.new_checkbox)).perform(click());
 
         DialogFragment dialog = (DialogFragment) sut.getSupportFragmentManager().findFragmentByTag("conflictDialog");
-        Screenshot.snap(dialog.getDialog().getWindow().getDecorView()).record();
+        screenshot(Objects.requireNonNull(dialog.requireDialog().getWindow()).getDecorView());
 
         onView(withText("OK")).perform(click());
 

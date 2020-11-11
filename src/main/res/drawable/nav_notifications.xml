@@ -1,9 +1,25 @@
-<vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt"
-    android:viewportWidth="24"
-    android:viewportHeight="24"
-    android:width="24dp"
-    android:height="24dp">
-    <path
-        android:pathData="M13.8828875 19.4999968C13.9902004 19.499415 14.0804974 19.5793969 14.0917464 19.685C14.1009237 19.7618854 14.1054234 19.8392471 14.1052277 19.9166667C14.1052277 21.0672599 13.1625869 21.9999968 11.9997886 21.9999968C10.8369902 21.9999968 9.89434942 21.0672599 9.89434942 19.9166667C9.89415373 19.8392471 9.89865343 19.7618854 9.90783071 19.685C9.91981657 19.5797715 10.0096718 19.5001809 10.1166896 19.4999968L10.1166896 19.4999968ZM11.9997886 2C12.6974676 2 13.2630482 2.55964406 13.2630482 3.25L13.2630482 3.25L13.2630482 4.19666667C13.9629634 4.32044522 14.6310854 4.58047016 15.2286801 4.96166667C17.3120861 6.41294819 18.5319009 8.79262732 18.4845211 11.3133333L18.4845211 11.9533333C18.4875887 14.075462 18.991084 16.1676033 19.9549553 18.0633333C20.0206984 18.1915982 20.0141181 18.3451902 19.9375689 18.4683195C19.8610196 18.5914489 19.7254418 18.6666667 19.5793461 18.6666667L19.5793461 18.6666667L4.42023108 18.6666667C4.27437844 18.6663733 4.13906572 18.5914169 4.06256716 18.4685388C3.9860686 18.3456607 3.97927948 18.1923619 4.0446219 18.0633333C5.0084932 16.1676033 5.51198845 14.075462 5.51505606 11.9533333L5.51505606 11.9533333L5.51585651 11.0222367C5.56465042 8.7955804 6.5908063 6.69390988 8.33549362 5.27166667C9.04053816 4.73572353 9.86298566 4.37120528 10.736529 4.2075L10.736529 4.2075L10.736529 3.25C10.736529 2.55964406 11.3021096 2 11.9997886 2Z"
-        android:fillColor="#757575" />
+<!--
+  Nextcloud Android client application
+
+  Copyright (C) 2020 Nextcloud.
+
+  This program is free software; you can redistribute it and/or
+  modify it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE
+  License as published by the Free Software Foundation; either
+  version 3 of the License, or any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU AFFERO GENERAL PUBLIC LICENSE for more details.
+
+  You should have received a copy of the GNU Affero General Public
+  License along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+  Icon provided by Android Material Library in Apache License 2.0
+-->
+<vector android:height="24dp" android:tint="#757575"
+    android:viewportHeight="24.0" android:viewportWidth="24.0"
+    android:width="24dp" xmlns:android="http://schemas.android.com/apk/res/android">
+    <path android:fillColor="#FF000000" android:pathData="M12,22c1.1,0 2,-0.9 2,-2h-4c0,1.1 0.89,2 2,2zM18,16v-5c0,-3.07 -1.64,-5.64 -4.5,-6.32L13.5,4c0,-0.83 -0.67,-1.5 -1.5,-1.5s-1.5,0.67 -1.5,1.5v0.68C7.63,5.36 6,7.92 6,11v5l-2,2v1h16v-1l-2,-2z"/>
 </vector>

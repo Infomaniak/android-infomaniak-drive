@@ -1,9 +1,29 @@
-<vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt"
-    android:viewportWidth="24"
-    android:viewportHeight="24"
-    android:width="24dp"
-    android:height="24dp">
+<!--
+  Nextcloud Android client application
+
+  Copyright (C) 2020 Nextcloud.
+
+  This program is free software; you can redistribute it and/or
+  modify it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE
+  License as published by the Free Software Foundation; either
+  version 3 of the License, or any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU AFFERO GENERAL PUBLIC LICENSE for more details.
+
+  You should have received a copy of the GNU Affero General Public
+  License along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+  Icon provided by Android Material Library in Apache License 2.0
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+        android:width="24dp"
+        android:height="24dp"
+        android:viewportWidth="24.0"
+        android:viewportHeight="24.0">
     <path
-        android:pathData="M16.125 12.8888889C19.9202822 12.8928082 22.9959582 15.8752819 23 19.5555556C23 19.8010154 22.7947972 20 22.5416667 20L22.5416667 20L16.5833333 20C16.3302028 20 16.125 19.8010154 16.125 19.5555556C16.1243337 17.4651118 15.275849 15.4587843 13.76275 13.9697778C13.6527565 13.8601841 13.6085939 13.7034517 13.6458352 13.5548479C13.6830764 13.4062442 13.7964899 13.2866444 13.9460833 13.2382222C14.6478328 13.0071385 15.3838916 12.8891304 16.125 12.8888889ZM7.875 12.8888889C11.6719577 12.8888889 14.75 15.8736572 14.75 19.5555556C14.75 19.8010154 14.5447972 20 14.2916667 20L14.2916667 20L1.45833333 20C1.20520282 20 1 19.8010154 1 19.5555556C1 15.8736572 4.07804234 12.8888889 7.875 12.8888889ZM16.125 4C18.5297398 4 20.4791666 5.8903533 20.4791666 8.22222222C20.4791666 10.5540911 18.5297398 12.4444444 16.125 12.4444444C14.9849542 12.440723 13.8929052 11.998985 13.0880833 11.216C12.9458348 11.0817857 12.9088334 10.8740394 12.9964167 10.7013333C13.3961333 9.93241765 13.6042912 9.0833077 13.6041667 8.22222222C13.60287 7.36077934 13.3931376 6.51165046 12.9918333 5.74311111C12.90425 5.57040506 12.9412515 5.36265876 13.0835 5.22844444C13.8894451 4.44437341 14.9833646 4.00254558 16.125 4ZM7.875 4C10.2797398 4 12.2291667 5.89035328 12.2291667 8.22222222C12.2291667 10.5540912 10.2797398 12.4444444 7.875 12.4444444C5.47026015 12.4444444 3.52083333 10.5540912 3.52083333 8.22222222C3.52083333 5.89035328 5.47026015 4 7.875 4Z"
-        android:fillColor="#000000" />
+        android:fillColor="#FF000000"
+        android:pathData="M16,11c1.66,0 2.99,-1.34 2.99,-3S17.66,5 16,5c-1.66,0 -3,1.34 -3,3s1.34,3 3,3zM8,11c1.66,0 2.99,-1.34 2.99,-3S9.66,5 8,5C6.34,5 5,6.34 5,8s1.34,3 3,3zM8,13c-2.33,0 -7,1.17 -7,3.5L1,19h14v-2.5c0,-2.33 -4.67,-3.5 -7,-3.5zM16,13c-0.29,0 -0.62,0.02 -0.97,0.05 1.16,0.84 1.97,1.97 1.97,3.45L17,19h6v-2.5c0,-2.33 -4.67,-3.5 -7,-3.5z"/>
 </vector>

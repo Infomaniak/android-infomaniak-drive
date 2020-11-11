@@ -67,10 +67,12 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import static com.owncloud.android.ui.activity.FileActivity.EXTRA_ACCOUNT;
+
 /**
  * Displays local files and let the user choose what of them wants to upload to the current ownCloud account.
  */
-public class UploadFilesActivity extends FileActivity implements LocalFileListFragment.ContainerActivity,
+public class UploadFilesActivity extends DrawerActivity implements LocalFileListFragment.ContainerActivity,
     OnClickListener, ConfirmationDialogFragmentListener, SortingOrderDialogFragment.OnSortingOrderListener,
     CheckAvailableSpaceTask.CheckAvailableSpaceListener, StoragePathAdapter.StoragePathAdapterListener, Injectable {
 
@@ -228,6 +230,7 @@ public class UploadFilesActivity extends FileActivity implements LocalFileListFr
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
+                // no action
             }
         });
 
@@ -527,7 +530,7 @@ public class UploadFilesActivity extends FileActivity implements LocalFileListFr
         } else {
             mBehaviourSpinner.setSelection(1);
             textView.setText(new StringBuilder().append(getString(R.string.uploader_upload_files_behaviour))
-                                 .append(" ")
+                                 .append(' ')
                                  .append(getString(R.string.uploader_upload_files_behaviour_not_writable))
                                  .toString());
         }

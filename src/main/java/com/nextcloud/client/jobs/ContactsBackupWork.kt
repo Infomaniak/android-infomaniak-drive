@@ -88,7 +88,7 @@ class ContactsBackupWork(
         }
         val user = optionalUser.get()
         val lastExecution = arbitraryDataProvider.getLongValue(
-            user.toPlatformAccount(),
+            user,
             ContactsPreferenceActivity.PREFERENCE_CONTACTS_LAST_BACKUP
         )
         val force = inputData.getBoolean(FORCE, false)
@@ -124,8 +124,11 @@ class ContactsBackupWork(
     private fun backupContact(user: User, backupFolder: String) {
         val vCard = ArrayList<String>()
         val cursor = contentResolver.query(
-            ContactsContract.Contacts.CONTENT_URI, null,
-            null, null, null
+            ContactsContract.Contacts.CONTENT_URI,
+            null,
+            null,
+            null,
+            null
         )
         if (cursor != null && cursor.count > 0) {
             cursor.moveToFirst()
@@ -166,7 +169,7 @@ class ContactsBackupWork(
             UploadFileOperation.CREATED_BY_USER,
             false,
             false,
-            FileUploader.NameCollisionPolicy.ASK_USER
+            FileUploader.NameCollisionPolicy.RENAME
         )
     }
 

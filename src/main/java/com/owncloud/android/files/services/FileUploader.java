@@ -90,6 +90,7 @@ import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import dagger.android.AndroidInjection;
 
 /**
@@ -166,6 +167,11 @@ public class FileUploader extends Service
 
     public static final String KEY_LOCAL_BEHAVIOUR = "BEHAVIOUR";
 
+    /**
+     * Set to true if the HTTP library should disable automatic retries of uploads.
+     */
+    public static final String KEY_DISABLE_RETRIES = "DISABLE_RETRIES";
+
     public static final int LOCAL_BEHAVIOUR_COPY = 0;
     public static final int LOCAL_BEHAVIOUR_MOVE = 1;
     public static final int LOCAL_BEHAVIOUR_FORGET = 2;
@@ -184,6 +190,7 @@ public class FileUploader extends Service
     @Inject UploadsStorageManager mUploadsStorageManager;
     @Inject ConnectivityService connectivityService;
     @Inject PowerManagementService powerManagementService;
+    @Inject LocalBroadcastManager localBroadcastManager;
 
     private IndexedForest<UploadFileOperation> mPendingUploads = new IndexedForest<>();
 
@@ -248,7 +255,7 @@ public class FileUploader extends Service
      */
     private void resurrection() {
         // remove stucked notification
-        mNotificationManager.cancel(R.string.uploader_upload_in_progress_ticker);
+        mNotificationManager.cancel(FOREGROUND_SERVICE_ID);
     }
 
     /**
@@ -262,6 +269,9 @@ public class FileUploader extends Service
         mServiceHandler = null;
         mServiceLooper.quit();
         mServiceLooper = null;
+        if (mNotificationManager != null) {
+            mNotificationManager.cancel(FOREGROUND_SERVICE_ID);
+        }
         mNotificationManager = null;
 
         // remove AccountsUpdatedListener
@@ -405,6 +415,7 @@ public class FileUploader extends Service
         int localAction = intent.getIntExtra(KEY_LOCAL_BEHAVIOUR, LOCAL_BEHAVIOUR_FORGET);
         boolean isCreateRemoteFolder = intent.getBooleanExtra(KEY_CREATE_REMOTE_FOLDER, false);
         int createdBy = intent.getIntExtra(KEY_CREATED_BY, UploadFileOperation.CREATED_BY_USER);
+        boolean disableRetries = intent.getBooleanExtra(KEY_DISABLE_RETRIES, true);
         try {
             for (OCFile file : files) {
                 startNewUpload(
@@ -416,8 +427,9 @@ public class FileUploader extends Service
                     localAction,
                     isCreateRemoteFolder,
                     createdBy,
-                    file
-                );
+                    file,
+                    disableRetries
+                              );
             }
         } catch (IllegalArgumentException e) {
             Log_OC.e(TAG, "Not enough information provided in intent: " + e.getMessage());
@@ -444,8 +456,9 @@ public class FileUploader extends Service
         int localAction,
         boolean isCreateRemoteFolder,
         int createdBy,
-        OCFile file
-    ) {
+        OCFile file,
+        boolean disableRetries
+                               ) {
         OCUpload ocUpload = new OCUpload(file, user.toPlatformAccount());
         ocUpload.setFileSize(file.getFileLength());
         ocUpload.setNameCollisionPolicy(nameCollisionPolicy);
@@ -467,7 +480,8 @@ public class FileUploader extends Service
             localAction,
             this,
             onWifiOnly,
-            whileChargingOnly
+            whileChargingOnly,
+            disableRetries
         );
         newUpload.setCreatedBy(createdBy);
         if (isCreateRemoteFolder) {
@@ -515,7 +529,8 @@ public class FileUploader extends Service
             upload.getLocalAction(),
             this,
             onWifiOnly,
-            whileChargingOnly
+            whileChargingOnly,
+            true
         );
 
         newUpload.addDataTransferProgressListener(this);
@@ -693,7 +708,7 @@ public class FileUploader extends Service
                 mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             }
 
-            mNotificationManager.notify(R.string.uploader_upload_in_progress_ticker, mNotificationBuilder.build());
+            mNotificationManager.notify(FOREGROUND_SERVICE_ID, mNotificationBuilder.build());
         }   // else wait until the upload really start (onTransferProgress is called), so that if it's discarded
         // due to lack of Wifi, no notification is shown
         // TODO generalize for automated uploads
@@ -718,7 +733,7 @@ public class FileUploader extends Service
             if (mNotificationManager == null) {
                 mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             }
-            mNotificationManager.notify(R.string.uploader_upload_in_progress_ticker, mNotificationBuilder.build());
+            mNotificationManager.notify(FOREGROUND_SERVICE_ID, mNotificationBuilder.build());
         }
         mLastPercent = percent;
     }
@@ -736,7 +751,7 @@ public class FileUploader extends Service
             mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         }
 
-        mNotificationManager.cancel(R.string.uploader_upload_in_progress_ticker);
+        mNotificationManager.cancel(FOREGROUND_SERVICE_ID);
 
         // Only notify if the upload fails
         if (!uploadResult.isCancelled() &&
@@ -793,6 +808,7 @@ public class FileUploader extends Service
                 if (uploadResult.getCode().equals(ResultCode.SYNC_CONFLICT)) {
                     intent = ConflictsResolveActivity.createIntent(upload.getFile(),
                                                                    upload.getAccount(),
+                                                                   upload.getOCUploadId(),
                                                                    Intent.FLAG_ACTIVITY_CLEAR_TOP,
                                                                    this);
                 } else {
@@ -823,7 +839,7 @@ public class FileUploader extends Service
         Intent start = new Intent(getUploadsAddedMessage());
         // nothing else needed right now
         start.setPackage(getPackageName());
-        sendStickyBroadcast(start);
+        localBroadcastManager.sendBroadcast(start);
     }
 
     /**
@@ -840,7 +856,7 @@ public class FileUploader extends Service
         start.putExtra(ACCOUNT_NAME, upload.getAccount().name);
 
         start.setPackage(getPackageName());
-        sendStickyBroadcast(start);
+        localBroadcastManager.sendBroadcast(start);
     }
 
     /**
@@ -873,7 +889,7 @@ public class FileUploader extends Service
             end.putExtra(EXTRA_LINKED_TO_PATH, unlinkedFromRemotePath);
         }
         end.setPackage(getPackageName());
-        sendStickyBroadcast(end);
+        localBroadcastManager.sendBroadcast(end);
     }
 
     /**
@@ -955,7 +971,7 @@ public class FileUploader extends Service
     }
 
     /**
-     * Upload and overwrite an already uploaded file
+     * Upload and overwrite an already uploaded file with disabled retries
      */
     public static void uploadUpdateFile(
         Context context,
@@ -963,8 +979,22 @@ public class FileUploader extends Service
         OCFile existingFile,
         Integer behaviour,
         NameCollisionPolicy nameCollisionPolicy
-    ) {
-        uploadUpdateFile(context, account, new OCFile[]{existingFile}, behaviour, nameCollisionPolicy);
+                                       ) {
+        uploadUpdateFile(context, account, new OCFile[]{existingFile}, behaviour, nameCollisionPolicy, true);
+    }
+
+    /**
+     * Upload and overwrite an already uploaded file
+     */
+    public static void uploadUpdateFile(
+        Context context,
+        Account account,
+        OCFile existingFile,
+        Integer behaviour,
+        NameCollisionPolicy nameCollisionPolicy,
+        boolean disableRetries
+                                       ) {
+        uploadUpdateFile(context, account, new OCFile[]{existingFile}, behaviour, nameCollisionPolicy, disableRetries);
     }
 
     /**
@@ -975,14 +1005,16 @@ public class FileUploader extends Service
         Account account,
         OCFile[] existingFiles,
         Integer behaviour,
-        NameCollisionPolicy nameCollisionPolicy
-    ) {
+        NameCollisionPolicy nameCollisionPolicy,
+        boolean disableRetries
+                                       ) {
         Intent intent = new Intent(context, FileUploader.class);
 
         intent.putExtra(FileUploader.KEY_ACCOUNT, account);
         intent.putExtra(FileUploader.KEY_FILE, existingFiles);
         intent.putExtra(FileUploader.KEY_LOCAL_BEHAVIOUR, behaviour);
         intent.putExtra(FileUploader.KEY_NAME_COLLISION_POLICY, nameCollisionPolicy);
+        intent.putExtra(FileUploader.KEY_DISABLE_RETRIES, disableRetries);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context.startForegroundService(intent);

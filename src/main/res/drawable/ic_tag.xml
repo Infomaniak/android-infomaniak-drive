@@ -1,13 +1,23 @@
-<vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt"
-    android:viewportWidth="24"
-    android:viewportHeight="24"
+<!--
+    @author Google LLC
+    Copyright (C) 2018 Google LLC
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:height="24dp"
     android:width="24dp"
-    android:height="24dp">
-    <group
-        android:translateX="2"
-        android:translateY="2">
-        <path
-            android:pathData="M1.15166667 9.48666667L10.9666667 19.1275L10.9808333 19.1408333C11.6344858 19.7756126 12.676748 19.7678179 13.3208333 19.1233333L19.2083333 13.2375C19.522793 12.9231915 19.698635 12.4962681 19.6967719 12.0516658C19.6948791 11.6070636 19.5154369 11.1816409 19.1983333 10.87L9.41666667 1.25C9.40166667 1.23416667 9.3875 1.21916667 9.37166667 1.205C8.82530917 0.705075608 8.11920333 0.415368444 7.37916667 0.3875L1.96916667 0.3875C1.04869208 0.3875 0.3025 1.13369208 0.3025 2.05416667L0.308333333 7.46666667C0.339221894 8.21909947 0.638369722 8.93563538 1.15166667 9.48666667ZM4.0525 5.3875C4.0525 4.69714406 4.61214406 4.1375 5.3025 4.1375C5.99285594 4.1375 6.5525 4.69714406 6.5525 5.3875C6.5525 6.07785594 5.99285594 6.6375 5.3025 6.6375C4.61214406 6.6375 4.0525 6.07785594 4.0525 5.3875Z"
-            android:fillColor="#757575" />
-    </group>
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path android:fillColor="#757575" android:pathData="M5.5,7A1.5,1.5 0 0,1 4,5.5A1.5,1.5 0 0,1 5.5,4A1.5,1.5 0 0,1 7,5.5A1.5,1.5 0 0,1 5.5,7M21.41,11.58L12.41,2.58C12.05,2.22 11.55,2 11,2H4C2.89,2 2,2.89 2,4V11C2,11.55 2.22,12.05 2.59,12.41L11.58,21.41C11.95,21.77 12.45,22 13,22C13.55,22 14.05,21.77 14.41,21.41L21.41,14.41C21.78,14.05 22,13.55 22,13C22,12.44 21.77,11.94 21.41,11.58Z" />
 </vector>

@@ -24,7 +24,6 @@ package com.nextcloud.client;
 
 import android.Manifest;
 
-import com.facebook.testing.screenshot.Screenshot;
 import com.owncloud.android.AbstractIT;
 import com.owncloud.android.R;
 import com.owncloud.android.ui.activity.FileDisplayActivity;
@@ -59,7 +58,7 @@ public class FileDisplayActivityScreenshotIT extends AbstractIT {
         sut.getListOfFilesFragment().setLoading(false);
         waitForIdleSync();
 
-        Screenshot.snapActivity(sut).record();
+        screenshot(sut);
     }
 
     @Test
@@ -74,6 +73,6 @@ public class FileDisplayActivityScreenshotIT extends AbstractIT {
         sut.getListOfFilesFragment().setLoading(false);
         waitForIdleSync();
 
-        Screenshot.snapActivity(sut).record();
+        screenshot(sut);
     }
 }

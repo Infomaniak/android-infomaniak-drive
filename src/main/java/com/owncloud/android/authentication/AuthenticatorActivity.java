@@ -61,7 +61,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.provider.DocumentsContract;
 import android.text.TextUtils;
 import android.util.AndroidRuntimeException;
 import android.view.KeyEvent;
@@ -114,6 +113,7 @@ import com.owncloud.android.lib.resources.status.OwnCloudVersion;
 import com.owncloud.android.lib.resources.users.GetUserInfoRemoteOperation;
 import com.owncloud.android.operations.DetectAuthenticationMethodOperation.AuthenticationMethod;
 import com.owncloud.android.operations.GetServerInfoOperation;
+import com.owncloud.android.providers.DocumentsStorageProvider;
 import com.owncloud.android.services.OperationsService;
 import com.owncloud.android.services.OperationsService.OperationsServiceBinder;
 import com.owncloud.android.ui.activity.FileDisplayActivity;
@@ -147,6 +147,9 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import de.cotech.hw.fido.WebViewFidoBridge;
+import de.cotech.hw.fido.ui.FidoDialogOptions;
+import de.cotech.hw.fido2.WebViewWebauthnBridge;
+import de.cotech.hw.fido2.ui.WebauthnDialogOptions;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
@@ -219,7 +222,8 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity
     private TextView mAuthStatusView;
     private WebView mLoginWebView;
 
-    private WebViewFidoBridge webViewFidoBridge;
+    private WebViewFidoBridge webViewFidoU2fBridge;
+    private WebViewWebauthnBridge webViewWebauthnBridge;
 
     private String mAuthStatusText = EMPTY_STRING;
     private int mAuthStatusIcon;
@@ -258,7 +262,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity
             onboarding.launchFirstRunIfNeeded(this);
         }
 
-        onlyAdd = getIntent().getBooleanExtra(KEY_ONLY_ADD, false);
+        onlyAdd = getIntent().getBooleanExtra(KEY_ONLY_ADD, false) || checkIfViaSSO(getIntent());
 
         // delete cookies for webView
         deleteCookies();
@@ -343,6 +347,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity
             Build.MANUFACTURER.substring(1).toLowerCase(Locale.getDefault()) + " " + Build.MODEL + " (Android)";
     }
 
+    @SuppressFBWarnings("ANDROID_WEB_VIEW_JAVASCRIPT")
     @SuppressLint("SetJavaScriptEnabled")
     private void initWebViewLogin(String baseURL, boolean useGenericUserAgent) {
         mLoginWebView.setVisibility(View.GONE);
@@ -361,7 +366,16 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity
         mLoginWebView.getSettings().setSaveFormData(false);
         mLoginWebView.getSettings().setSavePassword(false);
 
-        webViewFidoBridge = WebViewFidoBridge.createInstanceForWebView(this, mLoginWebView);
+        FidoDialogOptions.Builder dialogOptionsBuilder = FidoDialogOptions.builder();
+        dialogOptionsBuilder.setShowSdkLogo(true);
+        dialogOptionsBuilder.setTheme(R.style.FidoDialog);
+        webViewFidoU2fBridge = WebViewFidoBridge.createInstanceForWebView(this, mLoginWebView, dialogOptionsBuilder);
+
+        WebauthnDialogOptions.Builder webauthnOptionsBuilder = WebauthnDialogOptions.builder();
+        webauthnOptionsBuilder.setShowSdkLogo(true);
+        webauthnOptionsBuilder.setAllowSkipPin(true);
+        webauthnOptionsBuilder.setTheme(R.style.FidoDialog);
+        webViewWebauthnBridge = WebViewWebauthnBridge.createInstanceForWebView(this, mLoginWebView, webauthnOptionsBuilder);
 
         Map<String, String> headers = new HashMap<>();
         headers.put(RemoteOperation.OCS_API_HEADER, RemoteOperation.OCS_API_HEADER_VALUE);
@@ -396,14 +410,16 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity
         mLoginWebView.setWebViewClient(new WebViewClient() {
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-                webViewFidoBridge.delegateShouldInterceptRequest(view, request);
+                webViewFidoU2fBridge.delegateShouldInterceptRequest(view, request);
+                webViewWebauthnBridge.delegateShouldInterceptRequest(view, request);
                 return super.shouldInterceptRequest(view, request);
             }
 
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 super.onPageStarted(view, url, favicon);
-                webViewFidoBridge.delegateOnPageStarted(view, url, favicon);
+                webViewFidoU2fBridge.delegateOnPageStarted(view, url, favicon);
+                webViewWebauthnBridge.delegateOnPageStarted(view, url, favicon);
             }
 
             @Override
@@ -661,7 +677,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity
             super.finish();
         }
 
-        onlyAdd = intent.getBooleanExtra(KEY_ONLY_ADD, false);
+        onlyAdd = intent.getBooleanExtra(KEY_ONLY_ADD, false) || checkIfViaSSO(intent);
 
         // Passcode
         PassCodeManager passCodeManager = new PassCodeManager(preferences);
@@ -684,6 +700,16 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity
             setContentView(R.layout.account_setup_webview);
             mLoginWebView = findViewById(R.id.login_webview);
             initWebViewLogin(getString(R.string.provider_registration_server), true);
+        }
+    }
+
+    private boolean checkIfViaSSO(Intent intent) {
+        Bundle extras = intent.getExtras();
+        if (extras == null) {
+            return false;
+        } else {
+            String authTokenType = extras.getString("authTokenType");
+            return "SSO".equals(authTokenType);
         }
     }
 
@@ -1109,7 +1135,9 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity
 
             if (success) {
                 accountManager.setCurrentOwnCloudAccount(mAccount.name);
-                if (!onlyAdd) {
+                if (onlyAdd) {
+                    finish();
+                } else {
                     Intent i = new Intent(this, FileDisplayActivity.class);
                     i.setAction(FileDisplayActivity.RESTART);
                     i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -1272,11 +1300,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity
             setResult(RESULT_OK, intent);
 
             // notify Document Provider
-            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                String authority = getResources().getString(R.string.document_provider_authority);
-                Uri rootsUri = DocumentsContract.buildRootsUri(authority);
-                getContentResolver().notifyChange(rootsUri, null);
-            }
+            DocumentsStorageProvider.notifyRootsChanged(this);
 
             return true;
         }

@@ -131,7 +131,6 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import static com.infomaniak.drive.Utils.openOnlyOffice;
 import static com.owncloud.android.datamodel.OCFile.ROOT_PATH;
@@ -263,7 +262,7 @@ public class OCFileListFragment extends ExtendedListFragment implements
 
         } catch (ClassCastException e) {
             throw new IllegalArgumentException(context.toString() + " must implement " +
-                    SwipeRefreshLayout.OnRefreshListener.class.getSimpleName(), e);
+                                                   OnEnforceableRefreshListener.class.getSimpleName(), e);
         }
     }
 
@@ -331,7 +330,6 @@ public class OCFileListFragment extends ExtendedListFragment implements
         super.onActivityCreated(savedInstanceState);
         Log_OC.i(TAG, "onActivityCreated() start");
 
-
         if (savedInstanceState != null) {
             mFile = savedInstanceState.getParcelable(KEY_FILE);
         }
@@ -370,23 +368,34 @@ public class OCFileListFragment extends ExtendedListFragment implements
         }
         prepareCurrentSearch(searchEvent);
 
-        mSortButton.setOnClickListener(v -> openSortingOrderDialogFragment(requireFragmentManager(),
-                                                                           preferences.getSortOrderByFolder(mFile)));
+        if (mSortButton != null) {
+            mSortButton.setOnClickListener(v -> openSortingOrderDialogFragment(requireFragmentManager(),
+                                                                               preferences.getSortOrderByFolder(mFile)));
+        }
 
-        mSwitchGridViewButton.setOnClickListener(v -> {
-            if (isGridEnabled()) {
-                setListAsPreferred();
-            } else {
-                setGridAsPreferred();
-            }
-            setGridSwitchButton();
-        });
+        if (mSwitchGridViewButton != null) {
+            mSwitchGridViewButton.setOnClickListener(v -> {
+                if (isGridEnabled()) {
+                    setListAsPreferred();
+                } else {
+                    setGridAsPreferred();
+                }
+                setGridSwitchButton();
+            });
+        }
 
         setTitle();
 
         if (searchEvent != null) {
             onMessageEvent(searchEvent);
         }
+
+        FragmentActivity fragmentActivity;
+        if ((fragmentActivity = getActivity()) != null && fragmentActivity instanceof FileDisplayActivity) {
+            FileDisplayActivity fileDisplayActivity = (FileDisplayActivity) fragmentActivity;
+            fileDisplayActivity.updateActionBarTitleAndHomeButton(fileDisplayActivity.getCurrentDir());
+        }
+        listDirectory(false, false);
     }
 
     protected void prepareCurrentSearch(SearchEvent event) {
@@ -769,6 +778,8 @@ public class OCFileListFragment extends ExtendedListFragment implements
      */
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
         outState.putParcelable(KEY_FILE, mFile);
         if (searchFragment) {
             outState.putParcelable(KEY_CURRENT_SEARCH_TYPE, Parcels.wrap(currentSearchType));
@@ -777,8 +788,6 @@ public class OCFileListFragment extends ExtendedListFragment implements
             }
         }
         mMultiChoiceModeListener.storeStateIn(outState);
-
-        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -910,13 +919,6 @@ public class OCFileListFragment extends ExtendedListFragment implements
                     resetHeaderScrollingState();
 
                     if (file.isEncrypted()) {
-                        // check if API >= 19
-                        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.KITKAT) {
-                            Snackbar.make(getRecyclerView(), R.string.end_to_end_encryption_not_supported,
-                                          Snackbar.LENGTH_LONG).show();
-                            return;
-                        }
-
                         User user = ((FileActivity) mContainerActivity).getUser().orElseThrow(RuntimeException::new);
 
                         // check if e2e app is enabled
@@ -934,10 +936,8 @@ public class OCFileListFragment extends ExtendedListFragment implements
                             getContext().getContentResolver());
 
 
-                        String publicKey = arbitraryDataProvider.getValue(user.toPlatformAccount(),
-                                                                          EncryptionUtils.PUBLIC_KEY);
-                        String privateKey = arbitraryDataProvider.getValue(user.toPlatformAccount(),
-                                                                           EncryptionUtils.PRIVATE_KEY);
+                        String publicKey = arbitraryDataProvider.getValue(user, EncryptionUtils.PUBLIC_KEY);
+                        String privateKey = arbitraryDataProvider.getValue(user, EncryptionUtils.PRIVATE_KEY);
 
                         if (publicKey.isEmpty() || privateKey.isEmpty()) {
                             Log_OC.d(TAG, "no public key for " + user.getAccountName());
@@ -1203,6 +1203,9 @@ public class OCFileListFragment extends ExtendedListFragment implements
                 selectAllFiles(false);
                 return true;
             }
+            case R.id.action_send_file:
+                mContainerActivity.getFileOperationsHelper().sendFiles(checkedFiles);
+                return true;
             default:
                 return false;
         }
@@ -1314,8 +1317,12 @@ public class OCFileListFragment extends ExtendedListFragment implements
             switchToListView();
         }
 
-        mSortButton.setText(DisplayUtils.getSortOrderStringId(preferences.getSortOrderByFolder(mFile)));
-        setGridSwitchButton();
+        if (mSortButton != null) {
+            mSortButton.setText(DisplayUtils.getSortOrderStringId(preferences.getSortOrderByFolder(mFile)));
+        }
+        if (mSwitchGridViewButton != null) {
+            setGridSwitchButton();
+        }
 
         if (mHideFab) {
             setFabVisible(false);
@@ -1638,10 +1645,8 @@ public class OCFileListFragment extends ExtendedListFragment implements
                     new ArbitraryDataProvider(requireContext().getContentResolver());
 
 
-                String publicKey = arbitraryDataProvider.getValue(user.toPlatformAccount(),
-                                                                  EncryptionUtils.PUBLIC_KEY);
-                String privateKey = arbitraryDataProvider.getValue(user.toPlatformAccount(),
-                                                                   EncryptionUtils.PRIVATE_KEY);
+                String publicKey = arbitraryDataProvider.getValue(user, EncryptionUtils.PUBLIC_KEY);
+                String privateKey = arbitraryDataProvider.getValue(user, EncryptionUtils.PRIVATE_KEY);
 
                 if (publicKey.isEmpty() || privateKey.isEmpty()) {
                     Log_OC.d(TAG, "no public key for " + user.getAccountName());

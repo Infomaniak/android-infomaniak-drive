@@ -171,12 +171,12 @@ public class DownloadFileOperation extends RemoteOperation {
             modificationTimestamp = downloadOperation.getModificationTimestamp();
             etag = downloadOperation.getEtag();
             newFile = new File(getSavePath());
-            if (!newFile.getParentFile().mkdirs()) {
+            if (!newFile.getParentFile().exists() && !newFile.getParentFile().mkdirs()) {
                 Log_OC.e(TAG, "Unable to create parent folder " + newFile.getParentFile().getAbsolutePath());
             }
 
             // decrypt file
-            if (file.isEncrypted() && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+            if (file.isEncrypted()) {
                 FileDataStorageManager fileDataStorageManager = new FileDataStorageManager(account, context.getContentResolver());
 
                 OCFile parent = fileDataStorageManager.getFileByPath(file.getParentRemotePath());

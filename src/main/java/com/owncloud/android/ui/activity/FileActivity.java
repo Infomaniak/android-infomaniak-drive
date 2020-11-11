@@ -499,7 +499,7 @@ public abstract class FileActivity extends DrawerActivity
         OCFile syncedFile = operation.getLocalFile();
         if (!result.isSuccess()) {
             if (result.getCode() == ResultCode.SYNC_CONFLICT) {
-                Intent intent = ConflictsResolveActivity.createIntent(syncedFile, getAccount(), null, this);
+                Intent intent = ConflictsResolveActivity.createIntent(syncedFile, getAccount(), -1, null, this);
                 startActivity(intent);
             }
 
@@ -606,16 +606,6 @@ public abstract class FileActivity extends DrawerActivity
     @Override
     public FileUploaderBinder getFileUploaderBinder() {
         return mUploaderBinder;
-    }
-
-    @Override
-    public void restart() {
-        Intent i = new Intent(this, FileDisplayActivity.class);
-        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        i.setAction(FileDisplayActivity.RESTART);
-        startActivity(i);
-
-        fetchExternalLinks(false);
     }
 
     public OCFile getCurrentDir() {
@@ -756,7 +746,6 @@ public abstract class FileActivity extends DrawerActivity
 
         if (result.isSuccess()) {
             if (sharingFragment != null) {
-                sharingFragment.refreshPublicShareFromDB();
                 sharingFragment.onUpdateShareInformation(result, getFile());
             }
         } else {
@@ -771,7 +760,6 @@ public abstract class FileActivity extends DrawerActivity
         if (result.isSuccess()) {
             updateFileFromDB();
             if (sharingFragment != null) {
-                sharingFragment.refreshPublicShareFromDB();
                 sharingFragment.onUpdateShareInformation(result, getFile());
             }
         } else if (sharingFragment != null && sharingFragment.getView() != null) {
@@ -817,7 +805,6 @@ public abstract class FileActivity extends DrawerActivity
             copyAndShareFileLink(this, file, link);
 
             if (sharingFragment != null) {
-                sharingFragment.refreshPublicShareFromDB();
                 sharingFragment.onUpdateShareInformation(result, getFile());
             }
         } else {
@@ -838,7 +825,7 @@ public abstract class FileActivity extends DrawerActivity
 
             } else {
                 if (sharingFragment != null) {
-                    sharingFragment.refreshPublicShareFromDB();
+                    sharingFragment.refreshSharesFromDB();
                 }
                 Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content),
                                                   ErrorMessageAdapter.getErrorCauseMessage(result,
@@ -909,8 +896,8 @@ public abstract class FileActivity extends DrawerActivity
         if (getFile().isSharedWithMe()) {
             return OCShare.READ_PERMISSION_FLAG;    // minimum permissions
         } else if (ShareType.FEDERATED.equals(shareType)) {
-            return getFile().isFolder() ? OCShare.FEDERATED_PERMISSIONS_FOR_FOLDER_AFTER_OC9 :
-                OCShare.FEDERATED_PERMISSIONS_FOR_FILE_AFTER_OC9;
+            return getFile().isFolder() ? OCShare.FEDERATED_PERMISSIONS_FOR_FOLDER :
+                OCShare.FEDERATED_PERMISSIONS_FOR_FILE;
         } else {
             return getFile().isFolder() ? OCShare.MAXIMUM_PERMISSIONS_FOR_FOLDER :
                 OCShare.MAXIMUM_PERMISSIONS_FOR_FILE;

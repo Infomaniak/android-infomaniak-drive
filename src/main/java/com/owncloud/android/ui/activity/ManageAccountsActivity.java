@@ -194,7 +194,7 @@ public class ManageAccountsActivity extends FileActivity implements UserListAdap
         List<User> users = accountManager.getAllUsers();
         List<User> newList = new ArrayList<>();
         for (User user : users) {
-            boolean pendingForRemoval = arbitraryDataProvider.getBooleanValue(user.toPlatformAccount(), PENDING_FOR_REMOVAL);
+            boolean pendingForRemoval = arbitraryDataProvider.getBooleanValue(user, PENDING_FOR_REMOVAL);
 
             if (!pendingForRemoval) {
                 newList.add(user);
@@ -246,8 +246,7 @@ public class ManageAccountsActivity extends FileActivity implements UserListAdap
         List<User> users = accountManager.getAllUsers();
         List<UserListItem> userListItems = new ArrayList<>(users.size());
         for (User user : users) {
-            boolean pendingForRemoval = arbitraryDataProvider.getBooleanValue(user.toPlatformAccount(),
-                                                                              PENDING_FOR_REMOVAL);
+            boolean pendingForRemoval = arbitraryDataProvider.getBooleanValue(user, PENDING_FOR_REMOVAL);
             userListItems.add(new UserListItem(user, !pendingForRemoval));
         }
 
@@ -476,7 +475,7 @@ public class ManageAccountsActivity extends FileActivity implements UserListAdap
             PopupMenu popup = new PopupMenu(this, view);
             popup.getMenuInflater().inflate(R.menu.item_account, popup.getMenu());
 
-            if((accountManager.getUser()).equals(user)) {
+            if(accountManager.getUser().equals(user)) {
                 popup.getMenu().findItem(R.id.action_open_account).setVisible(false);
             }
             popup.setOnMenuItemClickListener(item -> {

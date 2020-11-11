@@ -1,10 +1,25 @@
-<vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt"
-    android:viewportWidth="24"
-    android:viewportHeight="24"
+<!--
+    @author Google LLC
+    Copyright (C) 2018 Google LLC
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
-    android:height="24dp">
-    <path
-        android:pathData="M12.4544621 3.00667918C8.70879003 3.15359323 5.42713843 5.51826096 4.15539455 8.98675856C4.12123517 9.08038998 4.0247995 9.13744238 3.92469937 9.12324035L2.48689806 8.91056321C2.32632978 8.89031308 2.16751486 8.9589167 2.0740303 9.08891057C1.98221885 9.22128084 1.97527784 9.39358535 2.05615355 9.53268572L4.33671585 13.4680502C4.40238086 13.581021 4.51772032 13.6575345 4.64881185 13.6750877C4.77990338 13.6926407 4.91183965 13.6492373 5.005817 13.5576425L8.21511892 10.4210733C8.3297357 10.309463 8.37037125 10.1437195 8.32007218 9.99299203C8.26977312 9.84226452 8.13718081 9.73244797 7.97761356 9.70935846L6.51767913 9.4950067C6.45158638 9.48555342 6.39383886 9.44613066 6.36171678 9.38853518C6.32959469 9.33093969 6.32682429 9.26185272 6.35423457 9.20194764C7.75782713 6.07623412 11.2720075 4.42745125 14.6249996 5.32147071C17.9779918 6.21549017 20.1644575 9.38425527 19.7709349 12.7792871C19.3774123 16.1743189 16.5218923 18.7776743 13.0503537 18.9063889C12.6701902 18.9131197 12.3225553 19.1188274 12.1383996 19.4460242C11.954244 19.773221 11.9615454 20.1721977 12.1575533 20.4926637C12.3535612 20.8131297 12.7084975 21.0063986 13.088661 21L13.1286709 21C16.4102782 20.900615 19.3865229 19.0801896 20.9282136 16.2290637C22.4699044 13.3779378 22.3408078 9.93298913 20.5899036 7.20123606C18.8389994 4.46948298 15.7345783 2.86951181 12.4544621 3.00835381L12.4544621 3.00667918Z"
-        android:fillType="evenOdd"
-        android:fillColor="#757575" />
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+  <path
+      android:fillColor="#757575"
+      android:pathData="M12,5V1L7,6l5,5V7c3.31,0 6,2.69 6,6s-2.69,6 -6,6 -6,-2.69 -6,-6H4c0,4.42 3.58,8 8,8s8,-3.58 8,-8 -3.58,-8 -8,-8z"/>
 </vector>

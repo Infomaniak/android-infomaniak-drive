@@ -35,7 +35,7 @@ import java.util.List;
  */
 public class ProviderMeta {
     public static final String DB_NAME = "filelist";
-    public static final int DB_VERSION = 59;
+    public static final int DB_VERSION = 61;
 
     private ProviderMeta() {
         // No instance
@@ -102,7 +102,6 @@ public class ProviderMeta {
         public static final String FILE_ETAG_ON_SERVER = "etag_on_server";
         public static final String FILE_SHARED_VIA_LINK = "share_by_link";
         public static final String FILE_SHARED_WITH_SHAREE = "shared_via_users";
-        public static final String FILE_PUBLIC_LINK = "public_link";
         public static final String FILE_PERMISSIONS = "permissions";
         public static final String FILE_REMOTE_ID = "remote_id";
         public static final String FILE_UPDATE_THUMBNAIL = "update_thumbnail";
@@ -137,7 +136,6 @@ public class ProviderMeta {
             FILE_ETAG_ON_SERVER,
             FILE_SHARED_VIA_LINK,
             FILE_SHARED_WITH_SHAREE,
-            FILE_PUBLIC_LINK,
             FILE_PERMISSIONS,
             FILE_REMOTE_ID,
             FILE_UPDATE_THUMBNAIL,
@@ -225,9 +223,11 @@ public class ProviderMeta {
         public static final String CAPABILITIES_RICHDOCUMENT_TEMPLATES = "richdocument_direct_templates";
         public static final String CAPABILITIES_RICHDOCUMENT_PRODUCT_NAME = "richdocument_product_name";
         public static final String CAPABILITIES_DEFAULT_SORT_ORDER = CAPABILITIES_ACCOUNT_NAME
-                + " collate nocase asc";
+            + " collate nocase asc";
         public static final String CAPABILITIES_DIRECT_EDITING_ETAG = "direct_editing_etag";
         public static final String CAPABILITIES_ETAG = "etag";
+        public static final String CAPABILITIES_USER_STATUS = "user_status";
+        public static final String CAPABILITIES_USER_STATUS_SUPPORTS_EMOJI = "user_status_supports_emoji";
 
         //Columns of Uploads table
         public static final String UPLOADS_LOCAL_PATH = "local_path";

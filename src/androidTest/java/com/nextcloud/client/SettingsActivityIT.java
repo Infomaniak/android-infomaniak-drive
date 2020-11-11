@@ -27,7 +27,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Looper;
 
-import com.facebook.testing.screenshot.Screenshot;
 import com.owncloud.android.AbstractIT;
 import com.owncloud.android.datamodel.ArbitraryDataProvider;
 import com.owncloud.android.ui.activity.RequestCredentialsActivity;
@@ -56,9 +55,9 @@ public class SettingsActivityIT extends AbstractIT {
     @Test
     @ScreenshotTest
     public void open() {
-        Activity test = activityRule.launchActivity(null);
+        Activity sut = activityRule.launchActivity(null);
 
-        Screenshot.snapActivity(test).record();
+        screenshot(sut);
     }
 
     @Test

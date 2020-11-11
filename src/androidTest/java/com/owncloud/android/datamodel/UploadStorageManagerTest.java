@@ -28,12 +28,14 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Random;
 
-import androidx.test.InstrumentationRegistry;
+import androidx.test.core.app.ApplicationProvider;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.SmallTest;
-import androidx.test.runner.AndroidJUnit4;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -49,7 +51,7 @@ public class UploadStorageManagerTest extends AbstractIT {
 
     @Before
     public void setUp() {
-        Context instrumentationCtx = InstrumentationRegistry.getTargetContext();
+        Context instrumentationCtx = ApplicationProvider.getApplicationContext();
         ContentResolver contentResolver = instrumentationCtx.getContentResolver();
         uploadsStorageManager = new UploadsStorageManager(currentAccountProvider, contentResolver);
 
@@ -94,6 +96,7 @@ public class UploadStorageManagerTest extends AbstractIT {
         int size = 3000;
         ArrayList<OCUpload> uploads = new ArrayList<>();
 
+        deleteAllUploads();
         assertEquals(0, uploadsStorageManager.getAllStoredUploads().length);
 
         for (int i = 0; i < size; i++) {
@@ -149,6 +152,25 @@ public class UploadStorageManagerTest extends AbstractIT {
         uploadsStorageManager.getAllStoredUploads();
     }
 
+    @Test
+    public void getById() {
+        OCUpload upload = createUpload(account);
+        long id = uploadsStorageManager.storeUpload(upload);
+
+        OCUpload newUpload = uploadsStorageManager.getUploadById(id);
+
+        assertNotNull(newUpload);
+        assertEquals(upload.getLocalAction(), newUpload.getLocalAction());
+        assertEquals(upload.getFolderUnlockToken(), newUpload.getFolderUnlockToken());
+    }
+
+    @Test
+    public void getByIdNull() {
+        OCUpload newUpload = uploadsStorageManager.getUploadById(-1);
+
+        assertNull(newUpload);
+    }
+
     private void insertUploads(Account account, int rowsToInsert) {
         for (int i = 0; i < rowsToInsert; i++) {
             uploadsStorageManager.storeUpload(createUpload(account));
@@ -156,8 +178,14 @@ public class UploadStorageManagerTest extends AbstractIT {
     }
 
     private OCUpload createUpload(Account account) {
-        OCUpload upload = new OCUpload(File.separator + "very long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long LocalPath",
-                                       OCFile.PATH_SEPARATOR + "very long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long RemotePath",
+        OCUpload upload = new OCUpload(File.separator + "very long long long long long long long long long long long " +
+                                           "long long long long long long long long long long long long long long " +
+                                           "long long long long long long long long long long long long long long " +
+                                           "long long long long long long long LocalPath",
+                                       OCFile.PATH_SEPARATOR + "very long long long long long long long long long " +
+                                           "long long long long long long long long long long long long long long " +
+                                           "long long long long long long long long long long long long long long " +
+                                           "long long long long long long long long long long long long RemotePath",
                                        account.name);
 
         upload.setFileSize(new Random().nextInt(20000) * 10000);
@@ -175,11 +203,15 @@ public class UploadStorageManagerTest extends AbstractIT {
         return upload;
     }
 
+    private void deleteAllUploads() {
+        uploadsStorageManager.removeAllUploads();
+
+        assertEquals(0, uploadsStorageManager.getAllStoredUploads().length);
+    }
+
     @After
     public void tearDown() {
-        for (Account account : getAllAccounts()) {
-            uploadsStorageManager.removeAccountUploads(account);
-        }
+        deleteAllUploads();
 
         AccountManager platformAccountManager = AccountManager.get(targetContext);
         platformAccountManager.removeAccountExplicitly(account2);

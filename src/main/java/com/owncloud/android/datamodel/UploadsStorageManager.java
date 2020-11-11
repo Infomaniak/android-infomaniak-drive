@@ -46,6 +46,7 @@ import java.util.Locale;
 import java.util.Observable;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 
 /**
  * Database helper for storing list of files to be uploaded, including status
@@ -230,13 +231,27 @@ public class UploadsStorageManager extends Observable {
      * @param upload Upload instance to remove from persisted storage.
      * @return true when the upload was stored and could be removed.
      */
-    public int removeUpload(OCUpload upload) {
+    public int removeUpload(@Nullable OCUpload upload) {
+        if (upload == null) {
+            return 0;
+        } else {
+            return removeUpload(upload.getUploadId());
+        }
+    }
+
+    /**
+     * Remove an upload from the uploads list, known its target account and remote path.
+     *
+     * @param id to remove from persisted storage.
+     * @return true when the upload was stored and could be removed.
+     */
+    public int removeUpload(long id) {
         int result = getDB().delete(
-                ProviderTableMeta.CONTENT_URI_UPLOADS,
-                ProviderTableMeta._ID + "=?",
-                new String[]{Long.toString(upload.getUploadId())}
-        );
-        Log_OC.d(TAG, "delete returns " + result + " for upload " + upload);
+            ProviderTableMeta.CONTENT_URI_UPLOADS,
+            ProviderTableMeta._ID + "=?",
+            new String[]{Long.toString(id)}
+                                   );
+        Log_OC.d(TAG, "delete returns " + result + " for upload with id " + id);
         if (result > 0) {
             notifyObserversNow();
         }
@@ -284,6 +299,25 @@ public class UploadsStorageManager extends Observable {
 
     public OCUpload[] getAllStoredUploads() {
         return getUploads(null, (String[]) null);
+    }
+
+    public @Nullable
+    OCUpload getUploadById(long id) {
+        OCUpload result = null;
+        Cursor cursor = getDB().query(
+            ProviderTableMeta.CONTENT_URI_UPLOADS,
+            null,
+            ProviderTableMeta._ID + "=?",
+            new String[]{Long.toString(id)},
+            "_id ASC");
+
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                result = createOCUploadFromCursor(cursor);
+            }
+        }
+        Log_OC.d(TAG, "Retrieve job " + result + " for id " + id);
+        return result;
     }
 
     private OCUpload[] getUploads(@Nullable String selection, @Nullable String... selectionArgs) {
@@ -581,17 +615,17 @@ public class UploadsStorageManager extends Observable {
         ContentValues cv = new ContentValues();
         cv.put(ProviderTableMeta.UPLOADS_STATUS, UploadStatus.UPLOAD_FAILED.getValue());
         cv.put(
-                ProviderTableMeta.UPLOADS_LAST_RESULT,
-                fail != null ? fail.getValue() : UploadResult.UNKNOWN.getValue()
-        );
+            ProviderTableMeta.UPLOADS_LAST_RESULT,
+            fail != null ? fail.getValue() : UploadResult.UNKNOWN.getValue()
+              );
         cv.put(ProviderTableMeta.UPLOADS_UPLOAD_END_TIMESTAMP, Calendar.getInstance().getTimeInMillis());
 
         int result = getDB().update(
-                ProviderTableMeta.CONTENT_URI_UPLOADS,
-                cv,
-                ProviderTableMeta.UPLOADS_STATUS + "=?",
-                new String[]{String.valueOf(UploadStatus.UPLOAD_IN_PROGRESS.getValue())}
-        );
+            ProviderTableMeta.CONTENT_URI_UPLOADS,
+            cv,
+            ProviderTableMeta.UPLOADS_STATUS + "=?",
+            new String[]{String.valueOf(UploadStatus.UPLOAD_IN_PROGRESS.getValue())}
+                                   );
 
         if (result == 0) {
             Log_OC.v(TAG, "No upload was killed");
@@ -603,12 +637,21 @@ public class UploadsStorageManager extends Observable {
         return result;
     }
 
+    @VisibleForTesting
+    public int removeAllUploads() {
+        Log_OC.v(TAG, "Delete all uploads!");
+        return getDB().delete(
+            ProviderTableMeta.CONTENT_URI_UPLOADS,
+            "",
+            new String[]{});
+    }
+
     public int removeAccountUploads(Account account) {
         Log_OC.v(TAG, "Delete all uploads for account " + account.name);
         return getDB().delete(
-                ProviderTableMeta.CONTENT_URI_UPLOADS,
-                ProviderTableMeta.UPLOADS_ACCOUNT_NAME + "=?",
-                new String[]{account.name});
+            ProviderTableMeta.CONTENT_URI_UPLOADS,
+            ProviderTableMeta.UPLOADS_ACCOUNT_NAME + "=?",
+            new String[]{account.name});
     }
 
     public enum UploadStatus {

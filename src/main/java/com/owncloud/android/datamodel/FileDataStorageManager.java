@@ -38,6 +38,7 @@ import android.text.TextUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import com.nextcloud.client.account.User;
 import com.owncloud.android.MainApp;
 import com.owncloud.android.db.ProviderMeta.ProviderTableMeta;
 import com.owncloud.android.lib.common.network.WebdavEntry;
@@ -333,7 +334,6 @@ public class FileDataStorageManager {
         contentValues.put(ProviderTableMeta.FILE_ETAG_IN_CONFLICT, ocFile.getEtagInConflict());
         contentValues.put(ProviderTableMeta.FILE_SHARED_VIA_LINK, ocFile.isSharedViaLink() ? 1 : 0);
         contentValues.put(ProviderTableMeta.FILE_SHARED_WITH_SHAREE, ocFile.isSharedWithSharee() ? 1 : 0);
-        contentValues.put(ProviderTableMeta.FILE_PUBLIC_LINK, ocFile.getPublicLink());
         contentValues.put(ProviderTableMeta.FILE_PERMISSIONS, ocFile.getPermissions());
         contentValues.put(ProviderTableMeta.FILE_REMOTE_ID, ocFile.getRemoteId());
         contentValues.put(ProviderTableMeta.FILE_FAVORITE, ocFile.isFavorite());
@@ -973,7 +973,6 @@ public class FileDataStorageManager {
             ocFile.setEtagOnServer(cursor.getString(cursor.getColumnIndex(ProviderTableMeta.FILE_ETAG_ON_SERVER)));
             ocFile.setSharedViaLink(cursor.getInt(cursor.getColumnIndex(ProviderTableMeta.FILE_SHARED_VIA_LINK)) == 1);
             ocFile.setSharedWithSharee(cursor.getInt(cursor.getColumnIndex(ProviderTableMeta.FILE_SHARED_WITH_SHAREE)) == 1);
-            ocFile.setPublicLink(cursor.getString(cursor.getColumnIndex(ProviderTableMeta.FILE_PUBLIC_LINK)));
             ocFile.setPermissions(cursor.getString(cursor.getColumnIndex(ProviderTableMeta.FILE_PERMISSIONS)));
             ocFile.setRemoteId(cursor.getString(cursor.getColumnIndex(ProviderTableMeta.FILE_REMOTE_ID)));
             ocFile.setUpdateThumbnailNeeded(cursor.getInt(cursor.getColumnIndex(ProviderTableMeta.FILE_UPDATE_THUMBNAIL)) == 1);
@@ -1218,7 +1217,6 @@ public class FileDataStorageManager {
         ContentValues contentValues = new ContentValues();
         contentValues.put(ProviderTableMeta.FILE_SHARED_VIA_LINK, Boolean.FALSE);
         contentValues.put(ProviderTableMeta.FILE_SHARED_WITH_SHAREE, Boolean.FALSE);
-        contentValues.put(ProviderTableMeta.FILE_PUBLIC_LINK, "");
         String where = ProviderTableMeta.FILE_ACCOUNT_OWNER + AND + ProviderTableMeta.FILE_PARENT + " = ?";
         String[] whereArgs = new String[]{account.name, String.valueOf(folder.getFileId())};
 
@@ -1229,7 +1227,6 @@ public class FileDataStorageManager {
         ContentValues contentValues = new ContentValues();
         contentValues.put(ProviderTableMeta.FILE_SHARED_VIA_LINK, Boolean.FALSE);
         contentValues.put(ProviderTableMeta.FILE_SHARED_WITH_SHAREE, Boolean.FALSE);
-        contentValues.put(ProviderTableMeta.FILE_PUBLIC_LINK, "");
         String where = ProviderTableMeta.FILE_ACCOUNT_OWNER + AND + ProviderTableMeta.FILE_PATH + " = ?";
         String[] whereArgs = new String[]{account.name, filePath};
 
@@ -1430,7 +1427,8 @@ public class FileDataStorageManager {
             Integer.toString(ShareType.EMAIL.getValue()),
             Integer.toString(ShareType.FEDERATED.getValue()),
             Integer.toString(ShareType.ROOM.getValue()),
-            Integer.toString(ShareType.CIRCLE.getValue())};
+            Integer.toString(ShareType.CIRCLE.getValue())
+        };
 
         Cursor cursor = executeQuery(ProviderTableMeta.CONTENT_URI_SHARE,
                                      null,
@@ -1463,7 +1461,7 @@ public class FileDataStorageManager {
         if (path != null) {
             ContentValues values = new ContentValues();
             ContentResolver contentResolver = MainApp.getAppContext().getContentResolver();
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && !TextUtils.isEmpty(path)) {
                 if (file != null) {
                     values.put(MediaStore.Images.Media.MIME_TYPE, file.getMimeType());
                     values.put(MediaStore.Images.Media.TITLE, file.getFileName());
@@ -1708,8 +1706,10 @@ public class FileDataStorageManager {
                           capability.getRichDocumentsProductName());
         contentValues.put(ProviderTableMeta.CAPABILITIES_DIRECT_EDITING_ETAG,
                           capability.getDirectEditingEtag());
-        contentValues.put(ProviderTableMeta.CAPABILITIES_ETAG,
-                          capability.getEtag());
+        contentValues.put(ProviderTableMeta.CAPABILITIES_ETAG, capability.getEtag());
+        contentValues.put(ProviderTableMeta.CAPABILITIES_USER_STATUS, capability.getUserStatus().getValue());
+        contentValues.put(ProviderTableMeta.CAPABILITIES_USER_STATUS_SUPPORTS_EMOJI,
+                          capability.getUserStatusSupportsEmoji().getValue());
 
         return contentValues;
     }
@@ -1734,6 +1734,11 @@ public class FileDataStorageManager {
                             selection,
                             selectionArgs,
                             "Couldn't determine capability existence, assuming non existance: ");
+    }
+
+    @NonNull
+    public OCCapability getCapability(User user) {
+        return getCapability(user.getAccountName());
     }
 
     @NonNull
@@ -1764,9 +1769,10 @@ public class FileDataStorageManager {
             capability.setVersionEdition(getString(cursor, ProviderTableMeta.CAPABILITIES_VERSION_EDITION));
             capability.setExtendedSupport(getBoolean(cursor, ProviderTableMeta.CAPABILITIES_EXTENDED_SUPPORT));
             capability.setCorePollInterval(getInt(cursor, ProviderTableMeta.CAPABILITIES_CORE_POLLINTERVAL));
-            capability.setFilesSharingApiEnabled(getBoolean(cursor, ProviderTableMeta.CAPABILITIES_SHARING_API_ENABLED));
-            capability.setFilesSharingPublicEnabled(
-                getBoolean(cursor, ProviderTableMeta.CAPABILITIES_SHARING_PUBLIC_ENABLED));
+            capability.setFilesSharingApiEnabled(getBoolean(cursor,
+                                                            ProviderTableMeta.CAPABILITIES_SHARING_API_ENABLED));
+            capability.setFilesSharingPublicEnabled(getBoolean(cursor,
+                                                               ProviderTableMeta.CAPABILITIES_SHARING_PUBLIC_ENABLED));
             capability.setFilesSharingPublicPasswordEnforced(
                 getBoolean(cursor, ProviderTableMeta.CAPABILITIES_SHARING_PUBLIC_PASSWORD_ENFORCED));
             capability.setFilesSharingPublicAskForOptionalPassword(
@@ -1779,14 +1785,18 @@ public class FileDataStorageManager {
                 getBoolean(cursor, ProviderTableMeta.CAPABILITIES_SHARING_PUBLIC_EXPIRE_DATE_ENFORCED));
             capability.setFilesSharingPublicSendMail(
                 getBoolean(cursor, ProviderTableMeta.CAPABILITIES_SHARING_PUBLIC_SEND_MAIL));
-            capability.setFilesSharingPublicUpload(getBoolean(cursor, ProviderTableMeta.CAPABILITIES_SHARING_PUBLIC_UPLOAD));
-            capability.setFilesSharingUserSendMail(getBoolean(cursor, ProviderTableMeta.CAPABILITIES_SHARING_USER_SEND_MAIL));
-            capability.setFilesSharingResharing(getBoolean(cursor, ProviderTableMeta.CAPABILITIES_SHARING_RESHARING));
+            capability.setFilesSharingPublicUpload(getBoolean(cursor,
+                                                              ProviderTableMeta.CAPABILITIES_SHARING_PUBLIC_UPLOAD));
+            capability.setFilesSharingUserSendMail(getBoolean(cursor,
+                                                              ProviderTableMeta.CAPABILITIES_SHARING_USER_SEND_MAIL));
+            capability.setFilesSharingResharing(getBoolean(cursor,
+                                                           ProviderTableMeta.CAPABILITIES_SHARING_RESHARING));
             capability.setFilesSharingFederationOutgoing(
                 getBoolean(cursor, ProviderTableMeta.CAPABILITIES_SHARING_FEDERATION_OUTGOING));
             capability.setFilesSharingFederationIncoming(
                 getBoolean(cursor, ProviderTableMeta.CAPABILITIES_SHARING_FEDERATION_INCOMING));
-            capability.setFilesBigFileChunking(getBoolean(cursor, ProviderTableMeta.CAPABILITIES_FILES_BIGFILECHUNKING));
+            capability.setFilesBigFileChunking(getBoolean(cursor,
+                                                          ProviderTableMeta.CAPABILITIES_FILES_BIGFILECHUNKING));
             capability.setFilesUndelete(getBoolean(cursor, ProviderTableMeta.CAPABILITIES_FILES_UNDELETE));
             capability.setFilesVersioning(getBoolean(cursor, ProviderTableMeta.CAPABILITIES_FILES_VERSIONING));
             capability.setExternalLinks(getBoolean(cursor, ProviderTableMeta.CAPABILITIES_EXTERNAL_LINKS));
@@ -1799,27 +1809,33 @@ public class FileDataStorageManager {
             capability.setEndToEndEncryption(getBoolean(cursor, ProviderTableMeta.CAPABILITIES_END_TO_END_ENCRYPTION));
             capability.setServerBackgroundDefault(
                 getBoolean(cursor, ProviderTableMeta.CAPABILITIES_SERVER_BACKGROUND_DEFAULT));
-            capability.setServerBackgroundPlain(getBoolean(cursor, ProviderTableMeta.CAPABILITIES_SERVER_BACKGROUND_PLAIN));
+            capability.setServerBackgroundPlain(getBoolean(cursor,
+                                                           ProviderTableMeta.CAPABILITIES_SERVER_BACKGROUND_PLAIN));
             capability.setActivity(getBoolean(cursor, ProviderTableMeta.CAPABILITIES_ACTIVITY));
             capability.setRichDocuments(getBoolean(cursor, ProviderTableMeta.CAPABILITIES_RICHDOCUMENT));
             capability.setRichDocumentsDirectEditing(
                 getBoolean(cursor, ProviderTableMeta.CAPABILITIES_RICHDOCUMENT_DIRECT_EDITING));
             capability.setRichDocumentsTemplatesAvailable(
                 getBoolean(cursor, ProviderTableMeta.CAPABILITIES_RICHDOCUMENT_TEMPLATES));
-            String mimetypes = cursor.getString(cursor.getColumnIndex(ProviderTableMeta.CAPABILITIES_RICHDOCUMENT_MIMETYPE_LIST));
+            String mimetypes = getString(cursor, ProviderTableMeta.CAPABILITIES_RICHDOCUMENT_MIMETYPE_LIST);
             if (mimetypes == null) {
                 mimetypes = "";
             }
             capability.setRichDocumentsMimeTypeList(Arrays.asList(mimetypes.split(",")));
 
-            String optionalMimetypes = getString(cursor, ProviderTableMeta.CAPABILITIES_RICHDOCUMENT_OPTIONAL_MIMETYPE_LIST);
+            String optionalMimetypes = getString(cursor,
+                                                 ProviderTableMeta.CAPABILITIES_RICHDOCUMENT_OPTIONAL_MIMETYPE_LIST);
             if (optionalMimetypes == null) {
                 optionalMimetypes = "";
             }
             capability.setRichDocumentsOptionalMimeTypeList(Arrays.asList(optionalMimetypes.split(",")));
-            capability.setRichDocumentsProductName(getString(cursor, ProviderTableMeta.CAPABILITIES_RICHDOCUMENT_PRODUCT_NAME));
+            capability.setRichDocumentsProductName(getString(cursor,
+                                                             ProviderTableMeta.CAPABILITIES_RICHDOCUMENT_PRODUCT_NAME));
             capability.setDirectEditingEtag(getString(cursor, ProviderTableMeta.CAPABILITIES_DIRECT_EDITING_ETAG));
             capability.setEtag(getString(cursor, ProviderTableMeta.CAPABILITIES_ETAG));
+            capability.setUserStatus(getBoolean(cursor, ProviderTableMeta.CAPABILITIES_USER_STATUS));
+            capability.setUserStatusSupportsEmoji(
+                getBoolean(cursor, ProviderTableMeta.CAPABILITIES_USER_STATUS_SUPPORTS_EMOJI));
         }
         return capability;
     }
@@ -1886,8 +1902,8 @@ public class FileDataStorageManager {
 
     public void deleteAllFiles() {
         Uri contentUriDir = ProviderTableMeta.CONTENT_URI_DIR;
-        String where = ProviderTableMeta.FILE_ACCOUNT_OWNER + AND
-            + ProviderTableMeta.FILE_PATH + "= ?";
+        String where = ProviderTableMeta.FILE_ACCOUNT_OWNER + "= ? AND " +
+            ProviderTableMeta.FILE_PATH + "= ?";
         String[] whereArgs = new String[]{account.name, OCFile.ROOT_PATH};
 
         deleteFiles(contentUriDir, where, whereArgs, "Exception in deleteAllFiles for account " + account.name + ": ");

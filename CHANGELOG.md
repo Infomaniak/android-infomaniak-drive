@@ -1,4 +1,15 @@
-## 3.13.1 RC1 (September, 08, 2020)
+## 3.14.0 RC1 (October, 30, 2020)
+
+Prevent Firebase crashes: Exodus will warn about tracker, but code wise it is disabled
+Status support
+Document storage enhancement @tgrote
+Auto upload media detection improvements @AndyScherzinger
+Sharing UI rewrite
+Drop Android 4.3, new min version Android 4.4
+
+For a full list, please see https://github.com/nextcloud/android/milestone/50
+
+## 3.13.1 (September, 15, 2020)
 
 - bugfix release
 - auto upload obey metered network
@@ -9,37 +20,7 @@
 
 For a full list, please see https://github.com/nextcloud/android/milestone/51
 
-## 3.13.0 RC4 (August, 07, 2020)
-
-- new UI overhaul @Shagequi @JorisBodin
-- E2EE beta support
-- dark mode enhancement @AndyScherzinger
-- warn on outdated NC16 server
-- requires Android 4.3 or newer
-
-For a full list, please see https://github.com/nextcloud/android/milestone/48
-
-## 3.13.0 RC3 (August, 04, 2020)
-
-- new UI overhaul @Shagequi @JorisBodin
-- E2EE beta support
-- dark mode enhancement @AndyScherzinger
-- warn on outdated NC16 server
-- requires Android 4.3 or newer
-
-For a full list, please see https://github.com/nextcloud/android/milestone/48
-
-## 3.13.0 RC2 (July, 31, 2020)
-
-- new UI overhaul @Shagequi @JorisBodin
-- E2EE beta support
-- dark mode enhancement @AndyScherzinger
-- warn on outdated NC16 server
-- requires Android 4.3 or newer
-
-For a full list, please see https://github.com/nextcloud/android/milestone/48
-
-## 3.13.0 RC1 (July, 23, 2020)
+## 3.13.0 (August, 18, 2020)
 
 - new UI overhaul @Shagequi @JorisBodin
 - E2EE beta support

@@ -45,13 +45,15 @@ import com.nextcloud.client.preferences.AppPreferences
 import com.nextcloud.client.preferences.AppPreferencesImpl
 import com.owncloud.android.R
 import com.owncloud.android.datamodel.ArbitraryDataProvider
+import com.owncloud.android.datamodel.MediaFolderType
 import com.owncloud.android.datamodel.MediaFoldersModel
 import com.owncloud.android.datamodel.MediaProvider
 import com.owncloud.android.datamodel.SyncedFolderProvider
 import com.owncloud.android.lib.common.utils.Log_OC
-import com.owncloud.android.ui.activity.ManageAccountsActivity
+import com.owncloud.android.ui.activity.ManageAccountsActivity.PENDING_FOR_REMOVAL
 import com.owncloud.android.ui.activity.SyncedFoldersActivity
 import com.owncloud.android.ui.notifications.NotificationUtils
+import com.owncloud.android.utils.SyncedFolderUtils
 import com.owncloud.android.utils.ThemeUtils
 import java.util.ArrayList
 import java.util.Random
@@ -122,13 +124,9 @@ class MediaFoldersDetectionWork constructor(
                 if (!imageMediaFolderPaths.isEmpty() || !videoMediaFolderPaths.isEmpty()) {
                     val allUsers = userAccountManager.allUsers
                     val activeUsers: MutableList<User> = ArrayList()
-                    for (account in allUsers) {
-                        if (!arbitraryDataProvider.getBooleanValue(
-                            account.toPlatformAccount(),
-                            ManageAccountsActivity.PENDING_FOR_REMOVAL
-                        )
-                        ) {
-                            activeUsers.add(account)
+                    for (user in allUsers) {
+                        if (!arbitraryDataProvider.getBooleanValue(user, PENDING_FOR_REMOVAL)) {
+                            activeUsers.add(user)
                         }
                     }
                     for (user in activeUsers) {
@@ -137,7 +135,9 @@ class MediaFoldersDetectionWork constructor(
                                 imageMediaFolder,
                                 user.toPlatformAccount()
                             )
-                            if (folder == null) {
+                            if (folder == null &&
+                                SyncedFolderUtils.isQualifyingMediaFolder(imageMediaFolder, MediaFolderType.IMAGE)
+                            ) {
                                 val contentTitle = String.format(
                                     resources.getString(R.string.new_media_folder_detected),
                                     resources.getString(R.string.new_media_folder_photos)
@@ -147,7 +147,7 @@ class MediaFoldersDetectionWork constructor(
                                     imageMediaFolder.substring(imageMediaFolder.lastIndexOf('/') + 1),
                                     user,
                                     imageMediaFolder,
-                                    1
+                                    MediaFolderType.IMAGE.id
                                 )
                             }
                         }
@@ -166,7 +166,7 @@ class MediaFoldersDetectionWork constructor(
                                     videoMediaFolder.substring(videoMediaFolder.lastIndexOf('/') + 1),
                                     user,
                                     videoMediaFolder,
-                                    2
+                                    MediaFolderType.VIDEO.id
                                 )
                             }
                         }
@@ -176,7 +176,8 @@ class MediaFoldersDetectionWork constructor(
         } else {
             mediaFoldersModel = MediaFoldersModel(imageMediaFolderPaths, videoMediaFolderPaths)
             arbitraryDataProvider.storeOrUpdateKeyValue(
-                ACCOUNT_NAME_GLOBAL, KEY_MEDIA_FOLDERS,
+                ACCOUNT_NAME_GLOBAL,
+                KEY_MEDIA_FOLDERS,
                 gson.toJson(mediaFoldersModel)
             )
         }
@@ -195,7 +196,8 @@ class MediaFoldersDetectionWork constructor(
         intent.putExtra(SyncedFoldersActivity.EXTRA_SHOW_SIDEBAR, true)
         val pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_ONE_SHOT)
         val notificationBuilder = NotificationCompat.Builder(
-            context, NotificationUtils.NOTIFICATION_CHANNEL_GENERAL
+            context,
+            NotificationUtils.NOTIFICATION_CHANNEL_GENERAL
         )
             .setSmallIcon(R.drawable.notification_icon)
             .setLargeIcon(BitmapFactory.decodeResource(context.resources, R.drawable.notification_icon))

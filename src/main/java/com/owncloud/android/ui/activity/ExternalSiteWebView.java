@@ -22,9 +22,7 @@
 package com.owncloud.android.ui.activity;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.content.pm.ApplicationInfo;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.MenuItem;
@@ -46,6 +44,7 @@ import java.io.InputStream;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.drawerlayout.widget.DrawerLayout;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * This activity shows an URL as a web view
@@ -100,8 +99,8 @@ public class ExternalSiteWebView extends FileActivity {
 
         // allow debugging (when building the debug version); see details in
         // https://developers.google.com/web/tools/chrome-devtools/remote-debugging/webviews
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT &&
-            (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0) {
+        if ((getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0 ||
+                getResources().getBoolean(R.bool.is_beta)) {
             Log_OC.d(this, "Enable debug for webView");
             WebView.setWebContentsDebuggingEnabled(true);
         }
@@ -151,6 +150,7 @@ public class ExternalSiteWebView extends FileActivity {
         webview.loadUrl(url);
     }
 
+    @SuppressFBWarnings("ANDROID_WEB_VIEW_JAVASCRIPT")
     @SuppressLint("SetJavaScriptEnabled")
     private void setupWebSettings(WebSettings webSettings) {
         // enable zoom
@@ -218,14 +218,6 @@ public class ExternalSiteWebView extends FileActivity {
                 break;
         }
         return retval;
-    }
-
-    @Override
-    public void showFiles(boolean onDeviceOnly) {
-        super.showFiles(onDeviceOnly);
-        Intent fileDisplayActivity = new Intent(getApplicationContext(), FileDisplayActivity.class);
-        fileDisplayActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(fileDisplayActivity);
     }
 
     @Override

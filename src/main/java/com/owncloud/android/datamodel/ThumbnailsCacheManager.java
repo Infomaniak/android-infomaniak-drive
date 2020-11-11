@@ -83,6 +83,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * Manager for concurrent access to thumbnails cache.
  */
 public final class ThumbnailsCacheManager {
+    private static final int READ_TIMEOUT = 40000;
+    private static final int CONNECTION_TIMEOUT = 5000;
 
     public static final String PREFIX_RESIZED_IMAGE = "r";
     public static final String PREFIX_THUMBNAIL = "t";
@@ -479,7 +481,6 @@ public final class ThumbnailsCacheManager {
         @Override
         protected Bitmap doInBackground(ThumbnailGenerationTaskObject... params) {
             Bitmap thumbnail = null;
-            boolean isError = false;
             try {
                 if (mAccount != null) {
                     OwnCloudAccount ocAccount = new OwnCloudAccount(
@@ -632,7 +633,7 @@ public final class ThumbnailsCacheManager {
                                 getMethod.setRequestHeader(RemoteOperation.OCS_API_HEADER,
                                         RemoteOperation.OCS_API_HEADER_VALUE);
 
-                                int status = mClient.executeMethod(getMethod);
+                                int status = mClient.executeMethod(getMethod, READ_TIMEOUT, CONNECTION_TIMEOUT);
                                 if (status == HttpStatus.SC_OK) {
                                     InputStream inputStream = getMethod.getResponseBodyAsStream();
                                     Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
@@ -932,7 +933,7 @@ public final class ThumbnailsCacheManager {
             avatar = getBitmapFromDiskCache(avatarKey);
 
             // Download avatar from server, only if older than 60 min or avatar does not exist
-            if ((System.currentTimeMillis() - timestamp >= 60 * 60 * 1000 || avatar == null)) {
+            if (System.currentTimeMillis() - timestamp >= 60 * 60 * 1000 || avatar == null) {
                 GetMethod get = null;
                 try {
                     if (mAccount != null) {
@@ -1136,13 +1137,10 @@ public final class ThumbnailsCacheManager {
     }
 
     public static class AsyncMediaThumbnailDrawable extends BitmapDrawable {
-        private final WeakReference<MediaThumbnailGenerationTask> bitmapWorkerTaskReference;
 
-        public AsyncMediaThumbnailDrawable(Resources res, Bitmap bitmap,
-                                           MediaThumbnailGenerationTask bitmapWorkerTask) {
+        public AsyncMediaThumbnailDrawable(Resources res, Bitmap bitmap) {
 
             super(res, bitmap);
-            bitmapWorkerTaskReference = new WeakReference<>(bitmapWorkerTask);
         }
     }
 

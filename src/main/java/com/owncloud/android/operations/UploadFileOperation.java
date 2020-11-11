@@ -25,7 +25,6 @@ import android.accounts.Account;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.Uri;
-import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
@@ -87,7 +86,6 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import androidx.annotation.CheckResult;
-import androidx.annotation.RequiresApi;
 
 
 /**
@@ -121,6 +119,7 @@ public class UploadFileOperation extends SyncOperation {
     private boolean mOnWifiOnly;
     private boolean mWhileChargingOnly;
     private boolean mIgnoringPowerSaveMode;
+    private final boolean mDisableRetries;
 
     private boolean mWasRenamed;
     private long mOCUploadId;
@@ -149,12 +148,6 @@ public class UploadFileOperation extends SyncOperation {
     private boolean encryptedAncestor;
 
     public static OCFile obtainNewOCFileToUpload(String remotePath, String localPath, String mimeType) {
-
-        // MIME type
-        if (TextUtils.isEmpty(mimeType)) {
-            mimeType = MimeTypeUtil.getBestMimeTypeByFilename(localPath);
-        }
-
         OCFile newFile = new OCFile(remotePath);
         newFile.setStoragePath(localPath);
         newFile.setLastSyncDateForProperties(0);
@@ -168,8 +161,12 @@ public class UploadFileOperation extends SyncOperation {
         } // don't worry about not assigning size, the problems with localPath
         // are checked when the UploadFileOperation instance is created
 
-
-        newFile.setMimeType(mimeType);
+        // MIME type
+        if (TextUtils.isEmpty(mimeType)) {
+            newFile.setMimeType(MimeTypeUtil.getBestMimeTypeByFilename(localPath));
+        } else {
+            newFile.setMimeType(mimeType);
+        }
 
         return newFile;
     }
@@ -184,15 +181,30 @@ public class UploadFileOperation extends SyncOperation {
                                int localBehaviour,
                                Context context,
                                boolean onWifiOnly,
-                               boolean whileChargingOnly
-    ) {
+                               boolean whileChargingOnly) {
+        this(uploadsStorageManager, connectivityService, powerManagementService, user, file, upload,
+             nameCollisionPolicy, localBehaviour, context, onWifiOnly, whileChargingOnly, true);
+    }
+
+    public UploadFileOperation(UploadsStorageManager uploadsStorageManager,
+                               ConnectivityService connectivityService,
+                               PowerManagementService powerManagementService,
+                               User user,
+                               OCFile file,
+                               OCUpload upload,
+                               FileUploader.NameCollisionPolicy nameCollisionPolicy,
+                               int localBehaviour,
+                               Context context,
+                               boolean onWifiOnly,
+                               boolean whileChargingOnly,
+                               boolean disableRetries) {
         if (upload == null) {
             throw new IllegalArgumentException("Illegal NULL file in UploadFileOperation creation");
         }
         if (TextUtils.isEmpty(upload.getLocalPath())) {
             throw new IllegalArgumentException(
-                    "Illegal file in UploadFileOperation; storage path invalid: "
-                            + upload.getLocalPath());
+                "Illegal file in UploadFileOperation; storage path invalid: "
+                    + upload.getLocalPath());
         }
 
         this.uploadsStorageManager = uploadsStorageManager;
@@ -222,6 +234,7 @@ public class UploadFileOperation extends SyncOperation {
         // Ignore power save mode only if user explicitly created this upload
         mIgnoringPowerSaveMode = mCreatedBy == CREATED_BY_USER;
         mFolderUnlockToken = upload.getFolderUnlockToken();
+        mDisableRetries = disableRetries;
     }
 
     public boolean isWifiRequired() {
@@ -413,12 +426,7 @@ public class UploadFileOperation extends SyncOperation {
 
         if (encryptedAncestor) {
             Log_OC.d(TAG, "encrypted upload");
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                return encryptedUpload(client, parent);
-            } else {
-                Log_OC.e(TAG, "Encrypted upload on old Android API");
-                return new RemoteOperationResult(ResultCode.OLD_ANDROID_API);
-            }
+            return encryptedUpload(client, parent);
         } else {
             Log_OC.d(TAG, "normal upload");
             return normalUpload(client);
@@ -426,7 +434,6 @@ public class UploadFileOperation extends SyncOperation {
     }
 
     @SuppressLint("AndroidLintUseSparseArrays") // gson cannot handle sparse arrays easily, therefore use hashmap
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private RemoteOperationResult encryptedUpload(OwnCloudClient client, OCFile parentFile) {
         RemoteOperationResult result = null;
         File temporalFile = null;
@@ -561,14 +568,18 @@ public class UploadFileOperation extends SyncOperation {
                                                                         mFile.getEtagInConflict(),
                                                                         timeStamp,
                                                                         onWifiConnection,
-                                                                        token);
+                                                                        token,
+                                                                        mDisableRetries
+                );
             } else {
                 mUploadOperation = new UploadFileRemoteOperation(encryptedTempFile.getAbsolutePath(),
                                                                  mFile.getParentRemotePath() + encryptedFileName,
                                                                  mFile.getMimeType(),
                                                                  mFile.getEtagInConflict(),
                                                                  timeStamp,
-                                                                 token);
+                                                                 token,
+                                                                 mDisableRetries
+                );
             }
 
             for (OnDatatransferProgressListener mDataTransferListener : mDataTransferListeners) {
@@ -796,13 +807,15 @@ public class UploadFileOperation extends SyncOperation {
                                                                         mFile.getMimeType(),
                                                                         mFile.getEtagInConflict(),
                                                                         timeStamp,
-                                                                        onWifiConnection);
+                                                                        onWifiConnection,
+                                                                        mDisableRetries);
             } else {
                 mUploadOperation = new UploadFileRemoteOperation(mFile.getStoragePath(),
                                                                  mFile.getRemotePath(),
                                                                  mFile.getMimeType(),
                                                                  mFile.getEtagInConflict(),
-                                                                 timeStamp);
+                                                                 timeStamp,
+                                                                 mDisableRetries);
             }
 
             for (OnDatatransferProgressListener mDataTransferListener : mDataTransferListeners) {
@@ -1286,6 +1299,10 @@ public class UploadFileOperation extends SyncOperation {
         OCFile file = mFile;
         if (file.fileExists()) {
             file = getStorageManager().getFileById(file.getFileId());
+        }
+        if (file == null) {
+            // this can happen e.g. when the file gets deleted during upload
+            return;
         }
         long syncDate = System.currentTimeMillis();
         file.setLastSyncDateForData(syncDate);

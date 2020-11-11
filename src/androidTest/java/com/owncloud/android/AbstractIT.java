@@ -1,5 +1,6 @@
 package com.owncloud.android;
 
+import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AuthenticatorException;
@@ -7,8 +8,12 @@ import android.accounts.OperationCanceledException;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.View;
 
 import com.facebook.testing.screenshot.Screenshot;
+import com.facebook.testing.screenshot.internal.TestNameDetector;
 import com.nextcloud.client.account.User;
 import com.nextcloud.client.account.UserAccountManager;
 import com.nextcloud.client.account.UserAccountManagerImpl;
@@ -16,6 +21,8 @@ import com.nextcloud.client.device.BatteryStatus;
 import com.nextcloud.client.device.PowerManagementService;
 import com.nextcloud.client.network.Connectivity;
 import com.nextcloud.client.network.ConnectivityService;
+import com.nextcloud.client.preferences.AppPreferencesImpl;
+import com.nextcloud.client.preferences.DarkMode;
 import com.nextcloud.java.util.Optional;
 import com.owncloud.android.datamodel.FileDataStorageManager;
 import com.owncloud.android.datamodel.OCFile;
@@ -26,6 +33,7 @@ import com.owncloud.android.lib.common.OwnCloudClient;
 import com.owncloud.android.lib.common.OwnCloudClientFactory;
 import com.owncloud.android.lib.common.accounts.AccountUtils;
 import com.owncloud.android.lib.common.operations.RemoteOperationResult;
+import com.owncloud.android.lib.resources.status.OCCapability;
 import com.owncloud.android.operations.CreateFolderOperation;
 import com.owncloud.android.operations.UploadFileOperation;
 import com.owncloud.android.utils.FileStorageUtils;
@@ -34,23 +42,28 @@ import junit.framework.TestCase;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Objects;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.DialogFragment;
 import androidx.test.espresso.contrib.DrawerActions;
 import androidx.test.espresso.intent.rule.IntentsTestRule;
 import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.rule.GrantPermissionRule;
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
 import androidx.test.runner.lifecycle.Stage;
 
 import static androidx.test.InstrumentationRegistry.getInstrumentation;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static com.owncloud.android.lib.common.accounts.AccountUtils.Constants.KEY_USER_ID;
 import static org.junit.Assert.assertTrue;
 
 
@@ -59,12 +72,16 @@ import static org.junit.Assert.assertTrue;
  */
 
 public abstract class AbstractIT {
-    //@Rule public RetryTestRule retryTestRule = new RetryTestRule();
+    @Rule
+    public final GrantPermissionRule permissionRule = GrantPermissionRule.grant(
+        Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
     protected static OwnCloudClient client;
     protected static Account account;
     protected static User user;
     protected static Context targetContext;
+    protected static String DARK_MODE = "";
+    protected static String COLOR = "";
 
     protected Activity currentActivity;
 
@@ -79,13 +96,15 @@ public abstract class AbstractIT {
             AccountManager platformAccountManager = AccountManager.get(targetContext);
 
             for (Account account : platformAccountManager.getAccounts()) {
-                platformAccountManager.removeAccountExplicitly(account);
+                if (account.type.equalsIgnoreCase("nextcloud")) {
+                    platformAccountManager.removeAccountExplicitly(account);
+                }
             }
 
             Account temp = new Account("test@https://server.com", MainApp.getAccountType(targetContext));
             platformAccountManager.addAccountExplicitly(temp, "password", null);
             platformAccountManager.setUserData(temp, AccountUtils.Constants.KEY_OC_BASE_URL, "https://server.com");
-            platformAccountManager.setUserData(temp, AccountUtils.Constants.KEY_USER_ID, "test");
+            platformAccountManager.setUserData(temp, KEY_USER_ID, "test");
 
             final UserAccountManager userAccountManager = UserAccountManagerImpl.fromContext(targetContext);
             account = userAccountManager.getAccountByName("test@https://server.com");
@@ -106,6 +125,63 @@ public abstract class AbstractIT {
             e.printStackTrace();
         } catch (AccountUtils.AccountNotFoundException e) {
             e.printStackTrace();
+        }
+
+        Bundle arguments = androidx.test.platform.app.InstrumentationRegistry.getArguments();
+
+        // color
+        String colorParameter = arguments.getString("COLOR");
+        if (!TextUtils.isEmpty(colorParameter)) {
+            FileDataStorageManager fileDataStorageManager = new FileDataStorageManager(account,
+                                                                                       targetContext.getContentResolver());
+
+            String colorHex = null;
+            COLOR = colorParameter;
+            switch (colorParameter) {
+                case "red":
+                    colorHex = "#7c0000";
+                    break;
+
+                case "green":
+                    colorHex = "#00ff00";
+                    break;
+
+                case "white":
+                    colorHex = "#ffffff";
+                    break;
+
+                case "black":
+                    colorHex = "#000000";
+                    break;
+
+                default:
+                    break;
+            }
+
+            if (colorHex != null) {
+                OCCapability capability = fileDataStorageManager.getCapability(account.name);
+                capability.setServerColor(colorHex);
+                fileDataStorageManager.saveCapabilities(capability);
+            }
+        }
+
+        // dark / light
+        String darkModeParameter = arguments.getString("DARKMODE");
+
+        if (darkModeParameter != null) {
+            if (darkModeParameter.equalsIgnoreCase("dark")) {
+                DARK_MODE = "dark";
+                AppPreferencesImpl.fromContext(targetContext).setDarkThemeMode(DarkMode.DARK);
+                MainApp.setAppTheme(DarkMode.DARK);
+            } else {
+                DARK_MODE = "light";
+            }
+        }
+
+        if (DARK_MODE.equalsIgnoreCase("light") && COLOR.equalsIgnoreCase("blue")) {
+            // use already existing names
+            DARK_MODE = "";
+            COLOR = "";
         }
     }
 
@@ -131,9 +207,12 @@ public abstract class AbstractIT {
     }
 
     protected static File getDummyFile(String name) throws IOException {
-        File file = new File(FileStorageUtils.getTemporalPath(account.name) + File.pathSeparator + name);
+        File file = new File(FileStorageUtils.getTemporalPath(account.name) + File.separator + name);
 
         if (file.exists()) {
+            return file;
+        } else if (name.endsWith("/")) {
+            file.mkdirs();
             return file;
         } else {
             switch (name) {
@@ -153,12 +232,11 @@ public abstract class AbstractIT {
     }
 
     public static File createFile(String name, int iteration) throws IOException {
-        File tempPath = new File(FileStorageUtils.getTemporalPath(account.name));
-        if (!tempPath.exists()) {
-            assertTrue(tempPath.mkdirs());
+        File file = new File(FileStorageUtils.getTemporalPath(account.name) + File.separator + name);
+        if (!file.getParentFile().exists()) {
+            assertTrue(file.getParentFile().mkdirs());
         }
 
-        File file = new File(FileStorageUtils.getTemporalPath(account.name) + File.separator + name);
         file.createNewFile();
 
         FileWriter writer = new FileWriter(file);
@@ -193,7 +271,7 @@ public abstract class AbstractIT {
 
         waitForIdleSync();
 
-        Screenshot.snapActivity(sut).record();
+        screenshot(sut);
     }
 
     protected Activity getCurrentActivity() {
@@ -292,7 +370,45 @@ public abstract class AbstractIT {
         assertTrue(result.getLogMessage(), result.isSuccess());
     }
 
+    protected void screenshot(View view) {
+        screenshot(view, "");
+    }
+
+    protected void screenshot(View view, String prefix) {
+        Screenshot.snap(view).setName(createName(prefix)).record();
+    }
+
     protected void screenshot(Activity sut) {
-        Screenshot.snapActivity(sut).record();
+        Screenshot.snapActivity(sut).setName(createName()).record();
+    }
+
+    protected void screenshot(DialogFragment dialogFragment, String prefix) {
+        screenshot(Objects.requireNonNull(dialogFragment.requireDialog().getWindow()).getDecorView(), prefix);
+    }
+
+    private String createName() {
+        return createName("");
+    }
+
+    private String createName(String prefix) {
+        String name = TestNameDetector.getTestClass() + "_" + TestNameDetector.getTestName();
+
+        if (!TextUtils.isEmpty(prefix)) {
+            name = name + "_" + prefix;
+        }
+
+        if (!DARK_MODE.isEmpty()) {
+            name = name + "_" + DARK_MODE;
+        }
+
+        if (!COLOR.isEmpty()) {
+            name = name + "_" + COLOR;
+        }
+
+        return name;
+    }
+
+    public static String getUserId(User user) {
+        return AccountManager.get(targetContext).getUserData(user.toPlatformAccount(), KEY_USER_ID);
     }
 }

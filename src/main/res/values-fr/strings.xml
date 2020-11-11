@@ -505,6 +505,7 @@ Attention la suppression est irréversible.</string>
     <string name="prefs_calendar_contacts">Synchroniser les contacts &amp; l\'agenda</string>
     <string name="prefs_calendar_contacts_address_resolve_error">L\'adresse du serveur pour le compte n\'a pas pu être résolu pour DAVx5 (autrefois connu comme DAVdroid)</string>
     <string name="prefs_calendar_contacts_no_store_error">Ni Google Play Store ou F-Droid ne sont installés</string>
+    <string name="prefs_calendar_contacts_summary">Configurer DAVx5 (autrefois connu comme DAVdroid) (v1.3.0+) pour le compte actuel</string>
     <string name="prefs_calendar_contacts_sync_setup_successful">Synchronisation de l\'agenda &amp; des contacts configurée</string>
     <string name="prefs_category_about">À propos</string>
     <string name="prefs_category_details">Préférences</string>
@@ -583,6 +584,7 @@ Attention la suppression est irréversible.</string>
     <string name="screenshot_05_autoUpload_heading">Téléversement automatique</string>
     <string name="screenshot_05_autoUpload_subline">pour vos photos &amp; vidéos</string>
     <string name="screenshot_06_davdroid_heading">Agenda &amp; Contacts</string>
+    <string name="screenshot_06_davdroid_subline">Synchroniser avec DAVx5</string>
     <string name="select_all">Tout sélectionner</string>
     <string name="select_template">Sélectionnez un modèle</string>
     <string name="send">Envoyer</string>
