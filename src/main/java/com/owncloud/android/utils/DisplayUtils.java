@@ -455,7 +455,7 @@ public final class DisplayUtils {
                 com.owncloud.android.lib.common.accounts.AccountUtils.Constants.KEY_USER_ID);
 
         // kDrive
-        setAvatar(user, userId,user.getAccountName(), listener, avatarRadius, resources, callContext, context);
+        setAvatar(user, userId, user.getAccountName(), listener, avatarRadius, resources, callContext, context);
     }
 
     /**

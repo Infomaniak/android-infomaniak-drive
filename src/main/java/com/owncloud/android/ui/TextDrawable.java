@@ -102,7 +102,7 @@ public class TextDrawable extends Drawable {
     @NonNull
     @NextcloudServer(max = 12)
     public static TextDrawable createAvatar(Account account, float radiusInDp) {
-        String username = UserAccountManager.getDisplayName(account);
+        String username = UserAccountManager.getUsername(account); //kDrive
         return createNamedAvatar(username, radiusInDp);
     }
 
