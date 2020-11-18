@@ -1,4 +1,4 @@
-## 3.14.0 RC2 (November, 09, 2020)
+## 3.14.0 (November, 18, 2020)
 
 Prevent Firebase crashes: Exodus will warn about tracker, but code wise it is disabled
 Status support
