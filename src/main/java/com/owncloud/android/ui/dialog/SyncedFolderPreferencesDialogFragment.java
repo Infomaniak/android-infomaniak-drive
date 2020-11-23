@@ -549,6 +549,7 @@ public class SyncedFolderPreferencesDialogFragment extends DialogFragment {
         @Override
         public void onClick(View v) {
             dismiss();
+            mSyncedFolder.setExisting(false); // kSync
             ((OnSyncedFolderPreferenceListener) getActivity()).onSaveSyncedFolderPreference(mSyncedFolder);
         }
     }
